@@ -1,42 +1,36 @@
 package mp.verif_ai.presentation.signup
 
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mp.verif_ai.R
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontVariation.width
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import mp.verif_ai.presentation.onboarding.onboarding
 
-object Variables {
-    val spacing0: Dp = 1.dp
 
-}
 
 @Composable
 fun signup(){
@@ -119,36 +113,16 @@ fun signup(){
                         .height(52.dp)
                         .background(color = Color(0xFF565E6D), shape = RoundedCornerShape(size = 10.dp))
                         .padding(start = 61.dp, top = 2.dp, end = 61.dp, bottom = 2.dp)
-                ) {
-                    Column(//apple
-                        verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.Top),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier
-                            .width(24.dp)
-                            .height(23.8307.dp)
-                            .padding(start = 4.dp, top = 2.dp, end = 4.dp, bottom = 2.dp)
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.vector),
-                            contentDescription = "image description",
-                            contentScale = ContentScale.None,
-                            modifier = Modifier
-                                .padding(0.85714.dp)
-                                .width(3.51454.dp)
-                                .height(4.08372.dp)
-                                .background(color = Color(0xFFFFFFFF))
-                        )
-                        Image(
-                            painter = painterResource(id = R.drawable.vector__1_),
-                            contentDescription = "image description",
-                            contentScale = ContentScale.None,
-                            modifier = Modifier
-                                .border(width = 2.05714.dp, color = Color(0xFFFFFFFF))
-                                .padding(2.05714.dp)
-                                .width(15.42879.dp)
-                                .height(13.74698.dp)
-                        )
-                    }
+                ) {Image(
+                    painter = painterResource(id = R.drawable.apple),
+                    contentDescription = "image description",
+                    contentScale = ContentScale.None,
+                    modifier = Modifier
+                        .padding(1.dp)
+                        .width(24.dp)
+                        .height(24.dp)
+                )
+
                     Row(//frame4
                         horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
                         verticalAlignment = Alignment.CenterVertically,
@@ -161,7 +135,7 @@ fun signup(){
                             text = " Continue with apple",
                             style = TextStyle(
                                 fontSize = 18.sp,
-                                lineHeight = 28.sp,
+                                lineHeight = 2.sp,
                                 //fontFamily = FontFamily(Font(R.font.inter)),
                                 fontWeight = FontWeight(400),
                                 color = Color(0xFFFFFFFF),
@@ -188,27 +162,16 @@ fun signup(){
                         modifier = Modifier
                             .width(23.11216.dp)
                             .height(22.90355.dp)
-                            .padding(start = 2.dp, top = 5.dp, end = 2.dp, bottom = 5.dp)
+                            .padding(start = 0.dp, top = 0.dp, end = 0.dp, bottom = 0.dp)
                     ) {
                         Image(
-                            painter = painterResource(id = R.drawable.vector2),
+                            painter = painterResource(id = R.drawable.google),
                             contentDescription = "image description",
                             contentScale = ContentScale.None,
                             modifier = Modifier
-                                .padding(0.6.dp)
-                                .width(12.71216.dp)
-                                .height(12.90355.dp)
-                                .background(color = Color(0xFF565E6D))
-                        )
-                        Image(
-                            painter = painterResource(id = R.drawable.vector3),
-                            contentDescription = "image description",
-                            contentScale = ContentScale.None,
-                            modifier = Modifier
-                                .padding(0.6.dp)
-                                .width(5.4.dp)
-                                .height(5.4.dp)
-                                .background(color = Color(0xFF565E6D))
+                                .padding(1.dp)
+                                .width(19.11216.dp)
+                                .height(14.90355.dp)
                         )
                     }
                     Row(

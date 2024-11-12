@@ -31,6 +31,8 @@ import androidx.compose.ui.text.style.TextAlign
 
 object Variables {
     val spacing0: Dp = 1.dp
+    val spacingSmall: Dp = 8.dp
+    val spacingMedium: Dp = 12.dp
 }
 
 @Composable
