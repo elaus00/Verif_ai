@@ -12,8 +12,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
@@ -30,7 +28,7 @@ import androidx.compose.ui.res.painterResource
 
 
 @Composable
-fun expertCertificate() {
+fun ExpertCertificateScreen() {
     Column(//expert certificate
         verticalArrangement = Arrangement.spacedBy(185.dp, Alignment.Top),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -169,6 +167,6 @@ fun expertCertificate() {
 
 @Preview
 @Composable
-fun expertCertificatePreview() {
-    expertCertificate()
+fun ExpertCertificateScreenPreview() {
+    ExpertCertificateScreen()
 }
