@@ -52,6 +52,11 @@ private fun NavGraphBuilder.authNavigation(navController: NavHostController) {
                 },
                 onNavigateToSignUp = {
                     navController.navigate(Screen.Auth.SignUp.route)
+                },
+                onNavigateToMain = {
+                    navController.navigate(Screen.MainNav.Home.route) {
+                        popUpTo(Screen.Auth.route) { inclusive = true }
+                    }
                 }
             )
         }
@@ -90,8 +95,21 @@ private fun NavGraphBuilder.mainNavigation(navController: NavHostController) {
         // Home
         composable(Screen.MainNav.Home.route) {
             HomeScreen(
+                navController = navController,
                 onQuestionClick = { questionId ->
                     navController.navigate(Screen.MainNav.Question.Detail.createRoute(questionId))
+                },
+                onCreateQuestion = {
+                    navController.navigate(Screen.MainNav.Question.Create.route)
+                },
+                onSeeMoreQuestions = {
+                    TODO()
+                },
+                onSeeMoreConversations = {
+                    TODO()
+                },
+                onSeeMoreTrending = {
+                    TODO()
                 }
             )
         }

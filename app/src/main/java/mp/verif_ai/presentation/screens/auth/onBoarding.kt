@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 fun OnBoardingScreen(
     onNavigateToSignIn: () -> Unit,
     onNavigateToSignUp: () -> Unit,
+    onNavigateToMain: () -> Unit,  // 추가
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -26,7 +27,9 @@ fun OnBoardingScreen(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.weight(1f).fillMaxWidth()
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
                 .wrapContentHeight(Alignment.CenterVertically)
         ) {
             Text(
@@ -60,6 +63,20 @@ fun OnBoardingScreen(
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text("로그인")
+            }
+
+            // 테스트용 버튼
+            TextButton(
+                onClick = onNavigateToMain,
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                )
+            ) {
+                Text(
+                    text = "[TEST] 메인 화면으로 바로가기",
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
         }
     }
