@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "mp.verif_ai"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "mp.verif_ai"
