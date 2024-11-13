@@ -59,23 +59,13 @@ private fun NavGraphBuilder.authNavigation(navController: NavHostController) {
         composable(Screen.Auth.SignIn.route) {
             SignInScreen(
                 modifier = Modifier,
-                onSignInSuccess = { navController.navigateToMain() },
-                onSignUpClick = { navController.navigate(Screen.Auth.SignUp.route) }
+                navController = navController
             )
         }
         composable(Screen.Auth.SignUp.route) {
             SignUpScreen(
                 modifier = Modifier,
-                navController = navController,
-                onSignUpSuccess = { email ->
-                    navController.navigate(Screen.Auth.Verification.createRoute(email.toString()))
-                },
-                onNavigateBack = {
-                    navController.navigate(Screen.Auth.OnBoarding.route) {
-                        // OnBoarding 화면으로 이동하면서 백스택에서 SignUp 화면 제거
-                        popUpTo(Screen.Auth.SignUp.route) { inclusive = true }
-                    }
-                }
+                navController = navController
             )
         }
         composable(
