@@ -4,11 +4,12 @@ plugins {
     id("kotlin-kapt")
     id("com.google.relay") version "0.3.12"
     alias(libs.plugins.hilt)
+    id("com.google.gms.google-services")
 }
 
 android {
     namespace = "mp.verif_ai"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "mp.verif_ai"
@@ -79,6 +80,7 @@ dependencies {
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.firebase.functions.ktx)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.benchmark.common)
     testImplementation(libs.kotlinx.coroutines)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -112,4 +114,16 @@ dependencies {
 
     // WorkManager
     implementation(libs.androidx.work.runtime.ktx)
+
+    // Firebase BOM
+    implementation(platform(libs.firebase.bom.v3270))
+
+    // Firebase 의존성들
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.firestore.ktx)
+    implementation(libs.firebase.functions.ktx)
+
+    // Google Play Services
+    implementation(libs.gms.play.services.auth)
+    implementation(libs.gms.play.services.safetynet)
 }

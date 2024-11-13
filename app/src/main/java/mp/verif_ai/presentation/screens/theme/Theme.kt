@@ -1,4 +1,4 @@
-package mp.verif_ai.presentation.theme
+package mp.verif_ai.presentation.screens.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme

@@ -1,4 +1,4 @@
-package mp.verif_ai.presentation.theme
+package mp.verif_ai.presentation.screens.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
