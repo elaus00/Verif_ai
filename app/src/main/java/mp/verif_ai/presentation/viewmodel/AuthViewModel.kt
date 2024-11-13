@@ -16,7 +16,6 @@ import mp.verif_ai.domain.repository.AuthRepository
 import mp.verif_ai.domain.repository.UserRepository
 import mp.verif_ai.domain.usecase.auth.SignInUseCase
 import mp.verif_ai.domain.usecase.auth.SignUpUseCase
-import mp.verif_ai.presentation.viewmodel.common.UiState
 import javax.inject.Inject
 
 /**

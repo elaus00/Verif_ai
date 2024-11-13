@@ -11,7 +11,9 @@ data class Question(
     val reward: Int,
     val attachments: List<String>,
     val createdAt: Long,
-    val updatedAt: Long
+    val updatedAt: Long,
+    val author : String,
+    val formattedDate : String,
 )
 
 enum class QuestionStatus { DRAFT, PUBLISHED, CLOSED, DELETED, CONTROVERSIAL }

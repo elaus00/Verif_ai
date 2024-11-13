@@ -1,6 +1,5 @@
-package mp.verif_ai.presentation.screens.auth.login
+package mp.verif_ai.presentation.screens.auth
 
-import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -10,9 +9,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.google.android.gms.safetynet.SafetyNet
 import mp.verif_ai.presentation.viewmodel.AuthViewModel
-import mp.verif_ai.presentation.viewmodel.common.UiState
+import mp.verif_ai.presentation.viewmodel.UiState
 
 /**
  * 로그인 화면을 구성하는 Composable 함수입니다.
@@ -26,6 +24,7 @@ fun SignInScreen(
     modifier: Modifier = Modifier,
     onSignInSuccess: () -> Unit,
     viewModel: AuthViewModel = hiltViewModel(),
+    onSignUpClick: () -> Unit
 ) {
     // 이메일과 비밀번호 상태 관리
     var email by remember { mutableStateOf("") }
@@ -138,7 +137,8 @@ fun SignInScreen(
 fun SignInScreenPreview() {
     MaterialTheme {
         SignInScreen(
-            onSignInSuccess = {}
+            onSignInSuccess = {},
+            onSignUpClick = {}
         )
     }
 }
