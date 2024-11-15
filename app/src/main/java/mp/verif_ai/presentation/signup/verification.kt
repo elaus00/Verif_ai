@@ -175,8 +175,3 @@ fun Verification() {
     }
 }
 
-@Preview
-@Composable
-fun PreviewVerification(){
-    Verification()
-}

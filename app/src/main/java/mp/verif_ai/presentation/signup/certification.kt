@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.painterResource
 import mp.verif_ai.R
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.ui.text.font.FontWeight
@@ -30,12 +30,12 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 
 @Composable
-fun Signupdetail() {
+fun Certification() {
     Column(
         modifier = Modifier
             .shadow(elevation = 6.dp, spotColor = Color(0x1F120F28), ambientColor = Color(0x1F120F28))
             .width(390.dp)
-            .height(844.dp)
+            .height(844.dp) // 이게 우선  고정값 , fillmaxsize로.
             .background(color = Color(0xFFFFFFFF))
             .padding(
                 start = Variables.spacing0,
@@ -43,7 +43,7 @@ fun Signupdetail() {
                 end = Variables.spacing0,
                 bottom = Variables.spacing0
             ),
-        verticalArrangement = Arrangement.spacedBy(30.dp, Alignment.Top),
+        verticalArrangement = Arrangement.spacedBy(95.dp, Alignment.Top),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Row(
@@ -81,146 +81,61 @@ fun Signupdetail() {
             ) {
             }
         }
-
-        Text(
+        Column(//image16
+            verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.Top),
+            horizontalAlignment = Alignment.Start,
             modifier = Modifier
-                .padding(top = 80.dp)
-                .width(114.dp)
-                .height(48.dp),
-            text = "Sign up",
-            style = TextStyle(
-                fontSize = 32.sp,
-                lineHeight = 48.sp,
-                fontFamily = FontFamily(Font(R.font.archivo_regular)),
-                fontWeight = FontWeight(700),
-                color = Color(0xFF171A1F),
-                textAlign = TextAlign.Center,
+                .border(width = Variables.spacing0, color = Color(0xFFFFFFFF))
+                .width(70.dp)
+                .height(75.9429.dp)
+                .background(color = Color(0xFFFFFFFF))
+                .padding(start = Variables.spacing0, top = 4.dp, end = Variables.spacing0, bottom = 4.dp)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.group),
+                contentDescription = "image description",
+                contentScale = ContentScale.None,
+                modifier = Modifier
+                    .padding(0.dp)
+                    .width(218.93733.dp)
+                    .height(67.9429.dp)
             )
-        )
+        }
 
-        Row(
+        Column(//frame1(button)
+            verticalArrangement = Arrangement.spacedBy(126.dp, Alignment.Top),
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 20.dp) // 전체 Row를 왼쪽으로 이동
+                .width(350.dp)
+                .height(234.dp)
+                .padding(start = Variables.spacing0, top = Variables.spacing0, end = Variables.spacing0, bottom = Variables.spacing0)
         ) {
             Text(
-                modifier = Modifier
-                    .width(102.dp)
-                    .height(15.dp),
-                text = "Email",
-                style = TextStyle(
-                    fontSize = 16.sp,
-                    lineHeight = 28.sp,
-                    fontFamily = FontFamily(Font(R.font.inter_light)),
+                text = "Welcome !",
+                style = androidx.compose.ui.text.TextStyle(
+                    fontSize = 40.sp,
+                    lineHeight = 56.sp,
+                    //fontFamily = FontFamily(Font(R.font.archivo)),
                     fontWeight = FontWeight(700),
-                    color = Color(0xFF000000),
-                )
+                    color = Color(0xFF171A1F),
+                ),
+                modifier = Modifier
+                    .width(197.dp)
+                    .height(56.dp)
             )
-        }
-
-
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(0.dp, Alignment.Start),
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .border(width = 1.dp, color = Color(0x00000000), shape = RoundedCornerShape(size = 10.dp))
-                .padding(0.dp)
-                .width(349.dp)
-                .height(51.dp)
-                .background(color = Color(0xFFF3F4F6), shape = RoundedCornerShape(size = 10.dp))
-                .padding(start = 20.dp, top = 10.dp, end = 165.dp, bottom = 11.dp)
-        ) {
             Text(
                 modifier = Modifier
-                    .width(164.dp)
-                    .height(28.dp),
-                text = "abcdef@gmail.com",
+                    .offset(y = -100.dp)
+                    .width(353.dp)
+                    .height(53.dp),
+                text = "If you want to be qualified as a respondent, please authenticate the additional information",
                 style = TextStyle(
-                    fontSize = 18.sp,
-                    lineHeight = 28.sp,
-                    fontFamily = FontFamily(Font(R.font.inter_extralight)),
+                    fontSize = 14.sp,
+                    lineHeight = 26.sp,
+                    fontFamily = FontFamily(Font(R.font.inter_light)),
                     fontWeight = FontWeight(400),
                     color = Color(0xFF000000),
-                )
-            )
-        }
-
-        Text(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 20.dp),
-            text = "Password",
-            style = TextStyle(
-                fontSize = 16.sp,
-                lineHeight = 28.sp,
-                fontFamily = FontFamily(Font(R.font.inter_light)),
-                fontWeight = FontWeight(700),
-                color = Color(0xFF000000),
-            )
-        )
-
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(0.dp, Alignment.Start),
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .border(width = 1.dp, color = Color(0x00000000), shape = RoundedCornerShape(size = 10.dp))
-                .padding(0.dp)
-                .width(349.dp)
-                .height(51.dp)
-                .background(color = Color(0xFFF3F4F6), shape = RoundedCornerShape(size = 10.dp))
-                .padding(start = 20.dp, top = 12.dp, end = 153.dp, bottom = 11.dp)
-        ) {
-            Text(
-                modifier = Modifier
-                    .width(176.dp)
-                    .height(28.dp),
-                text = "Enter your Password",
-                style = TextStyle(
-                    fontSize = 18.sp,
-                    lineHeight = 28.sp,
-                    fontFamily = FontFamily(Font(R.font.inter_extralight)),
-                    fontWeight = FontWeight(400),
-                    color = Color(0xFFBCC1CA),
-                )
-            )
-        }
-
-        Text(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 20.dp),
-            text = "User Name",
-            style = TextStyle(
-                fontSize = 16.sp,
-                lineHeight = 28.sp,
-                fontFamily = FontFamily(Font(R.font.inter_light)),
-                fontWeight = FontWeight(700),
-                color = Color(0xFF000000),
-            )
-        )
-
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(0.dp, Alignment.Start),
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .border(width = 1.dp, color = Color(0x00000000), shape = RoundedCornerShape(size = 10.dp))
-                .padding(0.dp)
-                .width(349.dp)
-                .height(51.dp)
-                .background(color = Color(0xFFF3F4F6), shape = RoundedCornerShape(size = 10.dp))
-                .padding(start = 20.dp, top = 12.dp, end = 141.dp, bottom = 11.dp)
-        ) {
-            Text(
-                modifier = Modifier
-                    .width(188.dp)
-                    .height(28.dp),
-                text = "Enter your User Name",
-                style = TextStyle(
-                    fontSize = 18.sp,
-                    lineHeight = 28.sp,
-                    fontFamily = FontFamily(Font(R.font.inter_extralight)),
-                    fontWeight = FontWeight(400),
-                    color = Color(0xFFBCC1CA),
+                    textAlign = TextAlign.Center,
                 )
             )
         }
@@ -229,17 +144,18 @@ fun Signupdetail() {
             horizontalArrangement = Arrangement.spacedBy(0.dp, Alignment.CenterHorizontally),
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
+                .offset(y = -40.dp)
                 .border(width = 1.dp, color = Color(0x00000000), shape = RoundedCornerShape(size = 10.dp))
                 .width(350.dp)
                 .height(52.dp)
                 .background(color = Color(0xFF2A5AB3), shape = RoundedCornerShape(size = 10.dp))
-                .padding(top = 12.dp, bottom = 12.dp)
+                .padding(start = 92.dp, top = 12.dp, end = 92.dp, bottom = 12.dp)
         ) {
             Text(
                 modifier = Modifier
-                    .width(67.dp)
+                    .width(166.dp)
                     .height(28.dp),
-                text = "Sign Up",
+                text = "Expert Certification",
                 style = TextStyle(
                     fontSize = 18.sp,
                     lineHeight = 28.sp,
@@ -250,5 +166,37 @@ fun Signupdetail() {
             )
         }
 
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(0.dp, Alignment.CenterHorizontally),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .offset(y = -100.dp)
+                .border(width = 1.dp, color = Color(0x00000000), shape = RoundedCornerShape(size = 10.dp))
+                .width(350.dp)
+                .height(52.dp)
+                .background(color = Color(0xFF2A5AB3), shape = RoundedCornerShape(size = 10.dp))
+                .padding(start = 86.dp, top = 12.dp, end = 86.dp, bottom = 12.dp)
+        ) {
+            Text(
+                modifier = Modifier
+                    .width(178.dp)
+                    .height(28.dp),
+                text = "Start as a questioner",
+                style = TextStyle(
+                    fontSize = 18.sp,
+                    lineHeight = 28.sp,
+                    fontFamily = FontFamily(Font(R.font.inter_light)),
+                    fontWeight = FontWeight(400),
+                    color = Color(0xFFFFFFFF),
+                )
+            )
+        }
     }
 }
+
+//@Preview
+//@Composable
+//fun PreviewCertification(){
+//    Certification()
+//}
+

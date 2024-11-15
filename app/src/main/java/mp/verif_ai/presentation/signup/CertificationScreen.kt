@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import mp.verif_ai.presentation.theme.OnBoardingButton
 import mp.verif_ai.presentation.theme.customTypography
 
@@ -33,7 +34,7 @@ fun CertificationScreen() {
             modifier = Modifier.weight(1f),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            GroupImage()
+            GroupImage(R.drawable.group)
             Spacer(modifier = Modifier.height(48.dp))
             WelcomeText()
         }
@@ -51,9 +52,9 @@ fun CertificationScreen() {
 }
 
 @Composable
-fun GroupImage() {
+fun GroupImage(imageResId: Int) {
     Image(
-        painter = painterResource(id = R.drawable.group),
+        painter = painterResource(id = imageResId),
         contentDescription = "group image",
         contentScale = ContentScale.None,
         modifier = Modifier
@@ -61,29 +62,35 @@ fun GroupImage() {
     )
 }
 
+
 @Composable
-fun WelcomeText() {
+fun WelcomeText(
+    mainText: String = "Welcome !",
+    subText: String = "If you want to be qualified as a respondent, please authenticate the additional information"
+) {
     Column(
         verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.Top),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Welcome !",
+            text = mainText,
             style = TextStyle(
                 fontSize = 40.sp,
                 lineHeight = 56.sp,
                 fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
                 color = Color(0xFF171A1F),
             ),
-            modifier = Modifier.width(197.dp)
+            modifier = Modifier.width(290.dp)
         )
         Text(
-            text = "If you want to be qualified as a respondent, please authenticate the additional information",
+            text = subText,
             style = customTypography.subWelcome,
-            modifier = Modifier.width(353.dp)
+            modifier = Modifier.width(350.dp)
         )
     }
 }
+
 
 @Preview
 @Composable
