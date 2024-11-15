@@ -8,7 +8,15 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
+import mp.verif_ai.R
 
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
@@ -31,6 +39,27 @@ private val LightColorScheme = lightColorScheme(
     onSurface = Color(0xFF1C1B1F),
     */
 )
+
+class customTypography {
+    companion object {
+        val subWelcome = TextStyle(
+            fontSize = 14.sp,
+            lineHeight = 26.sp,
+            fontFamily = FontFamily(Font(R.font.inter_light)),
+            fontWeight = FontWeight(400),
+            color = Color(0xFF000000),
+            textAlign = TextAlign.Center,
+        )
+        val certificationButton = TextStyle(
+            fontSize = 18.sp,
+            lineHeight = 28.sp,
+            fontFamily = FontFamily(Font(R.font.inter_light)),
+            fontWeight = FontWeight.Normal,
+            color = Color.White,
+        )
+    }
+}
+
 
 @Composable
 fun Verif_aiTheme(
