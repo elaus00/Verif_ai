@@ -1,7 +1,6 @@
 package mp.verif_ai.domain.repository
 
-import mp.verif_ai.domain.model.User
-import kotlinx.coroutines.flow.Flow
+import mp.verif_ai.domain.model.auth.User
 
 /**
  * 사용자 인증 관련 작업을 처리하는 Repository 인터페이스입니다.
@@ -43,4 +42,18 @@ interface AuthRepository {
      * @param email 비밀번호를 재설정할 이메일 주소
      */
     suspend fun resetPassword(email: String): Result<Unit>
+    /**
+     * 인증 이메일을 발송합니다.
+     */
+    suspend fun sendVerificationEmail(email: String): Result<Unit>
+
+    /**
+     * 이메일 인증 코드를 확인합니다.
+     */
+    suspend fun verifyEmailCode(code: String): Result<Unit>
+
+    /**
+     * 이메일 인증 상태를 확인합니다.
+     */
+    suspend fun isEmailVerified(): Boolean
 }

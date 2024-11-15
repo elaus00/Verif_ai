@@ -1,7 +1,7 @@
 package mp.verif_ai.domain.repository
 
-import mp.verif_ai.domain.model.ExpertProfile
-import mp.verif_ai.domain.model.User
+import mp.verif_ai.domain.model.auth.ExpertProfile
+import mp.verif_ai.domain.model.auth.User
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -42,4 +42,15 @@ interface UserRepository {
      * @param profile 생성할 전문가 프로필 정보
      */
     suspend fun createExpertProfile(userId: String, profile: ExpertProfile): Result<ExpertProfile>
+
+    /**
+     * 전문가 정보를 업데이트합니다.
+     */
+    suspend fun updateExpertInfo(userId: String, expertInfo: Map<String, Any>): Result<User>
+
+    /**
+     * 사용자의 전문가 상태를 확인합니다.
+     */
+    suspend fun isExpertUser(userId: String): Boolean
+
 }

@@ -10,16 +10,20 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
 import mp.verif_ai.presentation.screens.Screen
+import mp.verif_ai.presentation.screens.auth.EmailVerificationScreen
+import mp.verif_ai.presentation.screens.auth.ExpertOnboardingScreen
+import mp.verif_ai.presentation.screens.auth.ExpertSubmitScreen
+import mp.verif_ai.presentation.screens.auth.ExpertVerificationScreen
 import mp.verif_ai.presentation.screens.auth.OnBoardingScreen
-import mp.verif_ai.presentation.screens.auth.VerificationScreen
 import mp.verif_ai.presentation.screens.auth.SignInScreen
+import mp.verif_ai.presentation.screens.auth.SignUpFormScreen
 import mp.verif_ai.presentation.screens.auth.SignUpScreen
 import mp.verif_ai.presentation.screens.home.HomeScreen
 import mp.verif_ai.presentation.screens.home.question.QuestionDetailScreen
 import mp.verif_ai.presentation.screens.inbox.InboxQuestionDetailScreen
 import mp.verif_ai.presentation.screens.inbox.InboxScreen
 import mp.verif_ai.presentation.screens.question.QuestionCreateScreen
-import mp.verif_ai.presentation.screens.settings.SettingsScreen
+import mp.verif_ai.presentation.screens.settings.*
 import mp.verif_ai.presentation.screens.settings.notification.NotificationSettingsScreen
 import mp.verif_ai.presentation.screens.settings.payment.PaymentMethodsScreen
 import mp.verif_ai.presentation.screens.settings.payment.SubscriptionScreen
@@ -45,52 +49,103 @@ private fun NavGraphBuilder.authNavigation(navController: NavHostController) {
         startDestination = Screen.Auth.OnBoarding.route,
         route = Screen.Auth.route
     ) {
+        // OnBoarding
         composable(Screen.Auth.OnBoarding.route) {
             OnBoardingScreen(
-                onNavigateToSignIn = {
-                    navController.navigate(Screen.Auth.SignIn.route)
-                },
-                onNavigateToSignUp = {
-                    navController.navigate(Screen.Auth.SignUp.route)
-                },
-                onNavigateToMain = {
-                    navController.navigate(Screen.MainNav.Home.route) {
-                        popUpTo(Screen.Auth.route) { inclusive = true }
-                    }
-                }
+                navController = navController,
             )
         }
 
+        // Sign In
         composable(Screen.Auth.SignIn.route) {
             SignInScreen(
                 modifier = Modifier,
                 navController = navController
             )
         }
+
+        // Sign Up Flow
         composable(Screen.Auth.SignUp.route) {
             SignUpScreen(
                 modifier = Modifier,
+                onContinue = {
+                    navController.navigate(Screen.Auth.SignUpDetail.route)
+                }
+            )
+        }
+
+        composable(Screen.Auth.SignUpDetail.route) {
+            SignUpFormScreen(
+                onSignUpComplete = { email ->
+                    navController.navigate(Screen.Auth.Verification.createRoute(email))
+                }
+            )
+        }
+
+        composable(
+            route = Screen.Auth.Verification.route,
+            arguments = listOf(
+                navArgument(Screen.ARG_EMAIL) {
+                    type = NavType.StringType
+                    nullable = true
+                }
+            )
+        ) {
+            EmailVerificationScreen(
+                email = it.arguments?.getString(Screen.ARG_EMAIL),
+                onVerificationComplete = { userId ->
+                    navController.navigate(Screen.Auth.CertificationOnBoarding.createRoute(userId.toString())) {
+                        popUpTo(Screen.Auth.SignUp.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        // Expert Certification Flow
+        composable(
+            route = Screen.Auth.CertificationOnBoarding.route,
+            arguments = listOf(
+                navArgument(Screen.ARG_USER_ID) {
+                    type = NavType.StringType
+                }
+            )
+        ) {
+            ExpertOnboardingScreen(navController)
+        }
+
+        composable(
+            route = Screen.Auth.ExpertCertification.route,
+            arguments = listOf(
+                navArgument(Screen.ARG_USER_ID) {
+                    type = NavType.StringType
+                }
+            )
+        ) {
+            ExpertVerificationScreen(
+                userId = it.arguments?.getString(Screen.ARG_USER_ID) ?: "",
                 navController = navController
             )
         }
+
         composable(
-            route = Screen.Auth.Verification.route,
-            arguments = listOf(navArgument(Screen.ARG_EMAIL) { type = NavType.StringType })
-        ) { backStackEntry ->
-            val email = backStackEntry.arguments?.getString(Screen.ARG_EMAIL)
-            VerificationScreen(
-                email = email,
-                onVerified = { navController.navigateToMain() }
+            route = Screen.Auth.ExpertSubmit.route,
+            arguments = listOf(
+                navArgument(Screen.ARG_USER_ID) {
+                    type = NavType.StringType
+                }
+            )
+        ) {
+            ExpertSubmitScreen(
+                userId = it.arguments?.getString(Screen.ARG_USER_ID) ?: ""
             )
         }
     }
 }
 
-
 private fun NavGraphBuilder.mainNavigation(navController: NavHostController) {
     navigation(
         startDestination = Screen.MainNav.Home.route,
-        route = "main_graph"
+        route = Screen.MainNav.route
     ) {
         // Home
         composable(Screen.MainNav.Home.route) {
@@ -103,13 +158,13 @@ private fun NavGraphBuilder.mainNavigation(navController: NavHostController) {
                     navController.navigate(Screen.MainNav.Question.Create.route)
                 },
                 onSeeMoreQuestions = {
-                    TODO()
+                    // Implement see more questions navigation
                 },
                 onSeeMoreConversations = {
-                    TODO()
+                    // Implement see more conversations navigation
                 },
                 onSeeMoreTrending = {
-                    TODO()
+                    // Implement see more trending navigation
                 }
             )
         }
@@ -124,6 +179,7 @@ private fun NavGraphBuilder.mainNavigation(navController: NavHostController) {
                 }
             )
         }
+
         composable(
             route = Screen.MainNav.Question.Detail.route,
             arguments = listOf(navArgument(Screen.ARG_QUESTION_ID) { type = NavType.StringType })
@@ -141,6 +197,7 @@ private fun NavGraphBuilder.mainNavigation(navController: NavHostController) {
                 }
             )
         }
+
         composable(
             route = Screen.MainNav.Inbox.QuestionDetail.route,
             arguments = listOf(navArgument(Screen.ARG_QUESTION_ID) { type = NavType.StringType })
@@ -199,7 +256,9 @@ private fun NavGraphBuilder.settingsNavigation(navController: NavHostController)
                 onAddMethod = {
                     navController.navigate(
                         Screen.MainNav.Settings.Payment.AddMethod.createRoute(
-                            Screen.MainNav.Settings.Payment.Methods.route))
+                            Screen.MainNav.Settings.Payment.Methods.route
+                        )
+                    )
                 }
             )
         }
@@ -213,8 +272,8 @@ private fun NavGraphBuilder.settingsNavigation(navController: NavHostController)
     }
 }
 
-private fun NavHostController.navigateToMain() {
+fun NavHostController.navigateToMain() {
     navigate(Screen.MainNav.Home.route) {
-        popUpTo(Screen.Auth.route) { inclusive = true }  // "auth_graph" 대신 mp.verif_ai.presentation.screens.Screen.Auth.route 사용
+        popUpTo(Screen.Auth.route) { inclusive = true }
     }
 }

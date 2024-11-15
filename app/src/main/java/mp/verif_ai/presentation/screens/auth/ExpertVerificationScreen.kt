@@ -1,4 +1,4 @@
-package mp.verif_ai.presentation.signup
+package mp.verif_ai.presentation.screens.auth
 
 import android.app.Activity
 import android.content.Intent
@@ -11,7 +11,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.painterResource
@@ -25,16 +24,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextAlign
-import mp.verif_ai.presentation.theme.InputField
-import mp.verif_ai.presentation.theme.OnBoardingButton
-import mp.verif_ai.presentation.theme.customTypography
+import androidx.navigation.NavHostController
+import mp.verif_ai.presentation.screens.theme.OnBoardingButton
 
 @Composable
-fun ExpertCertificationScreen() {
+fun ExpertVerificationScreen(
+    navController: NavHostController,
+    userId: String
+) {
+    val verificationCode by remember { mutableStateOf("") }
+
     Column(
         modifier = Modifier
             .shadow(elevation = 6.dp, spotColor = Color(0x1F120F28))
@@ -72,7 +72,7 @@ fun ExpertCertificationScreen() {
                 .fillMaxWidth()
                 .padding(bottom = 32.dp),
         ) {
-            OnBoardingButton(text = "Submit", onClick = {})
+            OnBoardingButton(text = "Submit", onClick = {}, enabled = verificationCode.isNotEmpty())
         }
     }
 }
@@ -129,5 +129,5 @@ fun FileUploadField(
 @Preview
 @Composable
 fun PreviewExpertCertification() {
-    ExpertCertificationScreen()
+    ExpertVerificationScreen(navController = NavHostController(LocalContext.current), userId = "test")
 }

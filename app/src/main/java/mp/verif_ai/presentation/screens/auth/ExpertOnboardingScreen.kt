@@ -1,4 +1,4 @@
-package mp.verif_ai.presentation.signup
+package mp.verif_ai.presentation.screens.auth
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
@@ -13,15 +13,19 @@ import androidx.compose.ui.res.painterResource
 import mp.verif_ai.R
 import androidx.compose.foundation.Image
 import androidx.compose.material3.Text
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
-import mp.verif_ai.presentation.theme.OnBoardingButton
-import mp.verif_ai.presentation.theme.customTypography
+import androidx.navigation.NavHostController
+import mp.verif_ai.presentation.navigation.navigateToMain
+import mp.verif_ai.presentation.screens.Screen
+import mp.verif_ai.presentation.screens.theme.customTypography
+import mp.verif_ai.presentation.screens.theme.OnBoardingButton
 
 @Composable
-fun CertificationScreen() {
+fun ExpertOnboardingScreen(navController: NavHostController) {
     Column(
         modifier = Modifier
             .shadow(elevation = 6.dp, spotColor = Color(0x1F120F28))
@@ -29,7 +33,7 @@ fun CertificationScreen() {
             .padding(top = 160.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
-        ) {
+    ) {
         Column(
             modifier = Modifier.weight(1f),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -45,8 +49,18 @@ fun CertificationScreen() {
                 .fillMaxWidth()
                 .padding(bottom = 32.dp),
         ) {
-            OnBoardingButton(text = "Start as a respondent", onClick = {})
-            OnBoardingButton(text = "Start as a questioner", onClick = {})
+            OnBoardingButton(
+                text = "Start as a respondent",
+                onClick = {
+                    navController.navigate(Screen.Auth.ExpertCertification.createRoute(userId = "test"))
+                }
+            )
+            OnBoardingButton(
+                text = "Start as a questioner",
+                onClick = {
+                    navController.navigateToMain()
+                }
+            )
         }
     }
 }
@@ -95,5 +109,5 @@ fun WelcomeText(
 @Preview
 @Composable
 fun PreviewCertification() {
-    CertificationScreen()
+    ExpertOnboardingScreen(navController = NavHostController(LocalContext.current))
 }

@@ -18,20 +18,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
-import mp.verif_ai.domain.model.Conversation
-import mp.verif_ai.domain.model.Question
-import mp.verif_ai.domain.model.QuestionStatus
+import mp.verif_ai.domain.model.chat.Conversation
+import mp.verif_ai.domain.model.chat.Question
+import mp.verif_ai.domain.model.chat.QuestionStatus
 import mp.verif_ai.domain.model.TrendingQuestion
 import mp.verif_ai.presentation.navigation.AppBottomNavigation
-import mp.verif_ai.presentation.screens.Screen
 import mp.verif_ai.presentation.screens.theme.VerifAiColor
 
 @OptIn(ExperimentalMaterial3Api::class)

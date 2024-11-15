@@ -1,4 +1,4 @@
-package mp.verif_ai.presentation.onboarding
+package mp.verif_ai.presentation.screens.auth
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
@@ -9,11 +9,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mp.verif_ai.R
-import mp.verif_ai.presentation.signup.GroupImage
-import mp.verif_ai.presentation.theme.OnBoardingButton
+import mp.verif_ai.presentation.screens.Screen
 
 @Composable
-fun OnboardingScreen() {
+fun ExpertSubmitScreen(userId: String) {
     Column(
         modifier = Modifier
             .shadow(elevation = 6.dp, spotColor = Color(0x1F120F28))
@@ -26,26 +25,18 @@ fun OnboardingScreen() {
             modifier = Modifier.weight(1f),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            GroupImage(R.drawable.group)
+            GroupImage(R.drawable.check_circle)
             Spacer(modifier = Modifier.height(48.dp))
-            mp.verif_ai.presentation.signup.WelcomeText(
-                subText = "Verify your conversation\nwith ChatGPT easily!"
+            WelcomeText(
+                mainText = "Request Submitted !",
+                subText = "You will be notified via Push notification\nonce approved by the administrator."
             )
-        }
-
-        // Buttons at bottom
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 32.dp),
-        ) {
-            OnBoardingButton(text = "Get Started", onClick = {})
         }
     }
 }
 
 @Preview
 @Composable
-fun PreviewOnboarding() {
-    OnboardingScreen()
+fun PreviewExpertSubmit() {
+    ExpertSubmitScreen("test")
 }

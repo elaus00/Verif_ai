@@ -1,11 +1,11 @@
 package mp.verif_ai.domain.model.extension
 
 import com.google.firebase.firestore.DocumentSnapshot
-import mp.verif_ai.domain.model.Answer
-import mp.verif_ai.domain.model.Question
-import mp.verif_ai.domain.model.User
-import mp.verif_ai.domain.model.UserStatus
-import mp.verif_ai.domain.model.UserType
+import mp.verif_ai.domain.model.chat.Answer
+import mp.verif_ai.domain.model.chat.Question
+import mp.verif_ai.domain.model.auth.User
+import mp.verif_ai.domain.model.auth.UserStatus
+import mp.verif_ai.domain.model.auth.UserType
 
 fun User.toMap(): Map<String, Any?> = mapOf(
     "id" to id,

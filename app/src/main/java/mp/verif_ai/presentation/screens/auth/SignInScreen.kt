@@ -40,7 +40,7 @@ fun SignInScreen(
                 }
             }
             is UiState.Error -> {
-                errorMessage = (authState as UiState.Error).message
+                errorMessage = ((authState as UiState.Error).toString())
             }
             else -> { /* Loading 또는 Initial 상태 처리 필요 없음 */ }
         }

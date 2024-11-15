@@ -5,9 +5,11 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
-import mp.verif_ai.domain.model.User
-import mp.verif_ai.domain.model.UserStatus
-import mp.verif_ai.domain.model.UserType
+import mp.verif_ai.domain.model.auth.User
+import mp.verif_ai.domain.model.auth.UserStatus
+import mp.verif_ai.domain.model.auth.UserType
+import mp.verif_ai.domain.model.extension.VerificationConstants.MAX_VERIFICATION_ATTEMPTS
+import mp.verif_ai.domain.model.extension.VerificationConstants.VERIFICATION_CODE_EXPIRY
 import mp.verif_ai.domain.repository.AuthRepository
 import javax.inject.Inject
 
@@ -21,7 +23,7 @@ import javax.inject.Inject
  */
 class FirebaseAuthRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth,
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
 ) : AuthRepository {
 
     /**
@@ -29,6 +31,7 @@ class FirebaseAuthRepositoryImpl @Inject constructor(
      * 사용자의 기본 정보를 저장하고 관리하는데 사용됩니다.
      */
     private val usersCollection = firestore.collection("User")
+    private val verificationCollection = firestore.collection("EmailVerification")
 
     init {
         // reCAPTCHA 설정 - 테스트 환경에서만 사용
@@ -188,4 +191,124 @@ class FirebaseAuthRepositoryImpl @Inject constructor(
             Result.failure(e)
         }
     }
+
+    /**
+     * 이메일 인증 코드를 생성하고 전송합니다.
+     *
+     * 처리 과정:
+     * 1. 6자리 랜덤 코드 생성
+     * 2. Firestore에 인증 코드와 만료 시간 저장
+     * 3. 이메일 발송 (Firebase Cloud Functions 사용)
+     *
+     * @param email 인증 코드를 받을 이메일 주소
+     * @return 인증 코드 전송 성공 여부를 담은 Result
+     */
+    override suspend fun sendVerificationEmail(email: String): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
+            val code = generateVerificationCode()
+            val expirationTime = System.currentTimeMillis() + VERIFICATION_CODE_EXPIRY
+
+            // Firestore에 인증 정보 저장
+            verificationCollection.document(email).set(
+                hashMapOf(
+                    "code" to code,
+                    "email" to email,
+                    "expirationTime" to expirationTime,
+                    "verified" to false,
+                    "attempts" to 0
+                )
+            ).await()
+
+            // Cloud Functions를 통한 이메일 발송 (실제 구현 필요)
+            // cloudFunctions.getHttpsCallable("sendVerificationEmail")
+            //     .call(hashMapOf("email" to email, "code" to code))
+            //     .await()
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * 이메일 인증 코드를 확인합니다.
+     *
+     * 처리 과정:
+     * 1. Firestore에서 해당 이메일의 인증 정보 조회
+     * 2. 코드 일치 여부, 만료 시간, 시도 횟수 확인
+     * 3. 인증 성공 시 사용자 상태 업데이트
+     *
+     * @param code 사용자가 입력한 인증 코드
+     * @return 인증 성공 여부를 담은 Result
+     */
+    override suspend fun verifyEmailCode(code: String): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
+            val currentUser = auth.currentUser
+                ?: throw IllegalStateException("No user logged in")
+
+            val verificationDoc = verificationCollection.document(currentUser.email!!)
+                .get()
+                .await()
+
+            if (!verificationDoc.exists()) {
+                return@withContext Result.failure(IllegalStateException("인증 코드를 찾을 수 없습니다."))
+            }
+
+            val storedCode = verificationDoc.getString("code")!!
+            val expirationTime = verificationDoc.getLong("expirationTime")!!
+            val attempts = verificationDoc.getLong("attempts")!! + 1
+
+            when {
+                attempts > MAX_VERIFICATION_ATTEMPTS -> {
+                    Result.failure(IllegalStateException("인증 시도 횟수를 초과했습니다. 새로운 코드를 요청해주세요."))
+                }
+                System.currentTimeMillis() > expirationTime -> {
+                    Result.failure(IllegalStateException("인증 코드가 만료되었습니다. 새로운 코드를 요청해주세요."))
+                }
+                code != storedCode -> {
+                    // 시도 횟수 증가
+                    verificationDoc.reference.update("attempts", attempts)
+                    Result.failure(IllegalStateException("잘못된 인증 코드입니다."))
+                }
+                else -> {
+                    // 인증 성공 처리
+                    verificationDoc.reference.update(
+                        mapOf(
+                            "verified" to true,
+                            "verifiedAt" to System.currentTimeMillis()
+                        )
+                    ).await()
+
+                    // 사용자 상태 업데이트
+                    usersCollection.document(currentUser.uid)
+                        .update("emailVerified", true)
+                        .await()
+
+                    Result.success(Unit)
+                }
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * 현재 사용자의 이메일 인증 상태를 확인합니다.
+     *
+     * @return 이메일 인증 완료 여부
+     */
+    override suspend fun isEmailVerified(): Boolean = withContext(Dispatchers.IO) {
+        try {
+            val currentUser = auth.currentUser ?: return@withContext false
+            val userDoc = usersCollection.document(currentUser.uid).get().await()
+            return@withContext userDoc.getBoolean("emailVerified") ?: false
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    private fun generateVerificationCode(): String {
+        return (100000..999999).random().toString()
+    }
+
 }

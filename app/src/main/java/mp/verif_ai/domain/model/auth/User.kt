@@ -1,4 +1,4 @@
-package mp.verif_ai.domain.model
+package mp.verif_ai.domain.model.auth
 
 data class User(
     val id: String = "",
@@ -8,6 +8,7 @@ data class User(
     val type: UserType = UserType.NORMAL,
     val status: UserStatus = UserStatus.ACTIVE,
     val points: Int = 0,
+    val emailVerified: Boolean = false,
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis()
 ) {

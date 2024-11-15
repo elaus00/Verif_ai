@@ -1,113 +1,87 @@
 package mp.verif_ai.presentation.screens.auth
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import mp.verif_ai.presentation.viewmodel.AuthViewModel
-import mp.verif_ai.presentation.viewmodel.UiState
+import androidx.compose.ui.unit.sp
+import mp.verif_ai.R
+import mp.verif_ai.presentation.screens.theme.LoginButton
+import mp.verif_ai.presentation.screens.theme.OnBoardingButton
+import mp.verif_ai.presentation.theme.InputField
 
 @Composable
 fun SignUpScreen(
     modifier: Modifier = Modifier,
-    navController: NavController,
-    viewModel: AuthViewModel = hiltViewModel()
+    onContinue: (String) -> Unit
 ) {
     var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
-    var nickname by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    val passwordsMatch by remember(password, confirmPassword) {
-        derivedStateOf { password == confirmPassword }
-    }
-
-    val authState by viewModel.authState.collectAsState()
-
-    LaunchedEffect(authState) {
-        when (authState) {
-            is UiState.Success -> {
-                // 회원가입 성공 시 자동 로그인 처리 후 Main으로 이동
-                viewModel.signIn(email, password)
-                navController.navigate("main/home") {
-                    popUpTo(0) { inclusive = true }
-                }
-            }
-            is UiState.Error -> {
-                errorMessage = (authState as UiState.Error).message
-            }
-            else -> { /* Loading 또는 Initial 상태 처리 필요 없음 */ }
-        }
-    }
-
-    Box(
+    Column(
+        verticalArrangement = Arrangement.spacedBy(107.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
+            .shadow(6.dp, spotColor = Color(0x1F120F28))
             .fillMaxSize()
+            .background(Color.White)
             .padding(16.dp)
     ) {
+        Spacer(modifier = Modifier.height(40.dp))
+
         Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxWidth()
-                .align(Alignment.Center),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(16.dp)
         ) {
+            WelcomeText(
+                mainText = "Sign Up",
+                subText = "Create an account to continue"
+            )
+
+            Spacer(modifier = Modifier.height(48.dp))
+
+            // Social Login Buttons
+            LoginButton(
+                text = "Continue with Apple",
+                backgroundColor = Color(0xFF565E6D),
+                iconRes = R.drawable.apple,
+                onClick = { /* TODO: Add Apple login action */ }
+            )
+
+            Spacer(modifier = Modifier.height(15.dp))
+
+            LoginButton(
+                text = "Continue with Google",
+                backgroundColor = Color(0xFFBCC1CA),
+                iconRes = R.drawable.google,
+                textColor = Color(0xFF565E6D),
+                onClick = { /* TODO: Add Google login action */ }
+            )
+
+            Spacer(modifier = Modifier.height(15.dp))
+
             Text(
-                text = "Create Account",
-                style = MaterialTheme.typography.headlineMedium
+                text = "Or",
+                style = TextStyle(fontSize = 16.sp, color = Color(0xFF171A1F), textAlign = TextAlign.Center),
+                modifier = Modifier.padding(10.dp)
             )
 
-            OutlinedTextField(
+            InputField(
+                placeholder = "Input your email",
                 value = email,
-                onValueChange = { email = it },
-                label = { Text("Email") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                isError = errorMessage != null
-            )
-
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text("Password") },
-                visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                isError = errorMessage != null || (!passwordsMatch && confirmPassword.isNotEmpty())
-            )
-
-            OutlinedTextField(
-                value = confirmPassword,
-                onValueChange = { confirmPassword = it },
-                label = { Text("Confirm Password") },
-                visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                isError = !passwordsMatch && confirmPassword.isNotEmpty(),
-                supportingText = {
-                    if (!passwordsMatch && confirmPassword.isNotEmpty()) {
-                        Text(
-                            text = "Passwords do not match",
-                            color = MaterialTheme.colorScheme.error
-                        )
-                    }
-                }
-            )
-
-            OutlinedTextField(
-                value = nickname,
-                onValueChange = { nickname = it },
-                label = { Text("Nickname") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
+                onValueChange = {
+                    email = it
+                    errorMessage = null
+                },
                 isError = errorMessage != null
             )
 
@@ -115,48 +89,36 @@ fun SignUpScreen(
                 Text(
                     text = it,
                     color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(top = 4.dp)
                 )
             }
 
-            Button(
+            Spacer(modifier = Modifier.height(15.dp))
+
+            OnBoardingButton(
+                text = "Continue",
                 onClick = {
-                    errorMessage = null
-                    viewModel.signUp(email, password, nickname)
+                    if (email.contains("@")) {
+                        onContinue(email)
+                    } else {
+                        errorMessage = "Please enter a valid email"
+                    }
                 },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = email.isNotBlank() &&
-                        password.isNotBlank() &&
-                        nickname.isNotBlank() &&
-                        passwordsMatch &&
-                        password == confirmPassword &&
-                        authState !is UiState.Loading
-            ) {
-                if (authState is UiState.Loading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-                } else {
-                    Text("Sign Up")
-                }
-            }
-
-            TextButton(
-                onClick = { navController.navigate("auth/signin") }
-            ) {
-                Text("Already have an account? Sign In")
-            }
+                enabled = email.isNotBlank()
+            )
         }
-    }
-}
 
-@Preview(showBackground = true)
-@Composable
-fun SignUpScreenPreview() {
-    MaterialTheme {
-        SignUpScreen(
-            navController = rememberNavController()
+        Text(
+            text = "By tapping continue, you accept our Terms and\nConditions and Privacy Policy",
+            style = TextStyle(
+                fontSize = 14.sp,
+                color = Color(0xFF171A1F),
+                textAlign = TextAlign.Center
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
         )
     }
 }
