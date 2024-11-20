@@ -20,7 +20,8 @@ fun OnBoardingScreen(
     modifier: Modifier = Modifier,
     navController: NavController
 ) {
-    var verificationCode by remember { mutableStateOf("") }
+    val verificationCode by remember { mutableStateOf("") }
+    val isDebug = true
 
     Column(
         modifier = Modifier
@@ -70,7 +71,7 @@ fun OnBoardingScreen(
             )
 
             // Test Button (개발 중일 때만 표시)
-            if (BuildConfig.DEBUG) {
+            if (isDebug) {
                 TextButton(
                     onClick = { navController.navigate(Screen.MainNav.Home.route) },
                     modifier = Modifier.fillMaxWidth(),

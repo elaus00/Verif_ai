@@ -1,14 +1,17 @@
-package mp.verif_ai.data.firebase
+package mp.verif_ai.di
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.functions.FirebaseFunctions
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mp.verif_ai.data.firebase.repository.FirebaseAuthRepositoryImpl
 import mp.verif_ai.data.firebase.repository.FirebaseUserRepositoryImpl
+import mp.verif_ai.data.firebase.repository.FirebaseChatRepositoryImpl
 import mp.verif_ai.domain.repository.AuthRepository
+import mp.verif_ai.domain.repository.ChatRepository
 import mp.verif_ai.domain.repository.UserRepository
 import javax.inject.Singleton
 
@@ -38,4 +41,11 @@ object FirebaseModule {
         firestore: FirebaseFirestore,
         auth: FirebaseAuth
     ): UserRepository = FirebaseUserRepositoryImpl(firestore, auth)
+
+    @Provides
+    @Singleton
+    fun provideChatRepository(
+        functions: FirebaseFunctions,
+        firestore: FirebaseFirestore
+    ): ChatRepository = FirebaseChatRepositoryImpl(functions, firestore)
 }

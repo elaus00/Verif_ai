@@ -7,16 +7,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import mp.verif_ai.domain.model.Notification
 import mp.verif_ai.presentation.viewmodel.InboxUiState
 import mp.verif_ai.presentation.viewmodel.InboxViewModel
-import mp.verif_ai.presentation.viewmodel.NotificationItem
 import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -24,7 +21,7 @@ import java.util.Locale
 fun InboxScreen(
     modifier: Modifier = Modifier,
     viewModel: InboxViewModel = hiltViewModel(),
-    onQuestionClick: (String) -> Unit
+    onNotificationClick: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -65,7 +62,7 @@ fun InboxScreen(
                     items(notifications) { notification ->
                         InboxNotificationItem(
                             notification = notification,
-                            onClick = { onQuestionClick(notification.id) }
+                            onClick = { onNotificationClick(notification.id) }
                         )
                     }
                 }

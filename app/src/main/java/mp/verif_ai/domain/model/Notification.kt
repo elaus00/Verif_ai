@@ -16,5 +16,5 @@ enum class NotificationType {
     ANSWER,
     CHAT,
     POINT,
-    SYSTEM
+    SYSTEM,
 }

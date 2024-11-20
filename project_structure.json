@@ -1,0 +1,895 @@
+{
+  "type": "directory",
+  "name": "Verif_ai",
+  "contents": [
+    {
+      "type": "directory",
+      "name": ".vscode",
+      "contents": [
+        {
+          "type": "file",
+          "name": "settings.json"
+        }
+      ]
+    },
+    {
+      "type": "directory",
+      "name": "app",
+      "contents": [
+        {
+          "type": "directory",
+          "name": "release",
+          "contents": []
+        },
+        {
+          "type": "directory",
+          "name": "src",
+          "contents": [
+            {
+              "type": "directory",
+              "name": "androidTest",
+              "contents": [
+                {
+                  "type": "directory",
+                  "name": "java",
+                  "contents": [
+                    {
+                      "type": "directory",
+                      "name": "mp",
+                      "contents": [
+                        {
+                          "type": "directory",
+                          "name": "verif_ai",
+                          "contents": [
+                            {
+                              "type": "directory",
+                              "name": "data",
+                              "contents": [
+                                {
+                                  "type": "directory",
+                                  "name": "repository",
+                                  "contents": []
+                                }
+                              ]
+                            },
+                            {
+                              "type": "file",
+                              "name": "ExampleInstrumentedTest.kt"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "directory",
+              "name": "main",
+              "contents": [
+                {
+                  "type": "directory",
+                  "name": "java",
+                  "contents": [
+                    {
+                      "type": "directory",
+                      "name": "mp",
+                      "contents": [
+                        {
+                          "type": "directory",
+                          "name": "verif_ai",
+                          "contents": [
+                            {
+                              "type": "directory",
+                              "name": "data",
+                              "contents": [
+                                {
+                                  "type": "directory",
+                                  "name": "firebase",
+                                  "contents": [
+                                    {
+                                      "type": "directory",
+                                      "name": "repository",
+                                      "contents": [
+                                        {
+                                          "type": "file",
+                                          "name": "FirebaseAuthRepositoryImpl.kt"
+                                        },
+                                        {
+                                          "type": "file",
+                                          "name": "FirebaseChatRepositoryImpl.kt"
+                                        },
+                                        {
+                                          "type": "file",
+                                          "name": "FirebaseUserRepositoryImpl.kt"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "directory",
+                                  "name": "repository",
+                                  "contents": [
+                                    {
+                                      "type": "directory",
+                                      "name": "mock",
+                                      "contents": [
+                                        {
+                                          "type": "file",
+                                          "name": "MockRepositoryImpl.kt"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "file",
+                                      "name": "InboxRepositoryImpl.kt"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "directory",
+                              "name": "di",
+                              "contents": [
+                                {
+                                  "type": "file",
+                                  "name": "FirebaseModule.kt"
+                                },
+                                {
+                                  "type": "file",
+                                  "name": "RepositoryModule.kt"
+                                },
+                                {
+                                  "type": "file",
+                                  "name": "UseCaseModule.kt"
+                                },
+                                {
+                                  "type": "file",
+                                  "name": "ViewModelModule.kt"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "directory",
+                              "name": "domain",
+                              "contents": [
+                                {
+                                  "type": "directory",
+                                  "name": "model",
+                                  "contents": [
+                                    {
+                                      "type": "directory",
+                                      "name": "auth",
+                                      "contents": [
+                                        {
+                                          "type": "file",
+                                          "name": "EmailVerification.kt"
+                                        },
+                                        {
+                                          "type": "file",
+                                          "name": "Expert.kt"
+                                        },
+                                        {
+                                          "type": "file",
+                                          "name": "User.kt"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "directory",
+                                      "name": "chat",
+                                      "contents": [
+                                        {
+                                          "type": "file",
+                                          "name": "Answer.kt"
+                                        },
+                                        {
+                                          "type": "file",
+                                          "name": "Conversation.kt"
+                                        },
+                                        {
+                                          "type": "file",
+                                          "name": "Message.kt"
+                                        },
+                                        {
+                                          "type": "file",
+                                          "name": "Question.kt"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "directory",
+                                      "name": "extension",
+                                      "contents": [
+                                        {
+                                          "type": "file",
+                                          "name": "FirestoreDto.kt"
+                                        },
+                                        {
+                                          "type": "file",
+                                          "name": "VerificationConstants.kt"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "file",
+                                      "name": "Dispute.kt"
+                                    },
+                                    {
+                                      "type": "file",
+                                      "name": "Notification.kt"
+                                    },
+                                    {
+                                      "type": "file",
+                                      "name": "Payment.kt"
+                                    },
+                                    {
+                                      "type": "file",
+                                      "name": "Point.kt"
+                                    },
+                                    {
+                                      "type": "file",
+                                      "name": "TrendingQuestion.kt"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "directory",
+                                  "name": "repository",
+                                  "contents": [
+                                    {
+                                      "type": "file",
+                                      "name": "AuthRepository.kt"
+                                    },
+                                    {
+                                      "type": "file",
+                                      "name": "ChatRepository.kt"
+                                    },
+                                    {
+                                      "type": "file",
+                                      "name": "InboxRepository.kt"
+                                    },
+                                    {
+                                      "type": "file",
+                                      "name": "UserRepository.kt"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "directory",
+                                  "name": "usecase",
+                                  "contents": [
+                                    {
+                                      "type": "directory",
+                                      "name": "auth",
+                                      "contents": [
+                                        {
+                                          "type": "file",
+                                          "name": "SignInUseCase.kt"
+                                        },
+                                        {
+                                          "type": "file",
+                                          "name": "SignUpUseCase.kt"
+                                        },
+                                        {
+                                          "type": "file",
+                                          "name": "VerifyEmailUseCase.kt"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "directory",
+                                      "name": "payment",
+                                      "contents": []
+                                    },
+                                    {
+                                      "type": "directory",
+                                      "name": "question",
+                                      "contents": []
+                                    },
+                                    {
+                                      "type": "directory",
+                                      "name": "user",
+                                      "contents": [
+                                        {
+                                          "type": "file",
+                                          "name": "CreateUserUseCase.kt"
+                                        },
+                                        {
+                                          "type": "file",
+                                          "name": "GetUserUseCase.kt"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "directory",
+                              "name": "presentation",
+                              "contents": [
+                                {
+                                  "type": "directory",
+                                  "name": "navigation",
+                                  "contents": [
+                                    {
+                                      "type": "file",
+                                      "name": "NavigationBar.kt"
+                                    },
+                                    {
+                                      "type": "file",
+                                      "name": "navigation.kt"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "directory",
+                                  "name": "screens",
+                                  "contents": [
+                                    {
+                                      "type": "directory",
+                                      "name": "answer",
+                                      "contents": []
+                                    },
+                                    {
+                                      "type": "directory",
+                                      "name": "auth",
+                                      "contents": [
+                                        {
+                                          "type": "file",
+                                          "name": "EmailVerificationScreen.kt"
+                                        },
+                                        {
+                                          "type": "file",
+                                          "name": "ExpertOnboardingScreen.kt"
+                                        },
+                                        {
+                                          "type": "file",
+                                          "name": "ExpertSubmitScreen.kt"
+                                        },
+                                        {
+                                          "type": "file",
+                                          "name": "ExpertVerificationScreen.kt"
+                                        },
+                                        {
+                                          "type": "file",
+                                          "name": "OnBoarding.kt"
+                                        },
+                                        {
+                                          "type": "file",
+                                          "name": "SignInScreen.kt"
+                                        },
+                                        {
+                                          "type": "file",
+                                          "name": "SignUpFormScreen.kt"
+                                        },
+                                        {
+                                          "type": "file",
+                                          "name": "SignUpScreen.kt"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "directory",
+                                      "name": "home",
+                                      "contents": [
+                                        {
+                                          "type": "directory",
+                                          "name": "question",
+                                          "contents": [
+                                            {
+                                              "type": "file",
+                                              "name": "Question.kt"
+                                            },
+                                            {
+                                              "type": "file",
+                                              "name": "QuestionCreateScreen.kt"
+                                            },
+                                            {
+                                              "type": "file",
+                                              "name": "QuestionDetailScreen.kt"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "file",
+                                          "name": "HomeScreen.kt"
+                                        },
+                                        {
+                                          "type": "file",
+                                          "name": "HomeScreenComponents.kt"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "directory",
+                                      "name": "inbox",
+                                      "contents": [
+                                        {
+                                          "type": "file",
+                                          "name": "InboxQuestionDetailScreen.kt"
+                                        },
+                                        {
+                                          "type": "file",
+                                          "name": "InboxScreen.kt"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "directory",
+                                      "name": "settings",
+                                      "contents": [
+                                        {
+                                          "type": "directory",
+                                          "name": "notification",
+                                          "contents": [
+                                            {
+                                              "type": "file",
+                                              "name": "NotificationSettingsScreen.kt"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "directory",
+                                          "name": "payment",
+                                          "contents": [
+                                            {
+                                              "type": "file",
+                                              "name": "PaymentMethodsScreen.kt"
+                                            },
+                                            {
+                                              "type": "file",
+                                              "name": "SubscriptionScreen.kt"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "directory",
+                                          "name": "profile",
+                                          "contents": [
+                                            {
+                                              "type": "file",
+                                              "name": "ProfileEditScreen.kt"
+                                            },
+                                            {
+                                              "type": "file",
+                                              "name": "ProfileViewScreen.kt"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "file",
+                                          "name": "SettingsScreen.kt"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "directory",
+                                      "name": "theme",
+                                      "contents": [
+                                        {
+                                          "type": "file",
+                                          "name": "Button.kt"
+                                        },
+                                        {
+                                          "type": "file",
+                                          "name": "Color.kt"
+                                        },
+                                        {
+                                          "type": "file",
+                                          "name": "Input.kt"
+                                        },
+                                        {
+                                          "type": "file",
+                                          "name": "Theme.kt"
+                                        },
+                                        {
+                                          "type": "file",
+                                          "name": "Type.kt"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "file",
+                                      "name": "Screen.kt"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "directory",
+                                  "name": "viewmodel",
+                                  "contents": [
+                                    {
+                                      "type": "file",
+                                      "name": "AuthViewModel.kt"
+                                    },
+                                    {
+                                      "type": "file",
+                                      "name": "HomeViewModel.kt"
+                                    },
+                                    {
+                                      "type": "file",
+                                      "name": "InboxViewModel.kt"
+                                    },
+                                    {
+                                      "type": "file",
+                                      "name": "QuestionCreateViewModel.kt"
+                                    },
+                                    {
+                                      "type": "file",
+                                      "name": "UiState.kt"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "file",
+                                  "name": "MainActivity.kt"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "directory",
+                              "name": "util",
+                              "contents": [
+                                {
+                                  "type": "file",
+                                  "name": "DataFormatter.kt"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "file",
+                              "name": "VerifAI.kt"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "directory",
+                  "name": "res",
+                  "contents": [
+                    {
+                      "type": "directory",
+                      "name": "drawable",
+                      "contents": [
+                        {
+                          "type": "file",
+                          "name": "apple.xml"
+                        },
+                        {
+                          "type": "file",
+                          "name": "back_arrow.xml"
+                        },
+                        {
+                          "type": "file",
+                          "name": "check_circle.xml"
+                        },
+                        {
+                          "type": "file",
+                          "name": "google.xml"
+                        },
+                        {
+                          "type": "file",
+                          "name": "group.xml"
+                        },
+                        {
+                          "type": "file",
+                          "name": "ic_launcher_background.xml"
+                        },
+                        {
+                          "type": "file",
+                          "name": "ic_launcher_foreground.xml"
+                        },
+                        {
+                          "type": "file",
+                          "name": "image_14.xml"
+                        },
+                        {
+                          "type": "file",
+                          "name": "image_15.xml"
+                        },
+                        {
+                          "type": "file",
+                          "name": "notification_icon.xml"
+                        },
+                        {
+                          "type": "file",
+                          "name": "upload.xml"
+                        },
+                        {
+                          "type": "file",
+                          "name": "vector.xml"
+                        },
+                        {
+                          "type": "file",
+                          "name": "vector2.xml"
+                        },
+                        {
+                          "type": "file",
+                          "name": "vector3.xml"
+                        },
+                        {
+                          "type": "file",
+                          "name": "vector__1_.xml"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "directory",
+                      "name": "font",
+                      "contents": [
+                        {
+                          "type": "file",
+                          "name": "archivo_regular.ttf"
+                        },
+                        {
+                          "type": "file",
+                          "name": "archivo_thin.ttf"
+                        },
+                        {
+                          "type": "file",
+                          "name": "inter_extralight.ttf"
+                        },
+                        {
+                          "type": "file",
+                          "name": "inter_light.ttf"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "directory",
+                      "name": "layout",
+                      "contents": []
+                    },
+                    {
+                      "type": "directory",
+                      "name": "mipmap-anydpi-v26",
+                      "contents": [
+                        {
+                          "type": "file",
+                          "name": "ic_launcher.xml"
+                        },
+                        {
+                          "type": "file",
+                          "name": "ic_launcher_round.xml"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "directory",
+                      "name": "mipmap-hdpi",
+                      "contents": [
+                        {
+                          "type": "file",
+                          "name": "ic_launcher.webp"
+                        },
+                        {
+                          "type": "file",
+                          "name": "ic_launcher_round.webp"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "directory",
+                      "name": "mipmap-mdpi",
+                      "contents": [
+                        {
+                          "type": "file",
+                          "name": "ic_launcher.webp"
+                        },
+                        {
+                          "type": "file",
+                          "name": "ic_launcher_round.webp"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "directory",
+                      "name": "mipmap-xhdpi",
+                      "contents": [
+                        {
+                          "type": "file",
+                          "name": "ic_launcher.webp"
+                        },
+                        {
+                          "type": "file",
+                          "name": "ic_launcher_round.webp"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "directory",
+                      "name": "mipmap-xxhdpi",
+                      "contents": [
+                        {
+                          "type": "file",
+                          "name": "ic_launcher.webp"
+                        },
+                        {
+                          "type": "file",
+                          "name": "ic_launcher_round.webp"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "directory",
+                      "name": "mipmap-xxxhdpi",
+                      "contents": [
+                        {
+                          "type": "file",
+                          "name": "ic_launcher.webp"
+                        },
+                        {
+                          "type": "file",
+                          "name": "ic_launcher_round.webp"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "directory",
+                      "name": "values",
+                      "contents": [
+                        {
+                          "type": "file",
+                          "name": "colors.xml"
+                        },
+                        {
+                          "type": "file",
+                          "name": "font_certs.xml"
+                        },
+                        {
+                          "type": "file",
+                          "name": "preloaded_fonts.xml"
+                        },
+                        {
+                          "type": "file",
+                          "name": "strings.xml"
+                        },
+                        {
+                          "type": "file",
+                          "name": "themes.xml"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "directory",
+                      "name": "xml",
+                      "contents": [
+                        {
+                          "type": "file",
+                          "name": "backup_rules.xml"
+                        },
+                        {
+                          "type": "file",
+                          "name": "data_extraction_rules.xml"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "file",
+                  "name": "AndroidManifest.xml"
+                }
+              ]
+            },
+            {
+              "type": "directory",
+              "name": "test",
+              "contents": [
+                {
+                  "type": "directory",
+                  "name": "java",
+                  "contents": [
+                    {
+                      "type": "directory",
+                      "name": "mp",
+                      "contents": [
+                        {
+                          "type": "directory",
+                          "name": "verif_ai",
+                          "contents": [
+                            {
+                              "type": "directory",
+                              "name": "data",
+                              "contents": [
+                                {
+                                  "type": "directory",
+                                  "name": "respository",
+                                  "contents": []
+                                }
+                              ]
+                            },
+                            {
+                              "type": "file",
+                              "name": "ExampleUnitTest.kt"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "file",
+          "name": ".gitignore"
+        },
+        {
+          "type": "file",
+          "name": "build.gradle.kts"
+        },
+        {
+          "type": "file",
+          "name": "google-services.json"
+        },
+        {
+          "type": "file",
+          "name": "proguard-rules.pro"
+        }
+      ]
+    },
+    {
+      "type": "directory",
+      "name": "gradle",
+      "contents": [
+        {
+          "type": "directory",
+          "name": "wrapper",
+          "contents": [
+            {
+              "type": "file",
+              "name": "gradle-wrapper.jar"
+            },
+            {
+              "type": "file",
+              "name": "gradle-wrapper.properties"
+            }
+          ]
+        },
+        {
+          "type": "file",
+          "name": "libs.versions.toml"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "name": ".gitignore"
+    },
+    {
+      "type": "file",
+      "name": "build.gradle.kts"
+    },
+    {
+      "type": "file",
+      "name": "folder structure.py"
+    },
+    {
+      "type": "file",
+      "name": "gradle.properties"
+    },
+    {
+      "type": "file",
+      "name": "gradlew"
+    },
+    {
+      "type": "file",
+      "name": "gradlew.bat"
+    },
+    {
+      "type": "file",
+      "name": "settings.gradle.kts"
+    }
+  ]
+}
