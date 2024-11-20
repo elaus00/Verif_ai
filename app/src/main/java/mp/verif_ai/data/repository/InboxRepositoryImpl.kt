@@ -23,50 +23,14 @@ class InboxRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun insertMockData() {
-        val mockNotifications = listOf(
-            NotificationEntity(
-                id = "1",
-                title = "What is MVVM?",
-                content = "Alice replied to your question.",
-                isRead = false,
-                createdAt = System.currentTimeMillis(),
-                deepLink = "https://example.com/question/1",
-                type = "REPLY",
-                userId = "user_1"
-            ),
-            NotificationEntity(
-                id = "2",
-                title = "How to implement Room DB?",
-                content = "Bob commented on your question.",
-                isRead = true,
-                createdAt = System.currentTimeMillis() - 3600000,
-                deepLink = "https://example.com/question/2",
-                type = "COMMENT",
-                userId = "user_2"
-            ),
-            NotificationEntity(
-                id = "3",
-                title = "What is Clean Architecture?",
-                content = "Charlie upvoted your question.",
-                isRead = true,
-                createdAt = System.currentTimeMillis() - 7200000,
-                deepLink = "https://example.com/question/3",
-                type = "UPVOTE",
-                userId = "user_3"
-            )
-        )
-        notificationDao.insertNotification(mockNotifications)
+    override suspend fun getNotifications(): List<Notification> {
+        // TODO: Implementation
+        // 1. 네트워크 연결 확인
+        // 2. 연결된 경우 API에서 최신 데이터 가져오기
+        // 3. 로컬 DB 업데이트
+        // 4. 연결 안 된 경우 로컬 DB에서 데이터 가져오기
+        return emptyList()
     }
-
-//    override suspend fun getNotifications(): List<Notification> {
-//        // TODO: Implementation
-//        // 1. 네트워크 연결 확인
-//        // 2. 연결된 경우 API에서 최신 데이터 가져오기
-//        // 3. 로컬 DB 업데이트
-//        // 4. 연결 안 된 경우 로컬 DB에서 데이터 가져오기
-//        return emptyList()
-//    }
 
     override suspend fun markAsRead(notificationId: String) {
         // TODO: Implementation
@@ -106,6 +70,14 @@ class InboxRepositoryImpl @Inject constructor(
         // TODO: Implementation
         // 1. 로컬 DB에서 읽지 않은 알림 개수 조회
         return notificationDao.getUnreadCount()
+    }
+
+    override suspend fun getUnreadCount(userId: String): Flow<Int> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun clearAllNotifications(userId: String) {
+        TODO("Not yet implemented")
     }
 }
 fun NotificationEntity.toDomainModel(): Notification {
