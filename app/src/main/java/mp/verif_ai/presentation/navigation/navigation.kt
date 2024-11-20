@@ -192,9 +192,7 @@ private fun NavGraphBuilder.mainNavigation(navController: NavHostController) {
         // Inbox
         composable(Screen.MainNav.Inbox.Main.route) {
             InboxScreen(
-                onQuestionClick = { questionId ->
-                    navController.navigate(Screen.MainNav.Inbox.QuestionDetail.createRoute(questionId))
-                }
+                onNotificationClick = { TODO() },
             )
         }
 

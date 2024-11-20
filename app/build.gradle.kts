@@ -72,8 +72,22 @@ dependencies {
     // ViewModel
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.core)
 
     // Testing
+    testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.truth)
+    kaptTest(libs.hilt.android.compiler)
+
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
+
     implementation(libs.junit.junit)
     implementation(libs.androidx.media3.extractor)
     implementation(libs.firebase.auth.ktx)
@@ -82,12 +96,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     testImplementation(libs.kotlinx.coroutines)
     testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
+
 
     // Compose (버전을 명시적으로 지정된 BOM으로 통일)
     implementation(platform(libs.androidx.compose.bom.v20240100))
