@@ -53,4 +53,12 @@ class InboxRepositoryImpl @Inject constructor(
         // 1. 로컬 DB에서 읽지 않은 알림 개수 조회
         return 0
     }
+
+    override suspend fun getUnreadCount(userId: String): Flow<Int> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun clearAllNotifications(userId: String) {
+        TODO("Not yet implemented")
+    }
 }

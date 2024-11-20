@@ -10,4 +10,6 @@ interface InboxRepository {
     suspend fun deleteNotification(notificationId: String)
     fun observeNotifications(): Flow<List<Notification>>
     suspend fun getUnreadCount(): Int
+    suspend fun clearAllNotifications(userId: String)
+    suspend fun getUnreadCount(userId: String): Flow<Int>
 }
