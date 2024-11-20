@@ -11,7 +11,7 @@ import mp.verif_ai.data.firebase.repository.FirebaseAuthRepositoryImpl
 import mp.verif_ai.data.firebase.repository.FirebaseUserRepositoryImpl
 import mp.verif_ai.data.firebase.repository.FirebaseChatRepositoryImpl
 import mp.verif_ai.domain.repository.AuthRepository
-import mp.verif_ai.domain.repository.ChatRepository
+import mp.verif_ai.domain.repository.PromptRepository
 import mp.verif_ai.domain.repository.UserRepository
 import javax.inject.Singleton
 
@@ -47,5 +47,5 @@ object FirebaseModule {
     fun provideChatRepository(
         functions: FirebaseFunctions,
         firestore: FirebaseFirestore
-    ): ChatRepository = FirebaseChatRepositoryImpl(functions, firestore)
+    ): PromptRepository = FirebaseChatRepositoryImpl(functions, firestore)
 }
