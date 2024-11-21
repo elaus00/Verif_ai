@@ -125,4 +125,9 @@ dependencies {
     // Google Play Services
     implementation(libs.gms.play.services.auth)
     implementation(libs.gms.play.services.safetynet)
+
+    // Google Play billing
+    val billing_version = "7.1.1"
+    implementation("com.android.billingclient:billing:$billing_version")
+    implementation("com.android.billingclient:billing-ktx:$billing_version")
 }
