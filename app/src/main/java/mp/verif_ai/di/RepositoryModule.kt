@@ -7,7 +7,9 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mp.verif_ai.data.auth.AuthRepositoryImpl
+import mp.verif_ai.data.repository.InboxRepositoryImpl
 import mp.verif_ai.domain.repository.AuthRepository
+import mp.verif_ai.domain.repository.InboxRepository
 import javax.inject.Singleton
 
 @Module
@@ -28,4 +30,9 @@ object RepositoryModule {
         auth: FirebaseAuth,
         firestore: FirebaseFirestore
     ): AuthRepository = AuthRepositoryImpl(auth, firestore)
+
+    @Provides
+    @Singleton
+    fun provideInboxRepository(
+    ): InboxRepository = InboxRepositoryImpl()
 }
