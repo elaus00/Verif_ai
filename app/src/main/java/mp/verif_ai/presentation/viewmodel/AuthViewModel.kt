@@ -2,6 +2,10 @@ package mp.verif_ai.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.auth.api.signin.GoogleSignInStatusCodes
+import com.google.android.gms.auth.api.signin.GoogleSignInStatusCodes.SIGN_IN_CANCELLED
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.CommonStatusCodes.NETWORK_ERROR
 import com.google.firebase.auth.FirebaseAuthEmailException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
@@ -11,158 +15,117 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import mp.verif_ai.domain.model.auth.AuthCredential
 import mp.verif_ai.domain.model.auth.User
 import mp.verif_ai.domain.repository.AuthRepository
-import mp.verif_ai.domain.repository.UserRepository
-import mp.verif_ai.domain.usecase.auth.SignInUseCase
-import mp.verif_ai.domain.usecase.auth.SignUpUseCase
-import mp.verif_ai.domain.usecase.auth.VerifyEmailUseCase
 import javax.inject.Inject
-
-sealed class AuthError {
-    object InvalidCredentials : AuthError()
-    object UserNotFound : AuthError()
-    object WeakPassword : AuthError()
-    object EmailInUse : AuthError()
-    object UserNotLoggedIn : AuthError()
-    data class Unknown(val message: String) : AuthError()
-}
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val signUpUseCase: SignUpUseCase,
-    private val signInUseCase: SignInUseCase,
-    private val verifyEmailUseCase: VerifyEmailUseCase,
-    private val authRepository: AuthRepository,
-    private val userRepository: UserRepository
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
-    private val _authState = MutableStateFlow<UiState<User>>(UiState.Initial)
-    val authState: StateFlow<UiState<User>> = _authState.asStateFlow()
+    private val _uiState = MutableStateFlow<AuthUiState>(AuthUiState.Initial)
+    val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
 
-    private val _verificationState = MutableStateFlow<UiState<Unit>>(UiState.Initial)
-    val verificationState: StateFlow<UiState<Unit>> = _verificationState.asStateFlow()
-
-    private val _currentUser = MutableStateFlow<User?>(null)
-    val currentUser: StateFlow<User?> = _currentUser.asStateFlow()
-
-    private val _email = MutableStateFlow<String>("")
-    val email: StateFlow<String> = _email.asStateFlow()
-
-    private val _isExpertMode = MutableStateFlow(false)
-    val isExpertMode: StateFlow<Boolean> = _isExpertMode.asStateFlow()
-
-    init {
-        observeCurrentUser()
-    }
-
-    private fun observeCurrentUser() {
+    fun checkExistingAccount(email: String) {
         viewModelScope.launch {
-            userRepository.getCurrentUser()
-                .collect { user ->
-                    _currentUser.value = user
-                }
-        }
-    }
-
-    fun setEmail(email: String): Boolean {
-        return if (isValidEmail(email)) {
-            _email.value = email
-            true
-        } else {
-            false
-        }
-    }
-
-    fun signUp(email: String, password: String, nickname: String) {
-        viewModelScope.launch {
-            _authState.value = UiState.Loading
-            signUpUseCase(email, password, nickname)
-                .onSuccess {
-                    _authState.value = UiState.Success(it)
-                    sendVerificationEmail()
-                }
-                .onFailure {
-                    _authState.value = UiState.Error(mapAuthError(it))
-                }
-        }
-    }
-
-    private fun sendVerificationEmail() {
-        viewModelScope.launch {
-            _verificationState.value = UiState.Loading
-            verifyEmailUseCase(email.value)
-                .onSuccess {
-                    _verificationState.value = UiState.Success(Unit)
-                }
-                .onFailure {
-                    _verificationState.value = UiState.Error(mapAuthError(it))
-                }
-        }
-    }
-
-    fun verifyCode(code: String) {
-        viewModelScope.launch {
-            _verificationState.value = UiState.Loading
-            authRepository.verifyEmailCode(code)
-                .onSuccess {
-                    _verificationState.value = UiState.Success(Unit)
-                }
-                .onFailure {
-                    _verificationState.value = UiState.Error(mapAuthError(it))
-                }
-        }
-    }
-
-    fun setExpertMode(isExpert: Boolean) {
-        _isExpertMode.value = isExpert
-    }
-
-    fun submitExpertInfo(expertInfo: Map<String, Any>) {
-        viewModelScope.launch {
-            _currentUser.value?.let { user ->
-                _authState.value = UiState.Loading
-                userRepository.updateExpertInfo(user.id, expertInfo)
-                    .onSuccess {
-                        _authState.value = UiState.Success(it)
+            _uiState.value = AuthUiState.Loading
+            authRepository.checkExistingAccount(email)
+                .onSuccess { exists ->
+                    _uiState.value = if (exists) {
+                        AuthUiState.ExistingAccount(email)
+                    } else {
+                        AuthUiState.NewAccount(email)
                     }
-                    .onFailure {
-                        _authState.value = UiState.Error(mapAuthError(it))
-                    }
-            } ?: run {
-                _authState.value = UiState.Error(AuthError.UserNotLoggedIn)
-            }
+                }
+                .onFailure { exception ->
+                    _uiState.value = AuthUiState.Error(exception)
+                }
         }
     }
 
-    fun signIn(email: String, password: String) {
+    fun signInWithEmail(email: String, password: String) {
         viewModelScope.launch {
-            _authState.value = UiState.Loading
-            signInUseCase(email, password)
-                .onSuccess {
-                    _authState.value = UiState.Success(it)
+            _uiState.value = AuthUiState.Loading
+            authRepository.signInWithEmail(email, password)
+                .onSuccess { user ->
+                    _uiState.value = AuthUiState.SignedIn(user)
                 }
-                .onFailure {
-                    _authState.value = UiState.Error(mapAuthError(it))
+                .onFailure { exception ->
+                    _uiState.value = AuthUiState.Error(exception)
+                }
+        }
+    }
+
+    fun signInWithCredential(credential: AuthCredential) {
+        viewModelScope.launch {
+            _uiState.value = AuthUiState.Loading
+            authRepository.signInWithCredential(credential)
+                .onSuccess { user ->
+                    _uiState.value = AuthUiState.SignedIn(user)
+                }
+                .onFailure { exception ->
+                    _uiState.value = AuthUiState.Error(exception)
+                }
+        }
+    }
+
+    fun signUpWithEmail(email: String, password: String, nickname: String) {
+        viewModelScope.launch {
+            _uiState.value = AuthUiState.Loading
+            authRepository.signUpWithEmail(email, password, nickname)
+                .onSuccess { user ->
+                    _uiState.value = AuthUiState.SignedIn(user)
+                }
+                .onFailure { exception ->
+                    _uiState.value = AuthUiState.Error(exception)
                 }
         }
     }
 
     fun signOut() {
         viewModelScope.launch {
+            _uiState.value = AuthUiState.Loading
             authRepository.signOut()
+                .onSuccess {
+                    _uiState.value = AuthUiState.SignedOut
+                }
+                .onFailure { exception ->
+                    _uiState.value = AuthUiState.Error(exception)
+                }
         }
     }
 
-    private fun isValidEmail(email: String): Boolean {
-        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    fun resetErrorState() {
+        if (_uiState.value is AuthUiState.Error) {
+            _uiState.value = AuthUiState.Initial
+        }
     }
 
-    private fun mapAuthError(error: Throwable): AuthError = when (error) {
-        is FirebaseAuthInvalidCredentialsException -> AuthError.InvalidCredentials
-        is FirebaseAuthInvalidUserException -> AuthError.UserNotFound
-        is FirebaseAuthWeakPasswordException -> AuthError.WeakPassword
-        is FirebaseAuthEmailException -> AuthError.EmailInUse
-        else -> AuthError.Unknown(error.message ?: "Unknown error occurred")
+    fun handleError(exception: Throwable) {
+        _uiState.value = when (exception) {
+            is IllegalArgumentException -> AuthUiState.Error(exception) // 유효성 검사 실패
+            is ApiException -> when (exception.statusCode) {
+                SIGN_IN_CANCELLED -> AuthUiState.Initial // 사용자가 취소
+                NETWORK_ERROR -> AuthUiState.Error(Exception("네트워크 연결을 확인해주세요"))
+                else -> AuthUiState.Error(Exception("로그인에 실패했습니다"))
+            }
+            is FirebaseAuthInvalidCredentialsException -> AuthUiState.Error(Exception("이메일 또는 비밀번호가 올바르지 않습니다"))
+            is FirebaseAuthInvalidUserException -> AuthUiState.Error(Exception("존재하지 않는 계정입니다"))
+            is FirebaseAuthWeakPasswordException -> AuthUiState.Error(Exception("비밀번호가 너무 약합니다"))
+            is FirebaseAuthEmailException -> AuthUiState.Error(Exception("이미 사용중인 이메일입니다"))
+            else -> AuthUiState.Error(Exception("알 수 없는 오류가 발생했습니다"))
+        }
     }
+}
+
+sealed class AuthUiState {
+    data object Initial : AuthUiState()
+    data object Loading : AuthUiState()
+    data class ExistingAccount(val email: String) : AuthUiState()
+    data class NewAccount(val email: String) : AuthUiState()
+    data class SignedIn(val user: User) : AuthUiState()
+    data object SignedOut : AuthUiState()
+    data class Error(val exception: Throwable) : AuthUiState()
 }

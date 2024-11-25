@@ -2,7 +2,6 @@
 agp = "8.5.2"
 composeBomVersion = "2024.01.00"
 firebaseBom = "33.5.1"
-firebaseBomVersion = "32.7.0"
 googleFirebaseBom = "32.7.0"
 hiltAndroidGradlePlugin = "2.50"
 hiltNavigationCompose = "1.2.0"
@@ -71,7 +70,7 @@ androidx-media3-extractor = { group = "androidx.media3", name = "media3-extracto
 ui = { module = "androidx.compose.ui:ui" }
 ui-graphics = { module = "androidx.compose.ui:ui-graphics" }
 ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
-firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
 firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
 firebase-functions-ktx = { group = "com.google.firebase", name = "firebase-functions-ktx", version.ref = "firebaseFunctionsKtx" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }

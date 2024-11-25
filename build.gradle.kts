@@ -2,6 +2,7 @@
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.jetbrains.kotlin.android) apply false
+    id("com.android.library") version "8.7.2" apply false
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.google.services) apply false
 }

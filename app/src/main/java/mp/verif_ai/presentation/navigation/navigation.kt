@@ -192,9 +192,10 @@ private fun NavGraphBuilder.mainNavigation(navController: NavHostController) {
         // Inbox
         composable(Screen.MainNav.Inbox.Main.route) {
             InboxScreen(
-                onQuestionClick = { questionId ->
+                onNotificationClick = { questionId ->
                     navController.navigate(Screen.MainNav.Inbox.QuestionDetail.createRoute(questionId))
-                }
+                },
+                navController = navController
             )
         }
 
@@ -274,6 +275,14 @@ private fun NavGraphBuilder.settingsNavigation(navController: NavHostController)
 
 fun NavHostController.navigateToMain() {
     navigate(Screen.MainNav.Home.route) {
-        popUpTo(Screen.Auth.route) { inclusive = true }
+        // Auth 관련 백스택을 모두 제거하여 뒤로가기 시 Auth 화면으로 돌아가지 않도록 함
+        popUpTo(Screen.Auth.route) {
+            inclusive = true
+            saveState = false
+        }
+        // Single Top으로 설정하여 Home 화면이 중복으로 쌓이는 것을 방지
+        launchSingleTop = true
+        // Home 화면의 상태를 복원하지 않고 새로 시작
+        restoreState = false
     }
 }
