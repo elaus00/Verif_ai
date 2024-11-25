@@ -21,7 +21,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavHostController
 import mp.verif_ai.presentation.navigation.navigateToMain
 import mp.verif_ai.presentation.screens.Screen
-import mp.verif_ai.presentation.screens.theme.customTypography
+import mp.verif_ai.presentation.screens.theme.CustomTypography
 import mp.verif_ai.presentation.screens.theme.OnBoardingButton
 
 @Composable
@@ -99,7 +99,7 @@ fun WelcomeText(
         )
         Text(
             text = subText,
-            style = customTypography.subWelcome,
+            style = CustomTypography.subWelcome,
             modifier = Modifier.width(350.dp)
         )
     }

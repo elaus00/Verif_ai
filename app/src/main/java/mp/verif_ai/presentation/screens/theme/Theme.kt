@@ -40,7 +40,7 @@ private val LightColorScheme = lightColorScheme(
     */
 )
 
-class customTypography {
+class CustomTypography {
     companion object {
         val subWelcome = TextStyle(
             fontSize = 14.sp,

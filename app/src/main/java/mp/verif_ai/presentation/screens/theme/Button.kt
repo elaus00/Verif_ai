@@ -57,7 +57,7 @@ fun OnBoardingButton(
         onClick = { onClick() }) {
             Text(
                 text = text,
-                style = customTypography.certificationButton,
+                style = CustomTypography.certificationButton,
                 color = colors.contentColor
             )
         }

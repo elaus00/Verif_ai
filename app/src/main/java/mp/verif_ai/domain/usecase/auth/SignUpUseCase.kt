@@ -12,26 +12,28 @@ class SignUpUseCase @Inject constructor(
         password: String,
         nickname: String
     ): Result<User> {
-        // 입력값 검증
-        if (!isValidEmail(email)) {
-            return Result.failure(IllegalArgumentException("Invalid email format"))
-        }
-        if (!isValidPassword(password)) {
-            return Result.failure(IllegalArgumentException("Password must be at least 6 characters"))
-        }
-        if (!isValidNickname(nickname)) {
-            return Result.failure(IllegalArgumentException("Nickname must be 2-20 characters"))
+        // 1. 비밀번호 유효성 검사
+        if (!isPasswordValid(password)) {
+            return Result.failure(IllegalArgumentException("Invalid password format"))
         }
 
-        return authRepository.signUp(email, password, nickname)
+        // 2. 닉네임 유효성 검사
+        if (!isNicknameValid(nickname)) {
+            return Result.failure(IllegalArgumentException("Invalid nickname format"))
+        }
+
+        // 3. 회원가입 시도
+        return authRepository.signUpWithEmail(email, password, nickname)
     }
 
-    private fun isValidEmail(email: String): Boolean =
-        android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    private fun isPasswordValid(password: String): Boolean {
+        return password.length >= 8 && // 최소 8자
+                password.any { it.isDigit() } && // 숫자 포함
+                password.any { it.isLetter() } // 문자 포함
+    }
 
-    private fun isValidPassword(password: String): Boolean =
-        password.length >= 6
-
-    private fun isValidNickname(nickname: String): Boolean =
-        nickname.length in 2..20
+    private fun isNicknameValid(nickname: String): Boolean {
+        return nickname.length in 2..20 && // 2-20자 제한
+                nickname.all { it.isLetterOrDigit() || it == '_' } // 영숫자와 밑줄만 허용
+    }
 }

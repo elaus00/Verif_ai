@@ -1,7 +1,5 @@
 package mp.verif_ai.domain.model.auth
 
-import java.sql.Timestamp
-
 data class EmailVerification(
     val email: String,
     val code: String,
