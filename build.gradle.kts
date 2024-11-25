@@ -5,6 +5,7 @@ plugins {
     id("com.android.library") version "8.7.2" apply false
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.google.services) apply false
+    alias(libs.plugins.compose.compiler) apply false
 }
 
 buildscript {
