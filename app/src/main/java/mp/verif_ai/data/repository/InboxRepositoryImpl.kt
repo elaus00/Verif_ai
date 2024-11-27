@@ -1,16 +1,22 @@
 package mp.verif_ai.data.repository;
 
+import androidx.room.util.copy
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import mp.verif_ai.domain.model.Notification
 import mp.verif_ai.domain.repository.InboxRepository
 import javax.inject.Inject
 import javax.inject.Singleton
+import mp.verif_ai.data.room.dao.NotificationDao
+import mp.verif_ai.data.room.model.NotificationEntity
+import mp.verif_ai.domain.model.NotificationType
 
 @Singleton
 class InboxRepositoryImpl @Inject constructor(
     // TODO: 필요한 의존성 추가
     // private val notificationApi: NotificationApi,
-    // private val notificationDao: NotificationDao,
+    private val notificationDao: NotificationDao,
     // private val connectivityChecker: ConnectivityChecker
 ) : InboxRepository {
 
@@ -38,6 +44,7 @@ class InboxRepositoryImpl @Inject constructor(
     override suspend fun deleteNotification(notificationId: String) {
         // TODO: Implementation
         // 1. 로컬 DB에서 알림 삭제
+        notificationDao.deleteNotification(notificationId)
         // 2. 네트워크 연결된 경우 서버에 동기화
     }
 
@@ -51,6 +58,19 @@ class InboxRepositoryImpl @Inject constructor(
     override suspend fun getUnreadCount(): Int {
         // TODO: Implementation
         // 1. 로컬 DB에서 읽지 않은 알림 개수 조회
+        return notificationDao.getUnreadCount()
         return 0
     }
+}
+fun NotificationEntity.toDomainModel(): Notification {
+    return Notification(
+        id = this.id,
+        userId = this.userId,
+        title = this.title,
+        content = this.content,
+        type = NotificationType.valueOf(this.type),
+        isRead = this.isRead,
+        deepLink = this.deepLink,
+        createdAt = this.createdAt
+    )
 }

@@ -80,6 +80,7 @@ dependencies {
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.firebase.functions.ktx)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.room.ktx)
     testImplementation(libs.kotlinx.coroutines)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -125,4 +126,6 @@ dependencies {
     // Google Play Services
     implementation(libs.gms.play.services.auth)
     implementation(libs.gms.play.services.safetynet)
+
+    implementation(libs.androidx.room.common)
 }
