@@ -2,6 +2,7 @@ package mp.verif_ai.data.respository
 
 import android.content.Context
 import android.os.Bundle
+import androidx.activity.ComponentActivity
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
@@ -60,17 +61,19 @@ class PassKeyRepositoryTest {
     }
 
     @Test
-    fun `checkPassKeyStatus returns AVAILABLE when supported`() = runTest {
+    fun `checkPassKeyStatus returns AVAILABLE when supported with activity context`() = runTest {
         // Given
+        val activity = mockk<ComponentActivity>()
+
         coEvery {
             credentialManager.getCredential(
-                any<    Context>(),
+                activity,
                 any<GetCredentialRequest>()
             )
         } returns mockk<GetCredentialResponse>()
 
         // When
-        val result = passKeyRepository.checkPassKeyStatus()
+        val result = passKeyRepository.checkPassKeyStatus(activity)
 
         // Then
         assertEquals(PassKeyStatus.AVAILABLE, result)
@@ -117,16 +120,16 @@ class PassKeyRepositoryTest {
 
         val querySnapshot = mockk<QuerySnapshot>()
         val query = mockk<Query>()
+        val documentSnapshot = mockk<DocumentSnapshot>()
 
+        // Mock 설정 수정
         every { passKeysCollection.whereEqualTo("userId", userId) } returns query
-        every { query.snapshots() } returns flowOf(querySnapshot)
-        every { querySnapshot.documents } returns listOf(mockk {
-            every { data } returns passKeyInfo.toMap()
-        })
+        every { query.get() } returns mockk {
+            coEvery { await() } returns querySnapshot
+        }
 
-        coEvery {
-            passKeysCollection.whereEqualTo("userId", userId).get().await()
-        } returns querySnapshot
+        every { querySnapshot.documents } returns listOf(documentSnapshot)
+        every { documentSnapshot.data } returns passKeyInfo.toMap()
 
         // When
         val result = passKeyRepository.getRegisteredPassKeys(userId)
@@ -194,6 +197,7 @@ class PassKeyRepositoryTest {
     @Test
     fun `registerPassKey returns success for valid registration`() = runTest {
         // Given
+        val activity = mockk<ComponentActivity>()
         val userId = "testUserId"
         val displayName = "Test User"
         val createResponse = mockk<CreatePublicKeyCredentialResponse>()
@@ -208,7 +212,7 @@ class PassKeyRepositoryTest {
         every { createResponse.data } returns responseBundle  // CreatePublicKeyCredentialResponse.data는 ByteArray 타입입니다
         coEvery {
             credentialManager.createCredential(
-                context = any(),
+                activity,
                 request = any<CreatePublicKeyCredentialRequest>()
             )
         } returns createResponse
@@ -217,7 +221,7 @@ class PassKeyRepositoryTest {
         coEvery { task.await() } returns mockk()
 
         // When
-        val result = passKeyRepository.registerPassKey(userId, displayName)
+        val result = passKeyRepository.registerPassKey(userId, displayName, activity)
 
         // Then
         assertTrue(result is PassKeyRegistrationResult.Success)
@@ -227,6 +231,7 @@ class PassKeyRepositoryTest {
     @Test
     fun `registerPassKey returns error when credential creation fails`() = runTest {
         // Given
+        val activity = mockk<ComponentActivity>()
         val userId = "testUserId"
         val bundle = Bundle().apply {
             putString("androidx.credentials.provider.extra.CREATE_CREDENTIAL_EXCEPTION_TYPE", "CreateCredentialException")
@@ -235,11 +240,14 @@ class PassKeyRepositoryTest {
         val exception = GetCredentialException.fromBundle(bundle)
 
         coEvery {
-            credentialManager.createCredential(any(), any())
+            credentialManager.createCredential(
+                activity,
+                any()
+            )
         } throws exception
 
         // When
-        val result = passKeyRepository.registerPassKey(userId, null)
+        val result = passKeyRepository.registerPassKey(userId, null, activity)
 
         // Then
         assertTrue(result is PassKeyRegistrationResult.Error)

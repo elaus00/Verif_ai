@@ -1,5 +1,6 @@
 package mp.verif_ai.domain.repository
 
+import androidx.activity.ComponentActivity
 import androidx.credentials.GetCredentialResponse
 import kotlinx.coroutines.flow.Flow
 import mp.verif_ai.domain.model.passkey.PassKeyInfo
@@ -20,7 +21,7 @@ interface PassKeyRepository {
      * 기기의 PassKey 지원 여부와 사용자의 PassKey 등록 상태를 확인합니다.
      * @return PassKey 상태 정보를 포함한 Result
      */
-    suspend fun checkPassKeyStatus(): PassKeyStatus
+    suspend fun checkPassKeyStatus(context: ComponentActivity): PassKeyStatus
 
     /**
      * 사용자를 위한 새로운 PassKey를 등록합니다.
@@ -28,7 +29,7 @@ interface PassKeyRepository {
      * @param name PassKey의 식별 이름 (선택사항)
      * @return 등록 결과를 포함한 Result
      */
-    suspend fun registerPassKey(userId: String, name: String? = null): PassKeyRegistrationResult
+    suspend fun registerPassKey(userId: String, name: String? = null, context: ComponentActivity): PassKeyRegistrationResult
 
     /**
      * PassKey를 사용하여 로그인을 시도합니다.

@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">Verif_ai</string>
     <string name="web_client_id">488280392024-q5nsddv0315avokh0rldbt82v5c46qpe.apps.googleusercontent.com</string>
+    <string name="asset_statements">
+        [{
+            "include": "https://verifai-71428.firebaseapp.com/.well-known/assetlinks.json"
+        }]
+    </string>
 </resources>

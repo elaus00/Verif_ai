@@ -1,5 +1,6 @@
 package mp.verif_ai.presentation.viewmodel
 
+import androidx.activity.ComponentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,11 +31,11 @@ class PassKeyViewModel @Inject constructor(
         }
     }
 
-    fun checkPassKeyStatus() {
+    fun checkPassKeyStatus(context: ComponentActivity) {
         viewModelScope.launch {
             _uiState.value = PassKeyUiState.Loading
             try {
-                val status = passKeyRepository.checkPassKeyStatus()
+                val status = passKeyRepository.checkPassKeyStatus(context = context)
                 _uiState.value = PassKeyUiState.StatusChecked(status)
             } catch (e: Exception) {
                 _uiState.value = PassKeyUiState.Error(e)
@@ -42,10 +43,10 @@ class PassKeyViewModel @Inject constructor(
         }
     }
 
-    fun registerPassKey(userId: String, displayName: String?) {
+    fun registerPassKey(userId: String, displayName: String?, context: ComponentActivity) {
         viewModelScope.launch {
             _uiState.value = PassKeyUiState.Loading
-            when (val result = passKeyRepository.registerPassKey(userId, displayName)) {
+            when (val result = passKeyRepository.registerPassKey(userId, displayName, context)) {
                 is PassKeyRegistrationResult.Success -> {
                     _uiState.value = PassKeyUiState.Registered
                     _events.emit(PassKeyEvent.RegistrationSuccess)
