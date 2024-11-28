@@ -108,12 +108,24 @@ dependencies {
     // Google Play Services
     implementation(libs.gms.play.services.auth)
     implementation(libs.gms.play.services.safetynet)
+    implementation(libs.play.services.fido)
+
 
     // Testing
     testImplementation(libs.junit)
+    testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+    testImplementation(kotlin("test"))
+    testImplementation(libs.kotlinx.coroutines.test)
+
+    // Google Credential Manager
+    implementation("androidx.credentials:credentials:1.5.0-beta01")
+    implementation("androidx.credentials:credentials-play-services-auth:1.5.0-beta01")
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
+
+
 }

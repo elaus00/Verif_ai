@@ -10,4 +10,7 @@ sealed class AuthCredential {
         val idToken: String
     ) : AuthCredential()
 
+    data class PassKey(
+        val authenticationResponseJson: String
+    ) : AuthCredential()
 }

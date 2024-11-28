@@ -1,4 +1,4 @@
-package mp.verif_ai.presentation.screens.auth
+package mp.verif_ai.presentation.screens.auth.signup
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
@@ -10,8 +10,9 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import mp.verif_ai.presentation.theme.InputField
-import mp.verif_ai.presentation.screens.theme.OnBoardingButton
+import mp.verif_ai.presentation.screens.auth.OnBoardingButton
+import mp.verif_ai.presentation.screens.auth.WelcomeText
+import mp.verif_ai.presentation.screens.theme.InputField
 
 @Composable
 fun EmailVerificationScreen(

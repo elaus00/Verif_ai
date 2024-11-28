@@ -10,14 +10,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
 import mp.verif_ai.presentation.screens.Screen
-import mp.verif_ai.presentation.screens.auth.EmailVerificationScreen
-import mp.verif_ai.presentation.screens.auth.ExpertOnboardingScreen
-import mp.verif_ai.presentation.screens.auth.ExpertSubmitScreen
-import mp.verif_ai.presentation.screens.auth.ExpertVerificationScreen
+import mp.verif_ai.presentation.screens.auth.signup.EmailVerificationScreen
+import mp.verif_ai.presentation.screens.auth.expertsignup.ExpertOnboardingScreen
+import mp.verif_ai.presentation.screens.auth.expertsignup.ExpertSubmitScreen
+import mp.verif_ai.presentation.screens.auth.expertsignup.ExpertVerificationScreen
 import mp.verif_ai.presentation.screens.auth.OnBoardingScreen
 import mp.verif_ai.presentation.screens.auth.SignInScreen
-import mp.verif_ai.presentation.screens.auth.SignUpFormScreen
-import mp.verif_ai.presentation.screens.auth.SignUpScreen
+import mp.verif_ai.presentation.screens.auth.signup.SignUpFormScreen
+import mp.verif_ai.presentation.screens.auth.signup.SignUpScreen
 import mp.verif_ai.presentation.screens.home.HomeScreen
 import mp.verif_ai.presentation.screens.home.question.QuestionDetailScreen
 import mp.verif_ai.presentation.screens.inbox.InboxQuestionDetailScreen
@@ -68,9 +68,7 @@ private fun NavGraphBuilder.authNavigation(navController: NavHostController) {
         composable(Screen.Auth.SignUp.route) {
             SignUpScreen(
                 modifier = Modifier,
-                onContinue = {
-                    navController.navigate(Screen.Auth.SignUpDetail.route)
-                }
+                onNavigateToMain = navController::navigateToMain
             )
         }
 

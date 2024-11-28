@@ -1,23 +1,26 @@
 package mp.verif_ai.presentation.viewmodel
 
+import android.content.Context
+import androidx.activity.ComponentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.gms.auth.api.signin.GoogleSignInStatusCodes
 import com.google.android.gms.auth.api.signin.GoogleSignInStatusCodes.SIGN_IN_CANCELLED
 import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.common.api.CommonStatusCodes.NETWORK_ERROR
+import com.google.android.gms.common.api.CommonStatusCodes
 import com.google.firebase.auth.FirebaseAuthEmailException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import mp.verif_ai.domain.model.auth.AuthCredential
 import mp.verif_ai.domain.model.auth.User
 import mp.verif_ai.domain.repository.AuthRepository
+import mp.verif_ai.domain.util.passkey.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,45 +31,34 @@ class AuthViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<AuthUiState>(AuthUiState.Initial)
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
 
-    fun checkExistingAccount(email: String) {
+    private val _events = MutableSharedFlow<AuthEvent>()
+    val events: SharedFlow<AuthEvent> = _events
+
+    init {
+        observeAuthState()
+    }
+
+    fun signIn(activity: ComponentActivity) {
         viewModelScope.launch {
             _uiState.value = AuthUiState.Loading
-            authRepository.checkExistingAccount(email)
-                .onSuccess { exists ->
-                    _uiState.value = if (exists) {
-                        AuthUiState.ExistingAccount(email)
-                    } else {
-                        AuthUiState.NewAccount(email)
+            authRepository.signIn(activity)
+                .onSuccess { user ->
+                    _uiState.value = AuthUiState.Authenticated(user)
+                    _events.emit(AuthEvent.NavigateToMain)
+                }
+                .onFailure { e ->
+                    when (e) {
+                        is PassKeyCancellationException -> {
+                            _uiState.value = AuthUiState.Initial
+                        }
+                        is PassKeyNoCredentialException -> {
+                            _uiState.value = AuthUiState.NoCredential
+                        }
+                        else -> {
+                            _uiState.value = AuthUiState.Error(e)
+                            _events.emit(AuthEvent.ShowError(e.message ?: "Failed to sign in"))
+                        }
                     }
-                }
-                .onFailure { exception ->
-                    _uiState.value = AuthUiState.Error(exception)
-                }
-        }
-    }
-
-    fun signInWithEmail(email: String, password: String) {
-        viewModelScope.launch {
-            _uiState.value = AuthUiState.Loading
-            authRepository.signInWithEmail(email, password)
-                .onSuccess { user ->
-                    _uiState.value = AuthUiState.SignedIn(user)
-                }
-                .onFailure { exception ->
-                    _uiState.value = AuthUiState.Error(exception)
-                }
-        }
-    }
-
-    fun signInWithCredential(credential: AuthCredential) {
-        viewModelScope.launch {
-            _uiState.value = AuthUiState.Loading
-            authRepository.signInWithCredential(credential)
-                .onSuccess { user ->
-                    _uiState.value = AuthUiState.SignedIn(user)
-                }
-                .onFailure { exception ->
-                    _uiState.value = AuthUiState.Error(exception)
                 }
         }
     }
@@ -76,56 +68,110 @@ class AuthViewModel @Inject constructor(
             _uiState.value = AuthUiState.Loading
             authRepository.signUpWithEmail(email, password, nickname)
                 .onSuccess { user ->
-                    _uiState.value = AuthUiState.SignedIn(user)
+                    _uiState.value = AuthUiState.Authenticated(user)
+                    _events.emit(AuthEvent.NavigateToMain)
                 }
-                .onFailure { exception ->
-                    _uiState.value = AuthUiState.Error(exception)
+                .onFailure { e ->
+                    _uiState.value = AuthUiState.Error(e)
+                    _events.emit(AuthEvent.ShowError(e.message ?: "Failed to sign up"))
+                }
+        }
+    }
+
+    fun checkExistingAccount(email: String) {
+        viewModelScope.launch {
+            authRepository.checkExistingAccount(email)
+                .onSuccess { exists ->
+                    if (exists) {
+                        _events.emit(AuthEvent.ShowError("Account already exists"))
+                    }
+                }
+                .onFailure { e ->
+                    _events.emit(AuthEvent.ShowError(e.message ?: "Failed to check account"))
                 }
         }
     }
 
     fun signOut() {
         viewModelScope.launch {
-            _uiState.value = AuthUiState.Loading
             authRepository.signOut()
                 .onSuccess {
-                    _uiState.value = AuthUiState.SignedOut
+                    _uiState.value = AuthUiState.Initial
+                    _events.emit(AuthEvent.NavigateToAuth)
                 }
-                .onFailure { exception ->
-                    _uiState.value = AuthUiState.Error(exception)
+                .onFailure { e ->
+                    _events.emit(AuthEvent.ShowError(e.message ?: "Failed to sign out"))
                 }
         }
     }
 
-    fun resetErrorState() {
-        if (_uiState.value is AuthUiState.Error) {
-            _uiState.value = AuthUiState.Initial
+    fun withdraw() {
+        viewModelScope.launch {
+            _uiState.value = AuthUiState.Loading
+            authRepository.withdraw()
+                .onSuccess {
+                    _uiState.value = AuthUiState.Initial
+                    _events.emit(AuthEvent.NavigateToAuth)
+                }
+                .onFailure { e ->
+                    _uiState.value = AuthUiState.Error(e)
+                    _events.emit(AuthEvent.ShowError(e.message ?: "Failed to withdraw"))
+                }
         }
     }
 
-    fun handleError(exception: Throwable) {
-        _uiState.value = when (exception) {
-            is IllegalArgumentException -> AuthUiState.Error(exception) // 유효성 검사 실패
-            is ApiException -> when (exception.statusCode) {
-                SIGN_IN_CANCELLED -> AuthUiState.Initial // 사용자가 취소
-                NETWORK_ERROR -> AuthUiState.Error(Exception("네트워크 연결을 확인해주세요"))
-                else -> AuthUiState.Error(Exception("로그인에 실패했습니다"))
+    fun resetPassword(email: String) {
+        viewModelScope.launch {
+            authRepository.resetPassword(email)
+                .onSuccess {
+                    _events.emit(AuthEvent.PasswordResetEmailSent)
+                }
+                .onFailure { e ->
+                    _events.emit(AuthEvent.ShowError(e.message ?: "Failed to send reset email"))
+                }
+        }
+    }
+
+    fun sendVerificationEmail(email: String) {
+        viewModelScope.launch {
+            authRepository.sendVerificationEmail(email)
+                .onSuccess {
+                    _events.emit(AuthEvent.VerificationEmailSent)
+                }
+                .onFailure { e ->
+                    _events.emit(AuthEvent.ShowError(e.message ?: "Failed to send verification email"))
+                }
+        }
+    }
+
+    private fun observeAuthState() {
+        viewModelScope.launch {
+            authRepository.observeAuthState().collect { user ->
+                _uiState.value = if (user != null) {
+                    AuthUiState.Authenticated(user)
+                } else {
+                    AuthUiState.Initial
+                }
             }
-            is FirebaseAuthInvalidCredentialsException -> AuthUiState.Error(Exception("이메일 또는 비밀번호가 올바르지 않습니다"))
-            is FirebaseAuthInvalidUserException -> AuthUiState.Error(Exception("존재하지 않는 계정입니다"))
-            is FirebaseAuthWeakPasswordException -> AuthUiState.Error(Exception("비밀번호가 너무 약합니다"))
-            is FirebaseAuthEmailException -> AuthUiState.Error(Exception("이미 사용중인 이메일입니다"))
-            else -> AuthUiState.Error(Exception("알 수 없는 오류가 발생했습니다"))
         }
     }
+
 }
 
 sealed class AuthUiState {
     data object Initial : AuthUiState()
     data object Loading : AuthUiState()
+    data object NoCredential : AuthUiState()
+    data class Authenticated(val user: User) : AuthUiState()
     data class ExistingAccount(val email: String) : AuthUiState()
     data class NewAccount(val email: String) : AuthUiState()
-    data class SignedIn(val user: User) : AuthUiState()
-    data object SignedOut : AuthUiState()
     data class Error(val exception: Throwable) : AuthUiState()
+}
+
+sealed class AuthEvent {
+    data class ShowError(val message: String) : AuthEvent()
+    data object NavigateToMain : AuthEvent()
+    data object NavigateToAuth : AuthEvent()
+    data object PasswordResetEmailSent : AuthEvent()
+    data object VerificationEmailSent : AuthEvent()
 }

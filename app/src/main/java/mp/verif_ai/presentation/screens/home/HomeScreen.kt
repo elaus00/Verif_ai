@@ -154,7 +154,7 @@ private fun SearchBar(
             .height(40.dp)
             .clickable(onClick = onCreateQuestion),
         shape = RoundedCornerShape(20.dp),
-        color = VerifAiColor.SearchBarBg
+        color = VerifAiColor.Background
     ) {
         Row(
             modifier = Modifier
@@ -330,24 +330,22 @@ private fun StatusChip(
     status: QuestionStatus,
     modifier: Modifier = Modifier
 ) {
-    val (backgroundColor, textColor) = when (status) {
-        QuestionStatus.DRAFT -> VerifAiColor.StatusDraftBg to VerifAiColor.StatusDraftText
-        QuestionStatus.PUBLISHED -> VerifAiColor.StatusPublishedBg to VerifAiColor.StatusPublishedText
-        QuestionStatus.CLOSED -> VerifAiColor.StatusClosedBg to VerifAiColor.StatusClosedText
-        QuestionStatus.DELETED -> VerifAiColor.StatusDeletedBg to VerifAiColor.StatusDeletedText
-        QuestionStatus.CONTROVERSIAL -> VerifAiColor.StatusControversialBg to VerifAiColor.StatusControversialText
-    }
+//    val (backgroundColor, textColor) = when (status) {
+//        QuestionStatus.DRAFT -> VerifAiColor.StatusDraftBg to VerifAiColor.StatusDraftText
+//        QuestionStatus.PUBLISHED -> VerifAiColor.StatusPublishedBg to VerifAiColor.StatusPublishedText
+//        QuestionStatus.CLOSED -> VerifAiColor.StatusClosedBg to VerifAiColor.StatusClosedText
+//        QuestionStatus.DELETED -> VerifAiColor.StatusDeletedBg to VerifAiColor.StatusDeletedText
+//        QuestionStatus.CONTROVERSIAL -> VerifAiColor.StatusControversialBg to VerifAiColor.StatusControversialText
+//    }
 
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(4.dp),
-        color = backgroundColor
     ) {
         Text(
             text = status.name,
             modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
             style = MaterialTheme.typography.labelSmall,
-            color = textColor
         )
     }
 }
@@ -381,9 +379,9 @@ fun RecentConversationsCard(
                             conversation = conversation,
                             onClick = { onConversationClick(conversation.id) }
                         )
-                        if (conversation != conversations.last()) {
-                            Divider(color = VerifAiColor.DividerColor)
-                        }
+//                        if (conversation != conversations.last()) {
+//                            Divider(color = VerifAiColor.DividerColor)
+//                        }
                     }
                 }
             }

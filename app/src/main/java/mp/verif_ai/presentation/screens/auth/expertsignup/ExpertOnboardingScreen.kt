@@ -1,4 +1,4 @@
-package mp.verif_ai.presentation.screens.auth
+package mp.verif_ai.presentation.screens.auth.expertsignup
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
@@ -12,17 +12,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.painterResource
 import mp.verif_ai.R
 import androidx.compose.foundation.Image
-import androidx.compose.material3.Text
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavHostController
 import mp.verif_ai.presentation.navigation.navigateToMain
 import mp.verif_ai.presentation.screens.Screen
-import mp.verif_ai.presentation.screens.theme.CustomTypography
-import mp.verif_ai.presentation.screens.theme.OnBoardingButton
+import mp.verif_ai.presentation.screens.auth.OnBoardingButton
+import mp.verif_ai.presentation.screens.auth.WelcomeText
 
 @Composable
 fun ExpertOnboardingScreen(navController: NavHostController) {
@@ -40,7 +35,10 @@ fun ExpertOnboardingScreen(navController: NavHostController) {
         ) {
             GroupImage(R.drawable.group)
             Spacer(modifier = Modifier.height(48.dp))
-            WelcomeText()
+            WelcomeText(
+                mainText = "Verif AI",
+                subText = "Verify your AI-conversation \n by professionals!"
+            )
         }
 
         // Buttons at bottom
@@ -75,36 +73,6 @@ fun GroupImage(imageResId: Int) {
             .wrapContentSize()
     )
 }
-
-
-@Composable
-fun WelcomeText(
-    mainText: String = "Welcome !",
-    subText: String = "If you want to be qualified as a respondent, please authenticate the additional information"
-) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.Top),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = mainText,
-            style = TextStyle(
-                fontSize = 40.sp,
-                lineHeight = 56.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                color = Color(0xFF171A1F),
-            ),
-            modifier = Modifier.width(290.dp)
-        )
-        Text(
-            text = subText,
-            style = CustomTypography.subWelcome,
-            modifier = Modifier.width(350.dp)
-        )
-    }
-}
-
 
 @Preview
 @Composable

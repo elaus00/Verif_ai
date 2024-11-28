@@ -1,4 +1,4 @@
-package mp.verif_ai.presentation.screens.auth
+package mp.verif_ai.presentation.screens.auth.expertsignup
 
 import android.app.Activity
 import android.content.Intent
@@ -26,7 +26,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.navigation.NavHostController
-import mp.verif_ai.presentation.screens.theme.OnBoardingButton
+import mp.verif_ai.presentation.screens.auth.OnBoardingButton
+import mp.verif_ai.presentation.screens.auth.WelcomeText
 
 @Composable
 fun ExpertVerificationScreen(
