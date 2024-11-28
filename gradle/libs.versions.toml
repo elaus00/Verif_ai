@@ -1,6 +1,7 @@
 [versions]
 agp = "8.5.2"
 firebaseBom = "33.6.0"
+googleidVersion = "1.1.1"
 hilt = "2.51.1"
 hiltNavigationCompose = "1.2.0"
 kotlin = "2.0.21"
@@ -8,9 +9,12 @@ coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
+kotlinxCoroutinesTest = "1.9.0"
 lifecycleRuntimeCompose = "2.8.7"
 activityCompose = "1.9.3"
 composeBom = "2024.11.00"
+mockk = "1.13.8"
+playServicesVersion = "17.0.0"
 retrofit = "2.10.0"
 kotlinxCoroutines = "1.9.0"
 navigationCompose = "2.8.4"
@@ -20,6 +24,8 @@ firebaseAuthKtx = "23.1.0"
 appcompat = "1.7.0"
 gms-play-services-auth = "21.2.0"
 gms-play-services-safetynet = "18.1.0"
+playServicesFido = "21.1.0"
+
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -29,6 +35,8 @@ androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
+gms-play-services = { module = "com.google.android.gms:play-services", version.ref = "playServicesVersion" }
+google-googleid = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleidVersion" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
 hilt-android-gradle-plugin = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hilt" }
@@ -45,6 +53,8 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
+mockk = { module = "io.mockk:mockk", version = "1.13.13" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit-gson-converter = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
@@ -55,6 +65,8 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 google-services-plugin = { group = "com.google.gms", name = "google-services", version = "4.4.2" }
 gms-play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "gms-play-services-auth" }
 gms-play-services-safetynet = { group = "com.google.android.gms", name = "play-services-safetynet", version.ref = "gms-play-services-safetynet" }
+play-services-fido = { group = "com.google.android.gms", name = "play-services-fido", version.ref = "playServicesFido" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

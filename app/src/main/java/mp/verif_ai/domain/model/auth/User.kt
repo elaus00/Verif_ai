@@ -1,5 +1,10 @@
 package mp.verif_ai.domain.model.auth
 
+import android.view.Display
+import com.google.firebase.auth.EmailAuthProvider
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GoogleAuthProvider
+
 data class User(
     val id: String = "",
     val email: String = "",
@@ -13,7 +18,8 @@ data class User(
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis(),
     val lastSignInAt: Long? = null,  // 마지막 로그인 시간 추가
-    val signInMethod: String? = null  // EMAIL, GOOGLE, APPLE 추가
+    val signInMethod: String? = null,  // EMAIL, GOOGLE 추가
+    val displayName: String? = null,
 ) {
     /**
      * Firestore에서 사용할 Map으로 변환합니다.
@@ -38,21 +44,27 @@ data class User(
         /**
          * Firestore 문서를 User 객체로 변환합니다.
          */
-        fun fromMap(map: Map<String, Any?>): User = User(
-            id = map["id"] as? String ?: "",
-            email = map["email"] as? String ?: "",
-            phoneNumber = map["phoneNumber"] as? String,
-            nickname = map["nickname"] as? String ?: "",
-            type = UserType.fromString(map["type"] as? String ?: ""),
-            status = UserStatus.fromString(map["status"] as? String ?: ""),
-            points = (map["points"] as? Number)?.toInt() ?: 0,
-            emailVerified = map["emailVerified"] as? Boolean ?: false,
-            expertVerificationStatus = map["expertVerificationStatus"] as? String,
-            createdAt = (map["createdAt"] as? Number)?.toLong() ?: System.currentTimeMillis(),
-            updatedAt = (map["updatedAt"] as? Number)?.toLong() ?: System.currentTimeMillis(),
-            lastSignInAt = (map["lastSignInAt"] as? Number)?.toLong(),
-            signInMethod = map["signInMethod"] as? String
-        )
+        fun fromFirebaseUser(firebaseUser: FirebaseUser?): User? {
+            return firebaseUser?.let { fbUser ->
+                User(
+                    id = fbUser.uid,
+                    email = fbUser.email ?: "",
+                    phoneNumber = fbUser.phoneNumber,
+                    nickname = fbUser.displayName ?: "",
+                    emailVerified = fbUser.isEmailVerified,
+                    signInMethod = when {
+                        fbUser.providerData.any { it.providerId == GoogleAuthProvider.PROVIDER_ID } ->
+                            SignInMethod.GOOGLE.name
+                        fbUser.providerData.any { it.providerId == EmailAuthProvider.PROVIDER_ID } ->
+                            SignInMethod.EMAIL.name
+                        fbUser.providerData.any { it.providerId == "apple.com" } ->
+                            SignInMethod.APPLE.name
+                        else -> SignInMethod.EMAIL.name
+                    },
+                    lastSignInAt = fbUser.metadata?.lastSignInTimestamp
+                )
+            }
+        }
     }
 }
 

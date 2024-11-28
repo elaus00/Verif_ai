@@ -1,4 +1,4 @@
-package mp.verif_ai.presentation.screens.auth
+package mp.verif_ai.presentation.screens.auth.expertsignup
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
@@ -9,7 +9,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mp.verif_ai.R
-import mp.verif_ai.presentation.screens.Screen
+import mp.verif_ai.presentation.screens.auth.WelcomeText
 
 @Composable
 fun ExpertSubmitScreen(userId: String) {

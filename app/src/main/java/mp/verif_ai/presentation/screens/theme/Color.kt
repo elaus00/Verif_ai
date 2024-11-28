@@ -2,39 +2,109 @@ package mp.verif_ai.presentation.screens.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+data object VerifAiColor {
+    // Primary Colors
+    val Primary = Color(0xFF1E3A5F)       // Deep Navy
+    val PrimaryVariant = Color(0xFF2C5282) // Bright Navy
+    val Secondary = Color(0xFF4A90E2)     // Sky Blue
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+    // Background Colors
+    val Background = Color(0xFFF8FAFC)    // Light Gray Blue
+    val Surface = Color(0xFFFFFFFF)       // White
+    val SurfaceVariant = Color(0xFFF1F5F9) // Light Blue Gray
+    val CardBackground = Color(0xFFFFFFFF) // Card Background
 
-object VerifAiColor {
-    // Existing colors
-    val Primary = Color(0xFF2A5AB3)
-    val Secondary = Color(0xFFF8F9FA)
-    val TextPrimary = Color(0xFF171A1F)
-    val TextSecondary = Color(0xFF9095A0)
-    val TextTertiary = Color(0xFF7F7F7F)
-    val DividerColor = Color(0x1A000000)
-    val SearchBarBg = Color(0xFFBCC1CA).copy(alpha = 0.2f)
+    // Text Colors
+    val TextPrimary = Color(0xFF1A202C)   // Dark Navy
+    val TextSecondary = Color(0xFF4A5568) // Medium Gray
+    val TextTertiary = Color(0xFF718096)  // Light Gray
 
-    // Status Background Colors
-    val StatusDraftBg = Color(0xFF64748B)        // Slate gray for drafts
-    val StatusPublishedBg = Color(0xFF22C55E)    // Green for active/published
-    val StatusClosedBg = Color(0xFF6B7280)       // Gray for closed
-    val StatusDeletedBg = Color(0xFFEF4444)      // Red for deleted
-    val StatusControversialBg = Color(0xFFF59E0B) // Amber for controversial
+    // Divider & Border
+    val DividerColor = Color(0xFFE2E8F0)  // Light Gray
+    val BorderColor = Color(0xFFCBD5E1)   // Medium Gray
 
-    // Status Text Colors (lighter/darker variants for contrast)
-    val StatusDraftText = Color(0xFFF8FAFC)      // Light slate
-    val StatusPublishedText = Color(0xFFDCFCE7)  // Light green
-    val StatusClosedText = Color(0xFFF9FAFB)     // Light gray
-    val StatusDeletedText = Color(0xFFFEE2E2)    // Light red
-    val StatusControversialText = Color(0xFFFEF3C7) // Light amber
+    // Status Colors
+    data object Status {
+        // Draft - 작성 중
+        val DraftBg = Color(0xFFF1F5F9)
+        val DraftText = Color(0xFF475569)
 
-    // Additional utility colors
-    val RewardBg = Color(0xFFFEF3C7)            // Light amber for reward background
-    val RewardText = Color(0xFFD97706)           // Darker amber for reward text
+        // Published - 게시됨
+        val PublishedBg = Color(0xFFDBEAFE)
+        val PublishedText = Color(0xFF1E40AF)
+
+        // Closed - 종료됨
+        val ClosedBg = Color(0xFFE2E8F0)
+        val ClosedText = Color(0xFF475569)
+
+        // Deleted - 삭제됨
+        val DeletedBg = Color(0xFFFEE2E2)
+        val DeletedText = Color(0xFFB91C1C)
+
+        // Controversial - 논쟁
+        val ControversialBg = Color(0xFFFEF3C7)
+        val ControversialText = Color(0xFFB45309)
+    }
+
+    data object Navy {
+        // Main Navy Shades
+        val Dark = Color(0xFF0F172A)      // Darkest Navy
+        val Deep = Color(0xFF1E3A5F)      // Deep Navy
+        val Base = Color(0xFF2C5282)      // Navy Base
+        val Medium = Color(0xFF3B82F6)    // Medium Navy
+        val Light = Color(0xFF60A5FA)     // Light Navy
+
+        // Navy with Opacity
+        val DarkAlpha = Dark.copy(alpha = 0.1f)
+        val DeepAlpha = Deep.copy(alpha = 0.1f)
+        val BaseAlpha = Base.copy(alpha = 0.1f)
+
+        // Special Purpose Navy
+        val SearchBarBg = Dark.copy(alpha = 0.04f)
+        val CardBorder = Base.copy(alpha = 0.08f)
+        val IconTint = Base
+    }
+
+    // Component Specific Colors
+    data object Component {
+        // Button Colors
+        data object Button {
+            val Primary = Navy.Deep
+            val PrimaryText = Surface
+            val Secondary = Navy.Light
+            val SecondaryText = Navy.Deep
+            val Disabled = TextTertiary.copy(alpha = 0.6f)
+        }
+
+        // Card Colors
+        data object Card {
+            val Background = Surface
+            val Border = Navy.CardBorder
+            val HeaderText = TextPrimary
+            val ContentText = TextSecondary
+            val MetaText = TextTertiary
+        }
+
+        // SearchBar Colors
+        data object SearchBar {
+            val Background = Navy.SearchBarBg
+            val PlaceholderText = TextPrimary.copy(alpha = 0.64f)
+            val IconTint = Navy.IconTint
+        }
+
+        // Icon Colors
+        data object Icon {
+            val Primary = Navy.IconTint
+            val Secondary = TextTertiary
+            val Disabled = TextTertiary.copy(alpha = 0.4f)
+        }
+    }
+
+    // Interaction States
+    data object Interaction {
+        val Hover = Navy.BaseAlpha
+        val Press = Navy.DeepAlpha
+        val Focus = Navy.DarkAlpha
+        val Disabled = TextTertiary.copy(alpha = 0.6f)
+    }
 }

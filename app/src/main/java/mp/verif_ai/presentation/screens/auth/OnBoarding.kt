@@ -1,182 +1,120 @@
 package mp.verif_ai.presentation.screens.auth
 
-import android.app.Activity
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.IntentSenderRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import com.google.android.gms.auth.api.identity.BeginSignInRequest
-import com.google.android.gms.auth.api.identity.Identity
-import com.google.android.gms.common.api.ApiException
 import mp.verif_ai.R
-import mp.verif_ai.domain.model.auth.AuthCredential
+import mp.verif_ai.domain.model.passkey.PassKeyStatus
 import mp.verif_ai.presentation.navigation.navigateToMain
 import mp.verif_ai.presentation.screens.Screen
+import mp.verif_ai.presentation.screens.auth.expertsignup.GroupImage
 import mp.verif_ai.presentation.viewmodel.AuthUiState
 import mp.verif_ai.presentation.viewmodel.AuthViewModel
+import mp.verif_ai.presentation.viewmodel.PassKeyUiState
+import mp.verif_ai.presentation.viewmodel.PassKeyViewModel
 
 @Composable
 fun OnBoardingScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
-    viewModel: AuthViewModel = hiltViewModel()
+    authViewModel: AuthViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
-    val uiState by viewModel.uiState.collectAsState()
+    val authUiState by authViewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    // One Tap Client
-    val oneTapClient = remember { Identity.getSignInClient(context) }
-
-    // 결과 처리를 위한 launcher
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartIntentSenderForResult()
-    ) { result ->
-        try {
-            val credential = oneTapClient.getSignInCredentialFromIntent(result.data)
-            credential.googleIdToken?.let { token ->
-                viewModel.signInWithCredential(AuthCredential.Google(token))
-            }
-        } catch (e: Exception) {
-            viewModel.handleError(e)
-        }
-    }
-
-    LaunchedEffect(uiState) {
-        when (uiState) {
-            is AuthUiState.SignedIn -> {
+    LaunchedEffect(authUiState) {
+        when (authUiState) {
+            is AuthUiState.Authenticated -> {
                 (navController as NavHostController).navigateToMain()
             }
-            else -> {} // 다른 상태는 처리하지 않음
-        }
-    }
-
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(top = 160.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            // Image
-            GroupImage(R.drawable.group)
-
-            Spacer(modifier = Modifier.height(48.dp))
-
-            // Welcome Text
-            WelcomeText(
-                mainText = "Verif AI",
-                subText = "Verify your AI-conversation\nby professionals!"
-            )
-        }
-
-        // Buttons Section
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 32.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            // Email Button
-            OnBoardingButton(
-                text = "Continue with Email",
-                onClick = { navController.navigate(Screen.Auth.SignIn.route) },
-                icon = R.drawable.vector
-            )
-
-            // Google Button
-            OnBoardingButton(
-                text = "Continue with Google",
-                onClick = {
-                    val signInRequest = BeginSignInRequest.builder()
-                        .setGoogleIdTokenRequestOptions(
-                            BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
-                                .setSupported(true)
-//                                .setServerClientId(BuildConfig.GOOGLE_CLIENT_ID)
-                                .setFilterByAuthorizedAccounts(false)
-                                .build()
-                        )
-                        .setAutoSelectEnabled(true)
-                        .build()
-
-                    oneTapClient.beginSignIn(signInRequest)
-                        .addOnSuccessListener { result ->
-                            try {
-                                launcher.launch(
-                                    IntentSenderRequest.Builder(result.pendingIntent.intentSender).build()
-                                )
-                            } catch (e: Exception) {
-                                viewModel.handleError(e)
-                            }
-                        }
-                        .addOnFailureListener { e ->
-                            viewModel.handleError(e)
-                        }
-                },
-                icon = R.drawable.google
-            )
-
-            // Terms Text
-            Text(
-                text = "By continuing, you agree to our Terms of Service and Privacy Policy",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                modifier = Modifier.padding(top = 8.dp)
-            )
-        }
-    }
-}
-
-@Composable
-private fun OnBoardingButton(
-    text: String,
-    onClick: () -> Unit,
-    icon: Int? = null,
-    enabled: Boolean = true
-) {
-    Button(
-        onClick = onClick,
-        enabled = enabled,
-        modifier = Modifier.fillMaxWidth(),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-        ),
-        contentPadding = PaddingValues(16.dp)
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            icon?.let {
-                Icon(
-                    painter = painterResource(id = it),
-                    contentDescription = null,
-                    modifier = Modifier.size(24.dp)
+            is AuthUiState.Error -> {
+                val error = (authUiState as AuthUiState.Error).exception.message ?: "An error occurred"
+                snackbarHostState.showSnackbar(
+                    message = error,
+                    actionLabel = "Dismiss",
+                    duration = SnackbarDuration.Short,
                 )
-                Spacer(modifier = Modifier.width(8.dp))
             }
-            Text(
-                text = text,
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    fontWeight = FontWeight.Medium
-                )
+            else -> { }
+        }
+    }
+
+    Scaffold(
+        modifier = modifier,
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState,
+                snackbar = { snackbarData ->
+                    CustomSnackbar(snackbarData = snackbarData)
+                }
             )
+        }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .padding(paddingValues)
+                .padding(horizontal = 16.dp)
+                .fillMaxSize(),
+        ) {
+            // Logo Section - 가운데 정렬
+            Column(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(bottom = 80.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                GroupImage(R.drawable.group)
+                Spacer(modifier = Modifier.height(48.dp))
+                WelcomeText(
+                    mainText = "Verif AI",
+                    subText = "Verify your AI-conversation\nby professionals!"
+                )
+            }
+
+            // Button Section - 하단 고정
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 48.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Button(
+                    onClick = { navController.navigate(Screen.Auth.SignUp.route) },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                    ),
+                    contentPadding = PaddingValues(16.dp),
+                    shape = RoundedCornerShape(16.dp),
+                ) {
+                    Text(
+                        text = "Get Started",
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontWeight = FontWeight.Medium
+                        )
+                    )
+                }
+
+                Text(
+                    text = "By continuing, you agree to our \n" +
+                            " Terms of Service and Privacy Policy",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
         }
     }
 }
