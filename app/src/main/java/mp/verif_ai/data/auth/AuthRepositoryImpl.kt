@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
+import androidx.credentials.CreatePasswordRequest
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
@@ -12,6 +13,8 @@ import androidx.credentials.GetPasswordOption
 import androidx.credentials.GetPublicKeyCredentialOption
 import androidx.credentials.PasswordCredential
 import androidx.credentials.PublicKeyCredential
+import androidx.credentials.exceptions.CreateCredentialException
+import androidx.credentials.exceptions.CreateCredentialNoCreateOptionException
 import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.credentials.exceptions.GetCredentialException
 import androidx.credentials.exceptions.GetCredentialInterruptedException
@@ -55,6 +58,10 @@ class AuthRepositoryImpl @Inject constructor(
     private val passKeysCollection = firestore.collection("passkeys")
     private val usersCollection = firestore.collection("users")
 
+    init {
+        auth.firebaseAuthSettings.setAppVerificationDisabledForTesting(true)
+    }
+
     fun generateChallenge(): ByteArray {
         return ByteArray(32).apply {
             SecureRandom().nextBytes(this)
@@ -67,7 +74,7 @@ class AuthRepositoryImpl @Inject constructor(
         val credentialManager = CredentialManager.create(activity)
 
         // 패스 키 상태 확인 (존재 여부)
-        val passKeyStatus = passKeyRepository.checkPassKeyStatus()
+        val passKeyStatus = passKeyRepository.checkPassKeyStatus(activity)
 
         // Password Sign-In 옵션 설정
         val passwordOption = GetPasswordOption(
@@ -86,7 +93,7 @@ class AuthRepositoryImpl @Inject constructor(
         // Google Sign-In 옵션 설정
         val googleIdOption = GetGoogleIdOption.Builder()
             .setServerClientId("488280392024-v9gm0ef7eq47j762rveopjpdd2879s80.apps.googleusercontent.com")
-            .setFilterByAuthorizedAccounts(false)
+            .setFilterByAuthorizedAccounts(true)
             .setAutoSelectEnabled(false)
             .setNonce(null)
             .build()
@@ -105,8 +112,8 @@ class AuthRepositoryImpl @Inject constructor(
                 // PassKey 사용 가능한 경우 모든 옵션 포함
                 GetCredentialRequest(
                     listOf(
-                        googleIdOption,
                         passwordOption,
+                        googleIdOption,
                         getPublicKeyCredentialOption
                     )
                 )
@@ -157,7 +164,8 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun signUpWithEmail(
         email: String,
         password: String,
-        nickname: String
+        nickname: String,
+        context: ComponentActivity
     ): Result<User> = runCatching {
         val authResult = auth.createUserWithEmailAndPassword(email, password).await()
         val user = authResult.user ?: throw IllegalStateException("User not created")
@@ -173,7 +181,7 @@ class AuthRepositoryImpl @Inject constructor(
             .await()
 
         // PassKey 등록
-        passKeyRepository.registerPassKey(user.uid, nickname).let { result ->
+        passKeyRepository.registerPassKey(user.uid, nickname, context).let { result ->
             when (result) {
                 is PassKeyRegistrationResult.Success -> user.toUser()
                 is PassKeyRegistrationResult.Error -> throw result.exception
@@ -258,5 +266,81 @@ class AuthRepositoryImpl @Inject constructor(
         )
     }
 
+    override suspend fun signUpWithCredentialManager(
+        email: String,
+        password: String,
+        nickname: String,
+        context: ComponentActivity
+    ): Result<User> = runCatching {
+        Log.d("SignUpProcess", "Starting sign up process")
 
+        val credentialManager = CredentialManager.create(context)
+        Log.d("SignUpProcess", "CredentialManager instance created")
+
+        try {
+            Log.d("SignUpProcess", "Creating password request with email: $email")
+            val request = CreatePasswordRequest(
+                id = email,
+                password = password,
+                // 디버깅을 위해 추가 옵션 설정
+                preferImmediatelyAvailableCredentials = false,  // remote options도 시도
+                isAutoSelectAllowed = true  // 단일 옵션 자동 선택 허용
+            )
+            Log.d("SignUpProcess", "Password request created successfully")
+
+            // Credential Manager에 저장 시도
+            Log.d("SignUpProcess", "Attempting to save credentials to Credential Manager")
+            val result = credentialManager.createCredential(
+                context,
+                request
+            )
+            Log.d("SignUpProcess", "Successfully saved credentials. Result type: ${result.type}")
+
+            // 2. Firebase Auth에 계정 생성
+            Log.d("SignUpProcess", "Attempting to create Firebase Auth account")
+            val authResult = auth.createUserWithEmailAndPassword(email, password).await()
+            val user = authResult.user ?: throw IllegalStateException("User not created")
+            Log.d("SignUpProcess", "Successfully created Firebase Auth account with uid: ${user.uid}")
+
+            // 3. Firestore에 사용자 정보 저장
+            Log.d("SignUpProcess", "Attempting to save user info to Firestore")
+            usersCollection.document(user.uid)
+                .set(
+                    hashMapOf(
+                        "email" to email,
+                        "nickname" to nickname,
+                        "createdAt" to FieldValue.serverTimestamp()
+                    )
+                )
+                .await()
+            Log.d("SignUpProcess", "Successfully saved user info to Firestore")
+
+            // 4. PassKey 등록
+            Log.d("SignUpProcess", "Attempting to register PassKey")
+            passKeyRepository.registerPassKey(user.uid, nickname, context).let { result ->
+                when (result) {
+                    is PassKeyRegistrationResult.Success -> {
+                        Log.d("SignUpProcess", "Successfully registered PassKey")
+                        user.toUser()
+                    }
+                    is PassKeyRegistrationResult.Error -> {
+                        Log.e("SignUpProcess", "Failed to register PassKey", result.exception)
+                        throw result.exception
+                    }
+                }
+            }
+        } catch (e: CreateCredentialException) {
+            Log.e("SignUpProcess", "CreateCredentialException details:", e)
+            if (e is CreateCredentialNoCreateOptionException) {
+                Log.e("SignUpProcess", "No create options available. Check if:")
+                Log.e("SignUpProcess", "1. Google Play Services is installed and up to date")
+                Log.e("SignUpProcess", "2. Password autofill service is enabled in system settings")
+                Log.e("SignUpProcess", "3. Device Android version: ${android.os.Build.VERSION.SDK_INT}")
+            }
+            throw e
+        } catch (e: Exception) {
+            Log.e("SignUpProcess", "Unexpected error during sign up process", e)
+            throw e
+        }
+    }
 }

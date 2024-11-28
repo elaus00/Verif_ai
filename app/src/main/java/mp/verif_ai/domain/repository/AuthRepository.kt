@@ -36,7 +36,7 @@ interface AuthRepository {
      * @param nickname 사용자 닉네임
      * @return 생성된 사용자 정보를 포함한 Result
      */
-    suspend fun signUpWithEmail(email: String, password: String, nickname: String): Result<User>
+    suspend fun signUpWithEmail(email: String, password: String, nickname: String, context: ComponentActivity): Result<User>
 
     /**
      * 이메일 주소로 기존 계정 존재 여부를 확인합니다.
@@ -100,4 +100,11 @@ interface AuthRepository {
      * @return 현재 사용자 정보 또는 null
      */
     fun getCurrentUser(): User?
+
+    suspend fun signUpWithCredentialManager(
+        email: String,
+        password: String,
+        nickname: String,
+        context: ComponentActivity
+    ): Result<User>
 }

@@ -63,10 +63,10 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun signUpWithEmail(email: String, password: String, nickname: String) {
+    fun signUpWithEmail(email: String, password: String, nickname: String, context: ComponentActivity) {
         viewModelScope.launch {
             _uiState.value = AuthUiState.Loading
-            authRepository.signUpWithEmail(email, password, nickname)
+            authRepository.signUpWithEmail(email, password, nickname, context)
                 .onSuccess { user ->
                     _uiState.value = AuthUiState.Authenticated(user)
                     _events.emit(AuthEvent.NavigateToMain)
@@ -155,6 +155,26 @@ class AuthViewModel @Inject constructor(
             }
         }
     }
+    fun showError(message: String) {
+        viewModelScope.launch {
+            _events.emit(AuthEvent.ShowError(message))
+        }
+    }
+
+    fun signUpWithCredentialManager(email: String, password: String, nickname: String, context: ComponentActivity) {
+        viewModelScope.launch {
+            _uiState.value = AuthUiState.Loading
+            authRepository.signUpWithCredentialManager(email, password, nickname, context)
+                .onSuccess { user ->
+                    _uiState.value = AuthUiState.Authenticated(user)
+                    _events.emit(AuthEvent.NavigateToMain)
+                }
+                .onFailure { e ->
+                    _uiState.value = AuthUiState.Error(e)
+                    _events.emit(AuthEvent.ShowError(e.message ?: "Failed to sign up"))
+                }
+        }
+    }
 
 }
 
@@ -175,3 +195,4 @@ sealed class AuthEvent {
     data object PasswordResetEmailSent : AuthEvent()
     data object VerificationEmailSent : AuthEvent()
 }
+

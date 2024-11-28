@@ -43,7 +43,6 @@ object PassKeyConfig {
     fun getRequestOptions(challenge: String) = """
         {
             "rpId": "$RP_ID",
-            "rpName": "$RP_NAME",
             "userVerification": "preferred",
             "challenge": "$challenge",
             "timeout": 30000,

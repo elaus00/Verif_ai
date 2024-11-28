@@ -54,16 +54,20 @@ class PassKeyRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth
 ) : PassKeyRepository {
 
-    val context: ComponentActivity = ComponentActivity()
-    val credentialManager = CredentialManager.create(context)
     private val passKeysCollection = firestore.collection("passkeys")
     private val usersCollection = firestore.collection("users")
+    val TAG: String = "PasskeyRepositoryImpl"
 
-    override suspend fun checkPassKeyStatus(): PassKeyStatus = runCatching {
+    fun generateChallenge(): ByteArray {
+        return ByteArray(32).apply {
+            SecureRandom().nextBytes(this)
+        }
+    }
+
+    override suspend fun checkPassKeyStatus(context: ComponentActivity): PassKeyStatus = runCatching {
+        val credentialManager = CredentialManager.create(context)
         val challenge = generateChallenge()
-
         val requestOptionsJson = getRequestOptions(challenge.toString())
-
         val credentialRequest = GetCredentialRequest(
             listOf(
                 GetPublicKeyCredentialOption(
@@ -76,20 +80,35 @@ class PassKeyRepositoryImpl @Inject constructor(
         PassKeyStatus.AVAILABLE
 
     }.getOrElse { e ->
+        Log.d(TAG, "checkPassKeyStatus failed: ${e.message}", e)
         when (e) {
-            is PassKeyNotSupportedException -> PassKeyStatus.NOT_SUPPORTED
-            is PassKeyNoCredentialException -> PassKeyStatus.NO_CREDENTIAL
-            is PassKeyCancellationException -> PassKeyStatus.CANCELLED
-            else -> PassKeyStatus.ERROR
+            is PassKeyNotSupportedException -> {
+                Log.d(TAG, "PassKey not supported on this device")
+                PassKeyStatus.NOT_SUPPORTED
+            }
+            is PassKeyNoCredentialException -> {
+                Log.d(TAG, "No PassKey credential found")
+                PassKeyStatus.NO_CREDENTIAL
+            }
+            is PassKeyCancellationException -> {
+                Log.d(TAG, "PassKey operation cancelled by user")
+                PassKeyStatus.CANCELLED
+            }
+            else -> {
+                Log.e(TAG, "Unexpected error in checkPassKeyStatus", e)
+                PassKeyStatus.ERROR
+            }
         }
     }
 
     @SuppressLint("PublicKeyCredential")
     override suspend fun registerPassKey(
         userId: String,
-        displayName: String?
+        displayName: String?,
+        context: ComponentActivity
     ): PassKeyRegistrationResult = runCatching {
         val challenge = generateChallenge()
+        val credentialManager = CredentialManager.create(context)
 
         val request = CreatePublicKeyCredentialRequest(
             requestJson = PassKeyConfig.getCreateOptions(
@@ -106,6 +125,7 @@ class PassKeyRepositoryImpl @Inject constructor(
                     request
                 )
             } catch (e: GetCredentialException) {
+                Log.e(TAG, "Failed to create credential", e)
                 throw IllegalStateException("Failed to create credential", e)
             }
         }
@@ -113,6 +133,7 @@ class PassKeyRepositoryImpl @Inject constructor(
         when (response.type) {
             PublicKeyCredential.TYPE_PUBLIC_KEY_CREDENTIAL -> {
                 val createPublicKeyResponse = response as CreatePublicKeyCredentialResponse
+                Log.d(TAG, "Successfully created PublicKeyCredential")
 
                 passKeysCollection.document(userId).set(
                     hashMapOf(
@@ -127,10 +148,12 @@ class PassKeyRepositoryImpl @Inject constructor(
                 PassKeyRegistrationResult.Success(response.type)
             }
             else -> {
+                Log.e(TAG, "Unexpected credential type received: ${response.type}")
                 throw IllegalStateException("Unexpected credential type received: ${response.type}")
             }
         }
     }.getOrElse { e ->
+        Log.e(TAG, "PassKey registration failed", e)
         PassKeyRegistrationResult.Error(e as Exception)
     }
 
@@ -140,12 +163,14 @@ class PassKeyRepositoryImpl @Inject constructor(
         when (credential) {
             is PublicKeyCredential -> {
                 val responseJson = credential.authenticationResponseJson
+                Log.d(TAG, "Successfully authenticated with PublicKeyCredential")
                 PassKeySignInResult.Success(
                     credentialId = responseJson,
                     userId = auth.currentUser?.uid ?: throw IllegalStateException("User not found")
                 )
             }
             is PasswordCredential -> {
+                Log.d(TAG, "Authenticating with PasswordCredential")
                 val result = auth.signInWithEmailAndPassword(credential.id, credential.password).await()
                 val user = result.user ?: throw IllegalStateException("User not found")
                 PassKeySignInResult.Success(
@@ -155,6 +180,7 @@ class PassKeyRepositoryImpl @Inject constructor(
             }
             is GoogleIdTokenCredential -> {
                 try {
+                    Log.d(TAG, "Authenticating with GoogleIdTokenCredential")
                     val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
                     val idToken = googleIdTokenCredential.idToken
                     val firebaseCredential = GoogleAuthProvider.getCredential(idToken, null)
@@ -177,20 +203,19 @@ class PassKeyRepositoryImpl @Inject constructor(
                         userId = user.uid
                     )
                 } catch (e: GoogleIdTokenParsingException) {
+                    Log.e(TAG, "Invalid Google ID token", e)
                     throw IllegalStateException("Invalid Google ID token", e)
                 }
             }
-            else -> throw IllegalStateException("Unsupported credential type: ${credential.javaClass.simpleName}")
-        }
-    }
-
-    fun generateChallenge(): ByteArray {
-        return ByteArray(32).apply {
-            SecureRandom().nextBytes(this)
+            else -> {
+                Log.e(TAG, "Unsupported credential type: ${credential.javaClass.simpleName}")
+                throw IllegalStateException("Unsupported credential type: ${credential.javaClass.simpleName}")
+            }
         }
     }
 
     override suspend fun getRegisteredPassKeys(userId: String): Result<List<PassKeyInfo>> = runCatching {
+        Log.d(TAG, "Fetching registered PassKeys for user: $userId")
         passKeysCollection
             .whereEqualTo("userId", userId)
             .get()
@@ -207,13 +232,16 @@ class PassKeyRepositoryImpl @Inject constructor(
                         lastUsedAt = data["lastUsedAt"] as Long
                     )
                 }
+            }.also { passKeys ->
+                Log.d(TAG, "Found ${passKeys.size} PassKeys for user: $userId")
             }
     }
 
     override suspend fun removePassKey(credentialId: String): Result<Unit> = runCatching {
-        // 패스키 존재 여부 확인
+        Log.d(TAG, "Attempting to remove PassKey: $credentialId")
         val exists = verifyPassKey(credentialId).getOrThrow()
         if (!exists) {
+            Log.e(TAG, "PassKey not found: $credentialId")
             throw IllegalStateException("PassKey not found")
         }
 
@@ -221,6 +249,59 @@ class PassKeyRepositoryImpl @Inject constructor(
             .document(credentialId)
             .delete()
             .await()
+        Log.d(TAG, "Successfully removed PassKey: $credentialId")
+    }
+
+    override suspend fun savePassKeyToFirebase(passKeyInfo: PassKeyInfo): Result<Unit> = runCatching {
+        Log.d(TAG, "Saving PassKey to Firebase: ${passKeyInfo.credentialId}")
+        val passKeyData = mapOf(
+            "credentialId" to passKeyInfo.credentialId,
+            "userId" to passKeyInfo.userId,
+            "publicKey" to passKeyInfo.publicKey,
+            "name" to passKeyInfo.name,
+            "createdAt" to passKeyInfo.createdAt,
+            "lastUsedAt" to passKeyInfo.lastUsedAt
+        )
+
+        passKeysCollection
+            .document(passKeyInfo.credentialId)
+            .set(passKeyData)
+            .await()
+        Log.d(TAG, "Successfully saved PassKey to Firebase: ${passKeyInfo.credentialId}")
+    }
+
+    override suspend fun updatePassKeyLastUsed(credentialId: String): Result<Unit> = runCatching {
+        Log.d(TAG, "Updating last used timestamp for PassKey: $credentialId")
+        val exists = verifyPassKey(credentialId).getOrThrow()
+        if (!exists) {
+            Log.e(TAG, "PassKey not found: $credentialId")
+            throw IllegalStateException("PassKey not found")
+        }
+
+        passKeysCollection
+            .document(credentialId)
+            .update("lastUsedAt", System.currentTimeMillis())
+            .await()
+        Log.d(TAG, "Successfully updated last used timestamp for PassKey: $credentialId")
+    }
+
+    override suspend fun verifyPassKey(credentialId: String): Result<Boolean> = runCatching {
+        Log.d(TAG, "Verifying PassKey: $credentialId")
+        val doc = passKeysCollection
+            .document(credentialId)
+            .get()
+            .await()
+
+        if (doc.exists()) {
+            val userId = doc.getString("userId")
+            val currentUserId = auth.currentUser?.uid
+            val isValid = userId == currentUserId
+            Log.d(TAG, "PassKey verification result: $isValid")
+            isValid
+        } else {
+            Log.d(TAG, "PassKey not found: $credentialId")
+            false
+        }
     }
 
     override fun observePassKeys(userId: String): Flow<List<PassKeyInfo>> {
@@ -241,51 +322,6 @@ class PassKeyRepositoryImpl @Inject constructor(
                     }
                 }
             }
-    }
-
-    override suspend fun savePassKeyToFirebase(passKeyInfo: PassKeyInfo): Result<Unit> = runCatching {
-        val passKeyData = mapOf(
-            "credentialId" to passKeyInfo.credentialId,
-            "userId" to passKeyInfo.userId,
-            "publicKey" to passKeyInfo.publicKey,
-            "name" to passKeyInfo.name,
-            "createdAt" to passKeyInfo.createdAt,
-            "lastUsedAt" to passKeyInfo.lastUsedAt
-        )
-
-        passKeysCollection
-            .document(passKeyInfo.credentialId)
-            .set(passKeyData)
-            .await()
-    }
-
-    override suspend fun updatePassKeyLastUsed(credentialId: String): Result<Unit> = runCatching {
-        // 패스키 존재 여부 확인
-        val exists = verifyPassKey(credentialId).getOrThrow()
-        if (!exists) {
-            throw IllegalStateException("PassKey not found")
-        }
-
-        passKeysCollection
-            .document(credentialId)
-            .update("lastUsedAt", System.currentTimeMillis())
-            .await()
-    }
-
-    override suspend fun verifyPassKey(credentialId: String): Result<Boolean> = runCatching {
-        val doc = passKeysCollection
-            .document(credentialId)
-            .get()
-            .await()
-
-        // 문서 존재 여부와 현재 사용자와 패스키의 사용자 ID가 일치하는지 확인
-        if (doc.exists()) {
-            val userId = doc.getString("userId")
-            val currentUserId = auth.currentUser?.uid
-            userId == currentUserId
-        } else {
-            false
-        }
     }
 
     private fun FirebaseUser.toUser(): User {
