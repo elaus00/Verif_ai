@@ -2,17 +2,23 @@ package mp.verif_ai.domain.util.passkey
 
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
+import java.security.SecureRandom
 
-object PassKeyConfig {
-//    private const val RP_ID = "android:apk-key-hash-[B@24bdbe8"
+data object PassKeyConfig {
     private const val RP_ID = "verifai-71428.firebaseapp.com"
     private const val RP_NAME = "Android client for mp.verif_ai"
+
+    @OptIn(ExperimentalEncodingApi::class)
+    private fun generateChallenge(): String {
+        return ByteArray(32).apply {
+            SecureRandom().nextBytes(this)
+        }.let { Base64.encode(it) }
+    }
 
     @OptIn(ExperimentalEncodingApi::class)
     fun getCreateOptions(
         userId: String,
         displayName: String,
-        challenge: String
     ) = """
         {
             "rp": {
@@ -24,14 +30,14 @@ object PassKeyConfig {
                 "name": "$userId",
                 "displayName": "$displayName"
             },
-            "challenge": "$challenge",
+            "challenge": "${generateChallenge()}",
             "pubKeyCredParams": [
                 {
                     "type": "public-key",
                     "alg": -7
                 }
             ],
-            "timeout": 30000,
+            "timeout": 3000,
             "authenticatorSelection": {
                 "authenticatorAttachment": "platform",
                 "requireResidentKey": true,
@@ -40,11 +46,11 @@ object PassKeyConfig {
         }
     """.trimIndent()
 
-    fun getRequestOptions(challenge: String) = """
+    fun getRequestOptions() = """
         {
             "rpId": "$RP_ID",
             "userVerification": "preferred",
-            "challenge": "$challenge",
+            "challenge": "${generateChallenge()}",
             "timeout": 30000,
             "allowCredentials": []
         }

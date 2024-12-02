@@ -126,6 +126,7 @@ dependencies {
     implementation("androidx.credentials:credentials:1.5.0-beta01")
     implementation("androidx.credentials:credentials-play-services-auth:1.5.0-beta01")
     implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
+    implementation(libs.androidx.biometric)
 
 
 }

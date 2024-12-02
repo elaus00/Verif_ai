@@ -18,12 +18,6 @@ interface PassKeyRepository {
      */
 
     /**
-     * 기기의 PassKey 지원 여부와 사용자의 PassKey 등록 상태를 확인합니다.
-     * @return PassKey 상태 정보를 포함한 Result
-     */
-    suspend fun checkPassKeyStatus(context: ComponentActivity): PassKeyStatus
-
-    /**
      * 사용자를 위한 새로운 PassKey를 등록합니다.
      * @param userId 등록할 사용자의 고유 ID
      * @param name PassKey의 식별 이름 (선택사항)
