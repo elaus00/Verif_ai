@@ -84,6 +84,32 @@ sealed class Screen(val route: String) {
 
             data object Notifications : Settings("main/settings/notifications")
         }
+
+        sealed class Prompt(route: String) : MainNav(route) {
+            companion object {
+                const val route = "main/prompt"
+            }
+
+            // 메인 프롬프트 화면
+            data object Main : Prompt("main/prompt")
+
+            // 프롬프트 기록/히스토리 화면
+            data object History : Prompt("main/prompt/history")
+
+            // 특정 프롬프트 대화 상세 화면
+            data class Detail(val promptId: String) : Prompt("main/prompt/detail/$promptId") {
+                companion object {
+                    const val route = "main/prompt/detail/{$ARG_PROMPT_ID}"
+                    fun createRoute(promptId: String) = "main/prompt/detail/$promptId"
+                }
+            }
+
+            // 프롬프트 템플릿 선택 화면
+            data object Templates : Prompt("main/prompt/templates")
+
+            // 프롬프트 설정 화면 (API 키 설정 등)
+            data object Settings : Prompt("main/prompt/settings")
+        }
     }
 
     companion object {
@@ -92,5 +118,6 @@ sealed class Screen(val route: String) {
         const val ARG_EMAIL = "email"
         const val ARG_USER_ID = "userId"
         const val ARG_RETURN_ROUTE = "return"
+        const val ARG_PROMPT_ID = "promptId"
     }
 }

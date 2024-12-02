@@ -24,6 +24,10 @@ android {
         }
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -31,8 +35,13 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("String", "OPENAI_API_KEY", "\"${properties["OPENAI_API_KEY"]}\"")
+        }
+        debug {
+            buildConfigField("String", "OPENAI_API_KEY", "\"${properties["OPENAI_API_KEY"]}\"")
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -123,10 +132,17 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
 
     // Google Credential Manager
-    implementation("androidx.credentials:credentials:1.5.0-beta01")
-    implementation("androidx.credentials:credentials-play-services-auth:1.5.0-beta01")
-    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.google.googleid)
     implementation(libs.androidx.biometric)
+
+    // import Kotlin API client BOM
+    implementation(platform(libs.openai.client.bom))
+
+    // define dependencies without versions
+    implementation(libs.openai.client)
+    implementation(libs.ktor.client.okhttp)
 
 
 }

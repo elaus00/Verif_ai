@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import mp.verif_ai.domain.model.Notification
+import mp.verif_ai.domain.model.notification.Notification
 import mp.verif_ai.domain.repository.InboxRepository
 import javax.inject.Inject
 

@@ -1,4 +1,4 @@
-package mp.verif_ai.domain.model
+package mp.verif_ai.domain.model.payment
 
 data class Payment(
     val id: String,

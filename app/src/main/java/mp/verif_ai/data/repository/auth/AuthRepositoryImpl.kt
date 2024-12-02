@@ -203,7 +203,7 @@ class AuthRepositoryImpl @Inject constructor(
                 credentialManager.prepareGetCredential(credentialRequest)
                 credentialManager.getCredential(
                     context = activity,
-                    request = credentialRequest
+                    request = credentialRequest,
                 )
             } catch (e: GetCredentialException) {
                 when (e) {

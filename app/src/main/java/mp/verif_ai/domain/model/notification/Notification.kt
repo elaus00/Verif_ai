@@ -1,4 +1,4 @@
-package mp.verif_ai.domain.model
+package mp.verif_ai.domain.model.notification
 
 data class Notification(
     val id: String = "",

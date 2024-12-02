@@ -1,7 +1,7 @@
 package mp.verif_ai.domain.repository
 
 import kotlinx.coroutines.flow.Flow
-import mp.verif_ai.domain.model.Notification
+import mp.verif_ai.domain.model.notification.Notification
 
 interface InboxRepository {
     suspend fun getNotifications(): Flow<List<Notification>> // 변경된 반환 타입

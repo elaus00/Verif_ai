@@ -71,6 +71,12 @@ private val bottomNavItems = listOf(
         label = "인박스"
     ),
     BottomNavItem(
+        route = Screen.MainNav.Question.Create.route,
+        icon = Icons.Outlined.Add,
+        selectedIcon = Icons.Filled.Add,
+        label = "Explore"
+    ),
+    BottomNavItem(
         route = Screen.MainNav.Settings.Main.route,
         icon = Icons.Outlined.Settings,
         selectedIcon = Icons.Filled.Settings,

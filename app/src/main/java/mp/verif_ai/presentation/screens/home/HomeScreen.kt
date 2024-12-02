@@ -23,11 +23,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import mp.verif_ai.domain.model.chat.Conversation
-import mp.verif_ai.domain.model.chat.Question
-import mp.verif_ai.domain.model.chat.QuestionStatus
-import mp.verif_ai.domain.model.TrendingQuestion
+import mp.verif_ai.domain.model.prompt.Conversation
+import mp.verif_ai.domain.model.question.Question
+import mp.verif_ai.domain.model.question.QuestionStatus
+import mp.verif_ai.domain.model.question.TrendingQuestion
 import mp.verif_ai.presentation.navigation.AppBottomNavigation
+import mp.verif_ai.presentation.screens.Screen
 import mp.verif_ai.presentation.screens.theme.VerifAiColor
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,7 +49,20 @@ fun HomeScreen(
         },
         bottomBar = {
             AppBottomNavigation(navController = navController as NavHostController)
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { navController.navigate(Screen.MainNav.Prompt.Main.route) },
+                containerColor = VerifAiColor.Primary
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Open Prompt",
+                    tint = Color.White
+                )
+            }
         }
+
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -144,6 +158,7 @@ fun HomeTopBar(
         modifier = modifier
     )
 }
+
 @Composable
 private fun SearchBar(
     onCreateQuestion: () -> Unit

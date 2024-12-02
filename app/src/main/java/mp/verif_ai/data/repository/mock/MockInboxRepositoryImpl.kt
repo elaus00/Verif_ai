@@ -3,8 +3,8 @@ package mp.verif_ai.data.repository.mock
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
-import mp.verif_ai.domain.model.Notification
-import mp.verif_ai.domain.model.NotificationType
+import mp.verif_ai.domain.model.notification.Notification
+import mp.verif_ai.domain.model.notification.NotificationType
 import mp.verif_ai.domain.repository.InboxRepository
 import java.util.*
 import javax.inject.Inject

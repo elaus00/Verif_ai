@@ -15,52 +15,75 @@
 │   │   │   │   └── mp/
 │   │   │   │       └── verif_ai/
 │   │   │   │           ├── data/
-│   │   │   │           │   ├── firebase/
-│   │   │   │           │   │   ├── repository/
-│   │   │   │           │   │   │   ├── FirebaseAuthRepositoryImpl.kt
-│   │   │   │           │   │   │   └── FirebaseUserRepositoryImpl.kt
-│   │   │   │           │   │   └── FirebaseModule.kt
 │   │   │   │           │   └── repository/
+│   │   │   │           │       ├── auth/
+│   │   │   │           │       │   ├── AuthRepositoryImpl.kt
+│   │   │   │           │       │   └── PassKeyRepositoryImpl.kt
+│   │   │   │           │       ├── chat/
+│   │   │   │           │       │   ├── PromptRepositoryImpl.kt
+│   │   │   │           │       │   └── PromptSettingsRepositoryImpl.kt
 │   │   │   │           │       ├── mock/
 │   │   │   │           │       │   └── MockInboxRepositoryImpl.kt
 │   │   │   │           │       └── InboxRepositoryImpl.kt
 │   │   │   │           ├── di/
-│   │   │   │           │   ├── RepositoryModule.kt
-│   │   │   │           │   ├── UseCaseModule.kt
-│   │   │   │           │   └── ViewModelModule.kt
+│   │   │   │           │   ├── OpenAIModule.kt
+│   │   │   │           │   ├── PassKeyModule.kt
+│   │   │   │           │   └── RepositoryModule.kt
 │   │   │   │           ├── domain/
 │   │   │   │           │   ├── model/
 │   │   │   │           │   │   ├── auth/
+│   │   │   │           │   │   │   ├── AuthCredential.kt
+│   │   │   │           │   │   │   ├── AuthResult.kt
+│   │   │   │           │   │   │   ├── AuthState.kt
 │   │   │   │           │   │   │   ├── EmailVerification.kt
 │   │   │   │           │   │   │   ├── Expert.kt
+│   │   │   │           │   │   │   ├── ExpertFields.kt
+│   │   │   │           │   │   │   ├── SignUpState.kt
 │   │   │   │           │   │   │   └── User.kt
-│   │   │   │           │   │   ├── chat/
-│   │   │   │           │   │   │   ├── Answer.kt
-│   │   │   │           │   │   │   ├── Conversation.kt
-│   │   │   │           │   │   │   ├── Message.kt
-│   │   │   │           │   │   │   └── Question.kt
 │   │   │   │           │   │   ├── extension/
 │   │   │   │           │   │   │   ├── FirestoreDto.kt
 │   │   │   │           │   │   │   └── VerificationConstants.kt
-│   │   │   │           │   │   ├── Dispute.kt
-│   │   │   │           │   │   ├── Notification.kt
-│   │   │   │           │   │   ├── Payment.kt
-│   │   │   │           │   │   ├── Point.kt
-│   │   │   │           │   │   └── TrendingQuestion.kt
+│   │   │   │           │   │   ├── notification/
+│   │   │   │           │   │   │   └── Notification.kt
+│   │   │   │           │   │   ├── passkey/
+│   │   │   │           │   │   │   ├── PassKeyInfo.kt
+│   │   │   │           │   │   │   ├── PassKeyRegistrationResult.kt
+│   │   │   │           │   │   │   ├── PassKeySignInResult.kt
+│   │   │   │           │   │   │   └── PassKeyStatus.kt
+│   │   │   │           │   │   ├── payment/
+│   │   │   │           │   │   │   ├── Payment.kt
+│   │   │   │           │   │   │   └── Point.kt
+│   │   │   │           │   │   ├── prompt/
+│   │   │   │           │   │   │   ├── Conversation.kt
+│   │   │   │           │   │   │   ├── PromptCategory.kt
+│   │   │   │           │   │   │   ├── PromptException.kt
+│   │   │   │           │   │   │   ├── PromptResponse.kt
+│   │   │   │           │   │   │   ├── PromptTemplate.kt
+│   │   │   │           │   │   │   └── UserPrompt.kt
+│   │   │   │           │   │   └── question/
+│   │   │   │           │   │       ├── Question.kt
+│   │   │   │           │   │       └── TrendingQuestion.kt
 │   │   │   │           │   ├── repository/
 │   │   │   │           │   │   ├── AuthRepository.kt
 │   │   │   │           │   │   ├── InboxRepository.kt
+│   │   │   │           │   │   ├── PassKeyRepository.kt
+│   │   │   │           │   │   ├── PromptRepository.kt
+│   │   │   │           │   │   ├── PromptSettingsRepository.kt
 │   │   │   │           │   │   └── UserRepository.kt
-│   │   │   │           │   └── usecase/
-│   │   │   │           │       ├── auth/
-│   │   │   │           │       │   ├── SignInUseCase.kt
-│   │   │   │           │       │   ├── SignUpUseCase.kt
-│   │   │   │           │       │   └── VerifyEmailUseCase.kt
-│   │   │   │           │       ├── payment/
-│   │   │   │           │       ├── question/
-│   │   │   │           │       └── user/
-│   │   │   │           │           ├── CreateUserUseCase.kt
-│   │   │   │           │           └── GetUserUseCase.kt
+│   │   │   │           │   ├── usecase/
+│   │   │   │           │   │   ├── auth/
+│   │   │   │           │   │   ├── payment/
+│   │   │   │           │   │   ├── prompt/
+│   │   │   │           │   │   │   ├── GetPromptTemplatesUseCase.kt
+│   │   │   │           │   │   │   └── SendPromptUseCase.kt
+│   │   │   │           │   │   └── question/
+│   │   │   │           │   └── util/
+│   │   │   │           │       ├── config/
+│   │   │   │           │       │   └── OpenAIConfig.kt
+│   │   │   │           │       ├── passkey/
+│   │   │   │           │       │   ├── PassKeyConfig.kt
+│   │   │   │           │       │   └── PassKeyException.kt
+│   │   │   │           │       └── DataFormatter.kt
 │   │   │   │           ├── presentation/
 │   │   │   │           │   ├── navigation/
 │   │   │   │           │   │   ├── navigation.kt
@@ -68,14 +91,20 @@
 │   │   │   │           │   ├── screens/
 │   │   │   │           │   │   ├── answer/
 │   │   │   │           │   │   ├── auth/
-│   │   │   │           │   │   │   ├── EmailVerificationScreen.kt
-│   │   │   │           │   │   │   ├── ExpertOnboardingScreen.kt
-│   │   │   │           │   │   │   ├── ExpertSubmitScreen.kt
-│   │   │   │           │   │   │   ├── ExpertVerificationScreen.kt
+│   │   │   │           │   │   │   ├── expertsignup/
+│   │   │   │           │   │   │   │   ├── ExpertOnboardingScreen.kt
+│   │   │   │           │   │   │   │   ├── ExpertSubmitScreen.kt
+│   │   │   │           │   │   │   │   └── ExpertVerificationScreen.kt
+│   │   │   │           │   │   │   ├── signup/
+│   │   │   │           │   │   │   │   ├── EmailVerificationScreen.kt
+│   │   │   │           │   │   │   │   ├── PassWordSignUp.kt
+│   │   │   │           │   │   │   │   ├── PhoneSignUp.kt
+│   │   │   │           │   │   │   │   ├── SignUpFormScreen.kt
+│   │   │   │           │   │   │   │   └── SignUpScreen.kt
+│   │   │   │           │   │   │   ├── AuthComponents.kt
 │   │   │   │           │   │   │   ├── OnBoarding.kt
-│   │   │   │           │   │   │   ├── SignInScreen.kt
-│   │   │   │           │   │   │   ├── SignUpFormScreen.kt
-│   │   │   │           │   │   │   └── SignUpScreen.kt
+│   │   │   │           │   │   │   ├── SignInOptions.kt
+│   │   │   │           │   │   │   └── SignInScreen.kt
 │   │   │   │           │   │   ├── home/
 │   │   │   │           │   │   │   ├── question/
 │   │   │   │           │   │   │   │   ├── Question.kt
@@ -86,6 +115,14 @@
 │   │   │   │           │   │   ├── inbox/
 │   │   │   │           │   │   │   ├── InboxQuestionDetailScreen.kt
 │   │   │   │           │   │   │   └── InboxScreen.kt
+│   │   │   │           │   │   ├── prompt/
+│   │   │   │           │   │   │   ├── components/
+│   │   │   │           │   │   │   │   └── MessageComponent.kt
+│   │   │   │           │   │   │   ├── PromptDetailScreen.kt
+│   │   │   │           │   │   │   ├── PromptHistoryScreen.kt
+│   │   │   │           │   │   │   ├── PromptScreen.kt
+│   │   │   │           │   │   │   ├── PromptSettingScreen.kt
+│   │   │   │           │   │   │   └── PromptTemplateScreen.kt
 │   │   │   │           │   │   ├── settings/
 │   │   │   │           │   │   │   ├── notification/
 │   │   │   │           │   │   │   │   └── NotificationSettingsScreen.kt
@@ -104,14 +141,21 @@
 │   │   │   │           │   │   │   └── Type.kt
 │   │   │   │           │   │   └── Screen.kt
 │   │   │   │           │   ├── viewmodel/
+│   │   │   │           │   │   ├── prompt/
+│   │   │   │           │   │   │   ├── PromptDetailViewModel.kt
+│   │   │   │           │   │   │   ├── PromptHistoryViewModel.kt
+│   │   │   │           │   │   │   ├── PromptSettingsViewModel.kt
+│   │   │   │           │   │   │   ├── PromptTemplateViewModel.kt
+│   │   │   │           │   │   │   └── PromptViewModel.kt
+│   │   │   │           │   │   ├── state/
+│   │   │   │           │   │   │   ├── ChatUiState.kt
+│   │   │   │           │   │   │   └── SignInUiState.kt
 │   │   │   │           │   │   ├── AuthViewModel.kt
 │   │   │   │           │   │   ├── HomeViewModel.kt
 │   │   │   │           │   │   ├── InboxViewModel.kt
-│   │   │   │           │   │   ├── QuestionCreateViewModel.kt
-│   │   │   │           │   │   └── UiState.kt
+│   │   │   │           │   │   ├── PassKeyViewModel.kt
+│   │   │   │           │   │   └── QuestionCreateViewModel.kt
 │   │   │   │           │   └── MainActivity.kt
-│   │   │   │           ├── util/
-│   │   │   │           │   └── DataFormatter.kt
 │   │   │   │           └── VerifAI.kt
 │   │   │   ├── res/
 │   │   │   │   ├── drawable/
@@ -120,6 +164,7 @@
 │   │   │   │   │   ├── check_circle.xml
 │   │   │   │   │   ├── google.xml
 │   │   │   │   │   ├── group.xml
+│   │   │   │   │   ├── ic_google_logo.xml
 │   │   │   │   │   ├── ic_launcher_background.xml
 │   │   │   │   │   ├── ic_launcher_foreground.xml
 │   │   │   │   │   ├── image_14.xml
@@ -162,7 +207,8 @@
 │   │   │   │   │   └── themes.xml
 │   │   │   │   └── xml/
 │   │   │   │       ├── backup_rules.xml
-│   │   │   │       └── data_extraction_rules.xml
+│   │   │   │       ├── data_extraction_rules.xml
+│   │   │   │       └── provider.xml
 │   │   │   └── AndroidManifest.xml
 │   │   └── test/
 │   │       └── java/
@@ -170,8 +216,10 @@
 │   │               └── verif_ai/
 │   │                   ├── data/
 │   │                   │   └── respository/
+│   │                   │       └── PassKeyRepositoryTest.kt
 │   │                   └── ExampleUnitTest.kt
 │   ├── build.gradle.kts
+│   ├── desktop.ini
 │   ├── google-services.json
 │   └── proguard-rules.pro
 ├── gradle/
@@ -180,6 +228,8 @@
 │   │   └── gradle-wrapper.properties
 │   └── libs.versions.toml
 ├── build.gradle.kts
+├── folder_structure_20241124_213456.md
+├── folder_structure_20241203_032555.md
 ├── folder_structure_export.py
 ├── gradle.properties
 ├── gradlew
