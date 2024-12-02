@@ -12,8 +12,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Comment
 import androidx.compose.material.icons.automirrored.filled.Reply
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Comment
-import androidx.compose.material.icons.filled.Reply
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.*
@@ -21,14 +19,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import mp.verif_ai.domain.model.Notification
-import mp.verif_ai.domain.model.NotificationType
+import mp.verif_ai.domain.model.notification.Notification
+import mp.verif_ai.domain.model.notification.NotificationType
 import mp.verif_ai.presentation.navigation.AppBottomNavigation
 import mp.verif_ai.presentation.viewmodel.InboxUiState
 import mp.verif_ai.presentation.viewmodel.InboxViewModel

@@ -1,8 +1,7 @@
 package mp.verif_ai.domain.model.extension
 
 import com.google.firebase.firestore.DocumentSnapshot
-import mp.verif_ai.domain.model.chat.Answer
-import mp.verif_ai.domain.model.chat.Question
+import mp.verif_ai.domain.model.question.Question
 import mp.verif_ai.domain.model.auth.User
 import mp.verif_ai.domain.model.auth.UserStatus
 import mp.verif_ai.domain.model.auth.UserType
@@ -29,20 +28,6 @@ fun Question.toMap(): Map<String, Any?> = mapOf(
     "isPublic" to isPublic,
     "reward" to reward,
     "attachments" to attachments,
-    "createdAt" to createdAt,
-    "updatedAt" to updatedAt
-)
-
-fun Answer.toMap(): Map<String, Any?> = mapOf(
-    "id" to id,
-    "questionId" to questionId,
-    "expertId" to expertId,
-    "content" to content,
-    "type" to type.name,
-    "status" to status.name,
-    "accuracy" to accuracy,
-    "isAdopted" to isAdopted,
-    "helpfulCount" to helpfulCount,
     "createdAt" to createdAt,
     "updatedAt" to updatedAt
 )

@@ -1,7 +1,7 @@
 package mp.verif_ai.data.repository;
 
 import kotlinx.coroutines.flow.Flow
-import mp.verif_ai.domain.model.Notification
+import mp.verif_ai.domain.model.notification.Notification
 import mp.verif_ai.domain.repository.InboxRepository
 import javax.inject.Inject
 import javax.inject.Singleton

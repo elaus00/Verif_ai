@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import mp.verif_ai.domain.model.chat.Question
+import mp.verif_ai.domain.model.question.Question
 
 sealed class HomeUiState {
     data object Loading : HomeUiState()

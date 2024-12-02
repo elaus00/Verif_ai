@@ -1,4 +1,4 @@
-package mp.verif_ai.domain.model.chat
+package mp.verif_ai.domain.model.prompt
 
 data class Conversation(
     val id: String,

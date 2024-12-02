@@ -58,17 +58,17 @@ private val bottomNavItems = listOf(
         selectedIcon = Icons.Filled.Home,
         label = "Home"
     ),
-//    BottomNavItem(
-//        route = Screen.MainNav.Question.Create.route,
-//        icon = Icons.Outlined.Add,
-//        selectedIcon = Icons.Filled.Add,
-//        label = "Question"
-//    ),
     BottomNavItem(
         route = Screen.MainNav.Inbox.Main.route,
         icon = Icons.Outlined.Mail,
         selectedIcon = Icons.Filled.Mail,
         label = "Inbox"
+    ),
+    BottomNavItem(
+        route = Screen.MainNav.Question.Create.route,
+        icon = Icons.Outlined.Add,
+        selectedIcon = Icons.Filled.Add,
+        label = "Explore"
     ),
     BottomNavItem(
         route = Screen.MainNav.Settings.Main.route,

@@ -1,4 +1,8 @@
-package mp.verif_ai.domain.model.chat
+package mp.verif_ai.domain.model.question
+
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 data class Question(
     val id: String = "",
@@ -13,8 +17,8 @@ data class Question(
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis(),
     val author: String = "Anonymous",
-    val formattedDate: String = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.getDefault())
-        .format(java.util.Date(System.currentTimeMillis()))
+    val formattedDate: String = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+        .format(Date(System.currentTimeMillis()))
 )
 
 enum class QuestionStatus { DRAFT, PUBLISHED, CLOSED, DELETED, CONTROVERSIAL }

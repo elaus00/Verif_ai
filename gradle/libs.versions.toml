@@ -1,6 +1,7 @@
 [versions]
 agp = "8.5.2"
 biometric = "1.1.0"
+credentials = "1.5.0-beta01"
 firebaseBom = "33.6.0"
 googleidVersion = "1.1.1"
 hilt = "2.51.1"
@@ -15,6 +16,7 @@ lifecycleRuntimeCompose = "2.8.7"
 activityCompose = "1.9.3"
 composeBom = "2024.11.00"
 mockk = "1.13.8"
+openaiClientBom = "3.8.2"
 playServicesVersion = "17.0.0"
 retrofit = "2.10.0"
 kotlinxCoroutines = "1.9.0"
@@ -31,6 +33,8 @@ playServicesFido = "21.1.0"
 [libraries]
 androidx-biometric = { module = "androidx.biometric:biometric", version.ref = "biometric" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
+androidx-credentials-play-services-auth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycleRuntimeCompose" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeCompose" }
@@ -56,7 +60,10 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
+ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp" }
 mockk = { module = "io.mockk:mockk", version = "1.13.13" }
+openai-client = { module = "com.aallam.openai:openai-client" }
+openai-client-bom = { module = "com.aallam.openai:openai-client-bom", version.ref = "openaiClientBom" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit-gson-converter = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
