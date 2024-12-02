@@ -7,7 +7,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import mp.verif_ai.data.auth.PassKeyRepositoryImpl
+import mp.verif_ai.data.repository.auth.PassKeyRepositoryImpl
 import mp.verif_ai.domain.repository.PassKeyRepository
 import javax.inject.Singleton
 

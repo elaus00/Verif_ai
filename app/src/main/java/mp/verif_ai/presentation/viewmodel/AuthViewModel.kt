@@ -1,16 +1,8 @@
 package mp.verif_ai.presentation.viewmodel
 
-import android.content.Context
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.gms.auth.api.signin.GoogleSignInStatusCodes.SIGN_IN_CANCELLED
-import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.common.api.CommonStatusCodes
-import com.google.firebase.auth.FirebaseAuthEmailException
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
-import com.google.firebase.auth.FirebaseAuthInvalidUserException
-import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,8 +11,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import mp.verif_ai.domain.model.auth.User
+import mp.verif_ai.domain.model.passkey.PassKeyStatus
 import mp.verif_ai.domain.repository.AuthRepository
 import mp.verif_ai.domain.util.passkey.*
+import mp.verif_ai.presentation.screens.auth.SignUpOptions
 import javax.inject.Inject
 
 @HiltViewModel
@@ -38,10 +32,108 @@ class AuthViewModel @Inject constructor(
         observeAuthState()
     }
 
-    fun signIn(activity: ComponentActivity) {
+    fun handleSignUpOption(option: SignUpOptions.Option, context: ComponentActivity) {
+        when (option) {
+            SignUpOptions.Option.GOOGLE -> {
+                viewModelScope.launch {
+                    _uiState.value = AuthUiState.Loading
+                    // Google 로그인 처리
+                }
+            }
+            SignUpOptions.Option.PHONE -> {
+                // 전화번호 입력을 위한 이벤트 발생
+                viewModelScope.launch {
+                    _events.emit(AuthEvent.ShowPhoneInput)
+                }
+            }
+            SignUpOptions.Option.PASSWORD -> {
+                // 비밀번호 입력을 위한 이벤트 발생
+                viewModelScope.launch {
+                    _events.emit(AuthEvent.ShowPasswordInput)
+                }
+            }
+        }
+    }
+
+    private fun signUpWithGoogle(activity: ComponentActivity) {
         viewModelScope.launch {
             _uiState.value = AuthUiState.Loading
-            authRepository.signIn(activity)
+            try {
+                authRepository.signUpWithCredentialManager(
+                    email = "",  // Google SignIn will provide this
+                    password = "",  // Not needed for Google SignIn
+                    nickname = "",  // Will be taken from Google account
+                    context = activity
+                ).onSuccess { user ->
+                    _uiState.value = AuthUiState.Authenticated(user)
+                    _events.emit(AuthEvent.NavigateToMain)
+                }.onFailure { e ->
+                    _uiState.value = AuthUiState.Error(e)
+                    _events.emit(AuthEvent.ShowError(e.message ?: "Failed to sign up with Google"))
+                }
+            } catch (e: Exception) {
+                _uiState.value = AuthUiState.Error(e)
+                _events.emit(AuthEvent.ShowError(e.message ?: "Failed to sign up with Google"))
+            }
+        }
+    }
+
+    private fun showPhoneSignUpDialog() {
+        viewModelScope.launch {
+            _events.emit(AuthEvent.ShowPhoneInput)
+        }
+    }
+
+    private fun showPasswordSignUpDialog() {
+        viewModelScope.launch {
+            _events.emit(AuthEvent.ShowPasswordInput)
+        }
+    }
+
+    fun signUpWithPhone(phoneNumber: String, activity: ComponentActivity) {
+        viewModelScope.launch {
+            _uiState.value = AuthUiState.Loading
+            // Phone number verification implementation
+        }
+    }
+
+    fun signUpWithCredentialManager(email: String, password: String, nickname: String, context: ComponentActivity) {
+        viewModelScope.launch {
+            _uiState.value = AuthUiState.Loading
+            authRepository.signUpWithCredentialManager(email, password, nickname, context, enablePassKey = false)
+                .onSuccess { user ->
+                    _uiState.value = AuthUiState.Authenticated(user)
+                    _events.emit(AuthEvent.NavigateToMain)
+                }
+                .onFailure { e ->
+                    _uiState.value = AuthUiState.Error(e)
+                    _events.emit(AuthEvent.ShowError(e.message ?: "Failed to sign up"))
+                }
+        }
+    }
+
+    fun signUpWithPassword(password: String, activity: ComponentActivity) {
+        viewModelScope.launch {
+            _uiState.value = AuthUiState.Loading
+            authRepository.signUpWithCredentialManager(
+                email = "",  // PassKey/Credential Manager에서 처리
+                password = password,
+                nickname = "", // PassKey/Credential Manager에서 처리
+                context = activity
+            ).onSuccess { user ->
+                _uiState.value = AuthUiState.Authenticated(user)
+                _events.emit(AuthEvent.NavigateToMain)
+            }.onFailure { e ->
+                _uiState.value = AuthUiState.Error(e)
+                _events.emit(AuthEvent.ShowError(e.message ?: "Failed to sign up with password"))
+            }
+        }
+    }
+
+    fun signIn(email: String? = null, password: String? = null, activity: ComponentActivity) {
+        viewModelScope.launch {
+            _uiState.value = AuthUiState.Loading
+            authRepository.signIn(activity, email, password)
                 .onSuccess { user ->
                     _uiState.value = AuthUiState.Authenticated(user)
                     _events.emit(AuthEvent.NavigateToMain)
@@ -63,34 +155,6 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun signUpWithEmail(email: String, password: String, nickname: String, context: ComponentActivity) {
-        viewModelScope.launch {
-            _uiState.value = AuthUiState.Loading
-            authRepository.signUpWithEmail(email, password, nickname, context)
-                .onSuccess { user ->
-                    _uiState.value = AuthUiState.Authenticated(user)
-                    _events.emit(AuthEvent.NavigateToMain)
-                }
-                .onFailure { e ->
-                    _uiState.value = AuthUiState.Error(e)
-                    _events.emit(AuthEvent.ShowError(e.message ?: "Failed to sign up"))
-                }
-        }
-    }
-
-    fun checkExistingAccount(email: String) {
-        viewModelScope.launch {
-            authRepository.checkExistingAccount(email)
-                .onSuccess { exists ->
-                    if (exists) {
-                        _events.emit(AuthEvent.ShowError("Account already exists"))
-                    }
-                }
-                .onFailure { e ->
-                    _events.emit(AuthEvent.ShowError(e.message ?: "Failed to check account"))
-                }
-        }
-    }
 
     fun signOut() {
         viewModelScope.launch {
@@ -161,20 +225,6 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun signUpWithCredentialManager(email: String, password: String, nickname: String, context: ComponentActivity) {
-        viewModelScope.launch {
-            _uiState.value = AuthUiState.Loading
-            authRepository.signUpWithCredentialManager(email, password, nickname, context)
-                .onSuccess { user ->
-                    _uiState.value = AuthUiState.Authenticated(user)
-                    _events.emit(AuthEvent.NavigateToMain)
-                }
-                .onFailure { e ->
-                    _uiState.value = AuthUiState.Error(e)
-                    _events.emit(AuthEvent.ShowError(e.message ?: "Failed to sign up"))
-                }
-        }
-    }
 
 }
 
@@ -194,5 +244,7 @@ sealed class AuthEvent {
     data object NavigateToAuth : AuthEvent()
     data object PasswordResetEmailSent : AuthEvent()
     data object VerificationEmailSent : AuthEvent()
+    data object ShowPhoneInput : AuthEvent()
+    data object ShowPasswordInput : AuthEvent()
 }
 

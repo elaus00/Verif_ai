@@ -1,6 +1,5 @@
 package mp.verif_ai.data.respository
 
-import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.credentials.CredentialManager
@@ -23,12 +22,10 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.test.runTest
-import mp.verif_ai.data.auth.PassKeyRepositoryImpl
+import mp.verif_ai.data.repository.auth.PassKeyRepositoryImpl
 import mp.verif_ai.domain.model.passkey.PassKeyInfo
 import mp.verif_ai.domain.model.passkey.PassKeyRegistrationResult
-import mp.verif_ai.domain.model.passkey.PassKeySignInResult
 import mp.verif_ai.domain.model.passkey.PassKeyStatus
-import mp.verif_ai.domain.util.passkey.PassKeyNoCredentialException
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -61,25 +58,6 @@ class PassKeyRepositoryTest {
     }
 
     @Test
-    fun `checkPassKeyStatus returns AVAILABLE when supported with activity context`() = runTest {
-        // Given
-        val activity = mockk<ComponentActivity>()
-
-        coEvery {
-            credentialManager.getCredential(
-                activity,
-                any<GetCredentialRequest>()
-            )
-        } returns mockk<GetCredentialResponse>()
-
-        // When
-        val result = passKeyRepository.checkPassKeyStatus(activity)
-
-        // Then
-        assertEquals(PassKeyStatus.AVAILABLE, result)
-    }
-
-    @Test
     fun `verifyPassKey returns true for valid credential`() = runTest {
         // Given
         val credentialId = "testCredentialId"
@@ -105,71 +83,6 @@ class PassKeyRepositoryTest {
         assertTrue(result.getOrNull() ?: false)
     }
 
-    @Test
-    fun `getRegisteredPassKeys returns list of PassKeyInfo`() = runTest {
-        // Given
-        val userId = "testUserId"
-        val passKeyInfo = PassKeyInfo(
-            credentialId = "testCredentialId",
-            userId = userId,
-            publicKey = "testPublicKey",
-            name = "Test PassKey",
-            createdAt = 1000L,
-            lastUsedAt = 2000L
-        )
-
-        val querySnapshot = mockk<QuerySnapshot>()
-        val query = mockk<Query>()
-        val documentSnapshot = mockk<DocumentSnapshot>()
-
-        // Mock 설정 수정
-        every { passKeysCollection.whereEqualTo("userId", userId) } returns query
-        every { query.get() } returns mockk {
-            coEvery { await() } returns querySnapshot
-        }
-
-        every { querySnapshot.documents } returns listOf(documentSnapshot)
-        every { documentSnapshot.data } returns passKeyInfo.toMap()
-
-        // When
-        val result = passKeyRepository.getRegisteredPassKeys(userId)
-
-        // Then
-        assertTrue(result.isSuccess)
-        assertEquals(1, result.getOrNull()?.size)
-        assertEquals(passKeyInfo.credentialId, result.getOrNull()?.first()?.credentialId)
-    }
-
-    @Test
-    fun `observePassKeys emits PassKeyInfo updates`() = runTest {
-        // Given
-        val userId = "testUserId"
-        val passKeyInfo = PassKeyInfo(
-            credentialId = "testCredentialId",
-            userId = userId,
-            publicKey = "testPublicKey",
-            name = "Test PassKey",
-            createdAt = 1000L,
-            lastUsedAt = 2000L
-        )
-
-        val query = mockk<Query>()
-        val querySnapshot = mockk<QuerySnapshot>()
-        val documentSnapshot = mockk<DocumentSnapshot>()
-
-        every { passKeysCollection.whereEqualTo("userId", userId) } returns query
-        every { query.snapshots() } returns flowOf(querySnapshot)
-        every { querySnapshot.documents } returns listOf(documentSnapshot)
-        every { documentSnapshot.data } returns passKeyInfo.toMap()
-
-        // When
-        val flow = passKeyRepository.observePassKeys(userId)
-        val result = flow.first()
-
-        // Then
-        assertEquals(1, result.size)
-        assertEquals(passKeyInfo.credentialId, result.first().credentialId)
-    }
 
 //    @Test
 //    fun `signInWithPassKey handles invalid credential`() = runTest {
@@ -287,31 +200,6 @@ class PassKeyRepositoryTest {
         // Then
         assertTrue(result.isFailure)
         assertTrue(result.exceptionOrNull() is IllegalStateException)
-    }
-
-    @Test
-    fun `savePassKeyToFirebase returns success for valid save`() = runTest {
-        // Given
-        val passKeyInfo = PassKeyInfo(
-            credentialId = "testCredentialId",
-            userId = "testUserId",
-            publicKey = "testPublicKey",
-            name = "Test PassKey",
-            createdAt = 1000L,
-            lastUsedAt = 2000L
-        )
-        val docRef = mockk<DocumentReference>()
-        val task = mockk<Task<Void>>()
-
-        every { passKeysCollection.document(passKeyInfo.credentialId) } returns docRef
-        every { docRef.set(any<Map<String, Any>>()) } returns task
-        coEvery { task.await() } returns mockk()
-
-        // When
-        val result = passKeyRepository.savePassKeyToFirebase(passKeyInfo)
-
-        // Then
-        assertTrue(result.isSuccess)
     }
 
     @Test

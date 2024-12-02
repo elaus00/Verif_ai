@@ -10,6 +10,7 @@ class VerifAI : Application() {
     override fun onCreate() {
         super.onCreate()
         FirebaseApp.initializeApp(this)
-        FirebaseAuth.getInstance().signOut()
+//        FirebaseAuth.getInstance().signOut()
+//        FirebaseAuth.getInstance().signInAnonymously()
     }
 }
