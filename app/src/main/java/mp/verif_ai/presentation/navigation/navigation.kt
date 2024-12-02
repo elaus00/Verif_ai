@@ -253,6 +253,7 @@ private fun NavGraphBuilder.settingsNavigation(navController: NavHostController)
         }
         composable(Screen.MainNav.Settings.Payment.Methods.route) {
             PaymentMethodsScreen(
+                navController = navController,
                 onAddMethod = {
                     navController.navigate(
                         Screen.MainNav.Settings.Payment.AddMethod.createRoute(

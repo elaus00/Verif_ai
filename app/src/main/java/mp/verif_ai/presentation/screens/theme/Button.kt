@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 
@@ -100,5 +101,34 @@ fun LoginButton(
                 fontWeight = FontWeight.Medium
             )
         }
+    }
+}
+
+@Composable
+fun BuyButton(
+    text: String,
+    onClick: () -> Unit = {},
+    colors: ButtonColors = ButtonDefaults.buttonColors(
+        containerColor = Color(0xFF174EB4),
+        contentColor = Color.White,
+        disabledContainerColor = Color(0xFF2A5AB3),
+        disabledContentColor = Color.White,
+    ),
+    enabled: Boolean = true
+) {
+    Button(
+        modifier = Modifier
+            .border(width = 1.dp, color = Color(0x00000000), shape = RoundedCornerShape(size = 20.dp))
+            .background(color = Color(0xFF2A5AB3), shape = RoundedCornerShape(size = 20.dp))
+            .fillMaxSize(),
+
+        colors = colors,
+        onClick = { onClick() }) {
+        Text(
+            text=text,
+            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+            modifier = Modifier.fillMaxSize()
+
+        )
     }
 }
