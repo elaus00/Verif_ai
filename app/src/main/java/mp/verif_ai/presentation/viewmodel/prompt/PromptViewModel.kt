@@ -1,5 +1,10 @@
 package mp.verif_ai.presentation.viewmodel.prompt
 
+import android.app.Activity
+import android.content.Intent
+import android.speech.RecognizerIntent
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -65,4 +70,5 @@ class PromptViewModel @Inject constructor(
             }
         }
     }
+
 }
