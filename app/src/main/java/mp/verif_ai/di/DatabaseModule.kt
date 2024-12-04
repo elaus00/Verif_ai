@@ -9,7 +9,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import mp.verif_ai.data.room.NotificationDatabase
 import mp.verif_ai.data.room.dao.NotificationDao
-import mp.verif_ai.data.room.model.NotificationEntity
 import javax.inject.Singleton
 
 @Module

@@ -3,7 +3,7 @@ package mp.verif_ai.data.room.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import mp.verif_ai.data.room.model.QuestionEntity
+import mp.verif_ai.domain.RoomModel.QuestionEntity
 
 @Dao
 interface QuestionDao {

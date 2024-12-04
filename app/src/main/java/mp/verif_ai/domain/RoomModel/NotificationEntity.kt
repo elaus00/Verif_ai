@@ -1,4 +1,4 @@
-package mp.verif_ai.data.room.model
+package mp.verif_ai.domain.RoomModel
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

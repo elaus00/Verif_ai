@@ -1,15 +1,13 @@
 package mp.verif_ai.data.repository;
 
-import androidx.room.util.copy
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import mp.verif_ai.domain.model.Notification
 import mp.verif_ai.domain.repository.InboxRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 import mp.verif_ai.data.room.dao.NotificationDao
-import mp.verif_ai.data.room.model.NotificationEntity
+import mp.verif_ai.domain.RoomModel.NotificationEntity
 import mp.verif_ai.domain.model.NotificationType
 
 @Singleton
@@ -50,9 +48,9 @@ class InboxRepositoryImpl @Inject constructor(
             NotificationEntity(
                 id = "3",
                 userId = "user_789",
-                title = "새로운 질문 도착",
-                content = "당신의 전문가 답변이 필요한 질문이 있습니다.",
-                type = "NEW_QUESTION",
+                title = "새 댓글이 달렸습니다",
+                content = "당신의 질문에 새로운 댓글이 달렸습니다.",
+                type = "COMMENT",
                 isRead = false,
                 deepLink = null,
                 createdAt = System.currentTimeMillis() - 200000
@@ -73,12 +71,20 @@ class InboxRepositoryImpl @Inject constructor(
     override suspend fun markAsRead(notificationId: String) {
         // TODO: Implementation
         // 1. 로컬 DB에서 알림 읽음 표시
+        val notification = notificationDao.findNotificationById(notificationId)
+        notification?.let {
+            notificationDao.updateNotification(it.copy(isRead = true))
+        }
         // 2. 네트워크 연결된 경우 서버에 동기화
     }
 
     override suspend fun markAllAsRead() {
         // TODO: Implementation
         // 1. 로컬 DB의 모든 알림 읽음 표시
+        val unreadNotifications = notificationDao.getAllUnreadNotifications()
+        unreadNotifications.forEach {
+            notificationDao.updateNotification(it.copy(isRead = true))
+        }
         // 2. 네트워크 연결된 경우 서버에 동기화
     }
 
@@ -100,7 +106,6 @@ class InboxRepositoryImpl @Inject constructor(
         // TODO: Implementation
         // 1. 로컬 DB에서 읽지 않은 알림 개수 조회
         return notificationDao.getUnreadCount()
-        return 0
     }
 }
 fun NotificationEntity.toDomainModel(): Notification {
