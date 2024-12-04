@@ -127,5 +127,10 @@ dependencies {
     implementation(libs.gms.play.services.auth)
     implementation(libs.gms.play.services.safetynet)
 
-    implementation(libs.androidx.room.common)
+    val room_version = "2.6.1"
+
+    implementation("androidx.room:room-runtime:$room_version")
+    kapt ("androidx.room:room-compiler:2.6.0")
+    implementation ("androidx.room:room-ktx:2.6.0")
+
 }

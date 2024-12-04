@@ -69,6 +69,19 @@ fun OnBoardingScreen(
                 enabled = verificationCode.isNotEmpty(),
             )
 
+            TextButton(
+                onClick = { navController.navigate(Screen.MainNav.Home.route) },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                )
+            ) {
+                Text(
+                    text = "[TEST] Skip to Main",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+
             // Test Button (개발 중일 때만 표시)
             if (BuildConfig.DEBUG) {
                 TextButton(

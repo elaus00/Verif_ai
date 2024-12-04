@@ -19,15 +19,56 @@ class InboxRepositoryImpl @Inject constructor(
     private val notificationDao: NotificationDao,
     // private val connectivityChecker: ConnectivityChecker
 ) : InboxRepository {
-
-    override suspend fun getNotifications(): List<Notification> {
-        // TODO: Implementation
-        // 1. 네트워크 연결 확인
-        // 2. 연결된 경우 API에서 최신 데이터 가져오기
-        // 3. 로컬 DB 업데이트
-        // 4. 연결 안 된 경우 로컬 DB에서 데이터 가져오기
-        return emptyList()
+    override suspend fun getNotifications(): Flow<List<Notification>> {
+        return notificationDao.getAllNotifications().map { entities ->
+            entities.map { it.toDomainModel() }  // toDomainModel() 함수 활용
+        }
     }
+
+    override suspend fun insertMockData() {
+        val mockNotifications = listOf(
+            NotificationEntity(
+                id = "1",
+                userId = "user_123",
+                title = "새 댓글이 달렸습니다.",
+                content = "당신의 질문에 새로운 댓글이 달렸습니다.",
+                type = "COMMENT",
+                isRead = false,
+                deepLink = "app://comments/1",
+                createdAt = System.currentTimeMillis()
+            ),
+            NotificationEntity(
+                id = "2",
+                userId = "user_456",
+                title = "좋아요 알림",
+                content = "당신의 답변이 좋아요를 받았습니다.",
+                type = "LIKE",
+                isRead = true,
+                deepLink = "app://answers/like/2",
+                createdAt = System.currentTimeMillis() - 100000
+            ),
+            NotificationEntity(
+                id = "3",
+                userId = "user_789",
+                title = "새로운 질문 도착",
+                content = "당신의 전문가 답변이 필요한 질문이 있습니다.",
+                type = "NEW_QUESTION",
+                isRead = false,
+                deepLink = null,
+                createdAt = System.currentTimeMillis() - 200000
+            )
+        )
+        notificationDao.insertNotification(mockNotifications)
+    }
+
+//    override suspend fun getNotifications(): List<Notification> {
+//        // TODO: Implementation
+//        // 1. 네트워크 연결 확인
+//        // 2. 연결된 경우 API에서 최신 데이터 가져오기
+//        // 3. 로컬 DB 업데이트
+//        // 4. 연결 안 된 경우 로컬 DB에서 데이터 가져오기
+//        return emptyList()
+//    }
 
     override suspend fun markAsRead(notificationId: String) {
         // TODO: Implementation

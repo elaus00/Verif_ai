@@ -2,6 +2,7 @@ package mp.verif_ai.data.room.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
@@ -9,8 +10,8 @@ import mp.verif_ai.data.room.model.NotificationEntity
 
 @Dao
 interface NotificationDao {
-    @Insert
-    suspend fun insertNotification(notification: NotificationEntity)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertNotification(notification: List<NotificationEntity>)
 
     @Update
     suspend fun updateNotification(notification: NotificationEntity)
