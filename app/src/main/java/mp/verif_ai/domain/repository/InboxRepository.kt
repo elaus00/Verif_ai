@@ -3,7 +3,7 @@ package mp.verif_ai.domain.repository
 import kotlinx.coroutines.flow.Flow
 import mp.verif_ai.domain.model.notification.Notification
 
-interface InboxRepository {
+interface   InboxRepository {
     suspend fun getNotifications(): List<Notification>
     suspend fun markAsRead(notificationId: String)
     suspend fun markAllAsRead()

@@ -19,15 +19,13 @@ import mp.verif_ai.presentation.screens.auth.OnBoardingScreen
 import mp.verif_ai.presentation.screens.auth.SignInScreen
 import mp.verif_ai.presentation.screens.auth.signup.SignUpFormScreen
 import mp.verif_ai.presentation.screens.auth.signup.SignUpScreen
+import mp.verif_ai.presentation.screens.conversation.ConversationDetailScreen
+import mp.verif_ai.presentation.screens.conversation.ConversationHistoryScreen
+import mp.verif_ai.presentation.screens.conversation.ConversationScreen
 import mp.verif_ai.presentation.screens.home.HomeScreen
 import mp.verif_ai.presentation.screens.home.question.QuestionDetailScreen
 import mp.verif_ai.presentation.screens.inbox.InboxQuestionDetailScreen
 import mp.verif_ai.presentation.screens.inbox.InboxScreen
-import mp.verif_ai.presentation.screens.prompt.PromptDetailScreen
-import mp.verif_ai.presentation.screens.prompt.PromptHistoryScreen
-import mp.verif_ai.presentation.screens.prompt.PromptScreen
-import mp.verif_ai.presentation.screens.prompt.PromptSettingsScreen
-import mp.verif_ai.presentation.screens.prompt.PromptTemplatesScreen
 import mp.verif_ai.presentation.screens.question.QuestionCreateScreen
 import mp.verif_ai.presentation.screens.settings.*
 import mp.verif_ai.presentation.screens.settings.notification.NotificationSettingsScreen
@@ -215,7 +213,7 @@ private fun NavGraphBuilder.mainNavigation(navController: NavHostController) {
         // Settings
         settingsNavigation(navController)
 
-        promptNavigation(navController)
+        conversationNavigation(navController)
     }
 }
 
@@ -279,54 +277,40 @@ private fun NavGraphBuilder.settingsNavigation(navController: NavHostController)
     }
 }
 
-private fun NavGraphBuilder.promptNavigation(navController: NavHostController) {
+private fun NavGraphBuilder.conversationNavigation(navController: NavHostController) {
     navigation(
-        startDestination = Screen.MainNav.Prompt.Main.route,
-        route = "prompt_navigation_graph"  // 변경: 고유한 그래프 route 사용
+        startDestination = Screen.MainNav.Conversation.Main.route,
+        route = "conversation_navigation_graph"  // Prompt -> Conversation으로 변경
     ) {
-        // 메인 프롬프트 화면
-        composable(Screen.MainNav.Prompt.Main.route) {
-            PromptScreen()
-        }
-
-        // 프롬프트 히스토리 화면
-        composable(Screen.MainNav.Prompt.History.route) {
-            PromptHistoryScreen(
-                onPromptClick = { promptId ->
-                    navController.navigate(Screen.MainNav.Prompt.Detail.createRoute(promptId))
+        // 메인 대화 화면
+        composable(Screen.MainNav.Conversation.Main.route) {
+            ConversationScreen(
+                onNavigateToExpertProfile = { expertId ->
+                    navController.navigate(Screen.MainNav.Expert.Profile.createRoute(expertId))
                 }
             )
         }
 
-        // 프롬프트 상세 화면
+        // 대화 히스토리 화면
+        composable(Screen.MainNav.Conversation.History.route) {
+            ConversationHistoryScreen(
+                onConversationClick = { conversationId ->
+                    navController.navigate(Screen.MainNav.Conversation.Detail.createRoute(conversationId))
+                }
+            )
+        }
+
+        // 대화 상세 화면
         composable(
-            route = Screen.MainNav.Prompt.Detail.route,
+            route = Screen.MainNav.Conversation.Detail.route,
             arguments = listOf(
-                navArgument(Screen.ARG_PROMPT_ID) {
+                navArgument(Screen.ARG_CONVERSATION_ID) {
                     type = NavType.StringType
                 }
             )
         ) {
-            PromptDetailScreen(
-                promptId = it.arguments?.getString(Screen.ARG_PROMPT_ID) ?: ""
-            )
-        }
-
-        // 프롬프트 템플릿 화면
-        composable(Screen.MainNav.Prompt.Templates.route) {
-            PromptTemplatesScreen(
-                onTemplateSelect = { templateId ->
-                    navController.navigateUp()
-                }
-            )
-        }
-
-        // 프롬프트 설정 화면
-        composable(Screen.MainNav.Prompt.Settings.route) {
-            PromptSettingsScreen(
-                onComplete = {
-                    navController.navigateUp()
-                }
+            ConversationDetailScreen(
+                conversationId = it.arguments?.getString(Screen.ARG_CONVERSATION_ID) ?: ""
             )
         }
     }

@@ -6,10 +6,12 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import java.lang.reflect.Modifier
 
 private val LightColorScheme = lightColorScheme(
     primary = VerifAiColor.Navy.Deep,
@@ -66,6 +68,13 @@ fun VerifAiTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
-        content = content
+        content = {
+            Surface(
+//                modifier = Modifier.fillMaxSize(),
+                color = Color.White  // 앱 전체 배경색 설정
+            ) {
+                content()
+            }
+        }
     )
 }

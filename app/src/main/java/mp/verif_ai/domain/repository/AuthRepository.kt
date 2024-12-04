@@ -1,14 +1,7 @@
 package mp.verif_ai.domain.repository
 
-import android.content.Context
-import android.content.Intent
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.ManagedActivityResultLauncher
-import androidx.activity.result.ActivityResult
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.Flow
-import mp.verif_ai.domain.model.auth.AuthCredential
 import mp.verif_ai.domain.model.auth.User
 
 interface AuthRepository {
