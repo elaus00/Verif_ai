@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import mp.verif_ai.domain.model.auth.User
-import mp.verif_ai.domain.model.passkey.PassKeyStatus
 import mp.verif_ai.domain.repository.AuthRepository
 import mp.verif_ai.domain.util.passkey.*
 import mp.verif_ai.presentation.screens.auth.SignUpOptions

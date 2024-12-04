@@ -3,10 +3,9 @@ package mp.verif_ai.domain.repository
 import androidx.activity.ComponentActivity
 import androidx.credentials.GetCredentialResponse
 import kotlinx.coroutines.flow.Flow
-import mp.verif_ai.domain.model.passkey.PassKeyInfo
-import mp.verif_ai.domain.model.passkey.PassKeyRegistrationResult
-import mp.verif_ai.domain.model.passkey.PassKeySignInResult
-import mp.verif_ai.domain.model.passkey.PassKeyStatus
+import mp.verif_ai.domain.model.auth.passkey.PassKeyInfo
+import mp.verif_ai.domain.model.auth.passkey.PassKeyRegistrationResult
+import mp.verif_ai.domain.model.auth.passkey.PassKeySignInResult
 
 /**
  * PassKey 인증 및 관리를 위한 Repository 인터페이스

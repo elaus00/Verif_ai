@@ -15,9 +15,11 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import mp.verif_ai.domain.model.passkey.*
+import mp.verif_ai.domain.model.auth.passkey.PassKeyInfo
+import mp.verif_ai.domain.model.auth.passkey.PassKeyRegistrationResult
+import mp.verif_ai.domain.model.auth.passkey.PassKeySignInResult
+import mp.verif_ai.domain.model.auth.passkey.PassKeyStatus
 import mp.verif_ai.domain.repository.PassKeyRepository
-import mp.verif_ai.domain.util.passkey.PassKeyConfig
 import mp.verif_ai.domain.util.passkey.PassKeyConfig.getRequestOptions
 import javax.inject.Inject
 

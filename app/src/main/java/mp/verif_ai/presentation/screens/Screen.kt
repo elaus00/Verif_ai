@@ -85,30 +85,43 @@ sealed class Screen(val route: String) {
             data object Notifications : Settings("main/settings/notifications")
         }
 
-        sealed class Prompt(route: String) : MainNav(route) {
+        sealed class Conversation(route: String) : MainNav(route) {
             companion object {
-                const val route = "main/prompt"
+                const val route = "main/conversation"
             }
 
-            // 메인 프롬프트 화면
-            data object Main : Prompt("main/prompt")
+            // 메인 대화 화면
+            data object Main : Conversation("main/conversation")
 
-            // 프롬프트 기록/히스토리 화면
-            data object History : Prompt("main/prompt/history")
+            // 대화 기록/히스토리 화면
+            data object History : Conversation("main/conversation/history")
 
-            // 특정 프롬프트 대화 상세 화면
-            data class Detail(val promptId: String) : Prompt("main/prompt/detail/$promptId") {
+            // 특정 대화 상세 화면
+            data class Detail(val conversationId: String) : Conversation("main/conversation/detail/$conversationId") {
                 companion object {
-                    const val route = "main/prompt/detail/{$ARG_PROMPT_ID}"
-                    fun createRoute(promptId: String) = "main/prompt/detail/$promptId"
+                    const val route = "main/conversation/detail/{$ARG_CONVERSATION_ID}"
+                    fun createRoute(conversationId: String) = "main/conversation/detail/$conversationId"
                 }
             }
 
-            // 프롬프트 템플릿 선택 화면
-            data object Templates : Prompt("main/prompt/templates")
+            // 대화 템플릿 선택 화면
+            data object Templates : Conversation("main/conversation/templates")
 
-            // 프롬프트 설정 화면 (API 키 설정 등)
-            data object Settings : Prompt("main/prompt/settings")
+            // 대화 설정 화면
+            data object Settings : Conversation("main/conversation/settings")
+        }
+
+        sealed class Expert(route: String) : MainNav(route) {
+            companion object {
+                const val route = "main/expert"
+            }
+
+            data class Profile(val expertId: String) : Expert("main/expert/profile/$expertId") {
+                companion object {
+                    const val route = "main/expert/profile/{$ARG_EXPERT_ID}"
+                    fun createRoute(expertId: String) = "main/expert/profile/$expertId"
+                }
+            }
         }
     }
 
@@ -118,6 +131,7 @@ sealed class Screen(val route: String) {
         const val ARG_EMAIL = "email"
         const val ARG_USER_ID = "userId"
         const val ARG_RETURN_ROUTE = "return"
-        const val ARG_PROMPT_ID = "promptId"
+        const val ARG_CONVERSATION_ID = "conversationId"
+        const val ARG_EXPERT_ID = "expertId"
     }
 }

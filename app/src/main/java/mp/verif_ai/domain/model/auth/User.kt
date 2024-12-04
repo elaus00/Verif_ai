@@ -1,6 +1,5 @@
 package mp.verif_ai.domain.model.auth
 
-import android.view.Display
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider

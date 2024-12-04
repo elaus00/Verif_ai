@@ -20,14 +20,15 @@ fun User.toMap(): Map<String, Any?> = mapOf(
 
 fun Question.toMap(): Map<String, Any?> = mapOf(
     "id" to id,
-    "userId" to userId,
     "title" to title,
-    "content" to content,
-    "status" to status.name,
     "category" to category,
-    "isPublic" to isPublic,
-    "reward" to reward,
-    "attachments" to attachments,
+    "tags" to tags,
+    "content" to content,
+    "aiConversationId" to aiConversationId,
+    "authorId" to authorId,
+    "status" to status.name,
+    "points" to points,
+    "viewCount" to viewCount,
     "createdAt" to createdAt,
     "updatedAt" to updatedAt
 )

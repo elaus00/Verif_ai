@@ -23,13 +23,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import mp.verif_ai.domain.model.prompt.Conversation
+import mp.verif_ai.domain.model.conversation.Conversation
+import mp.verif_ai.domain.model.conversation.ConversationStatus
 import mp.verif_ai.domain.model.question.Question
 import mp.verif_ai.domain.model.question.QuestionStatus
 import mp.verif_ai.domain.model.question.TrendingQuestion
 import mp.verif_ai.presentation.navigation.AppBottomNavigation
 import mp.verif_ai.presentation.screens.Screen
 import mp.verif_ai.presentation.screens.theme.VerifAiColor
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,7 +56,7 @@ fun HomeScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { navController.navigate(Screen.MainNav.Prompt.Main.route) },
+                onClick = { navController.navigate(Screen.MainNav.Conversation.Main.route) },
                 containerColor = VerifAiColor.Primary
             ) {
                 Icon(
@@ -300,7 +304,7 @@ fun QuestionItem(
                 color = VerifAiColor.TextPrimary,
                 maxLines = 1
             )
-            StatusChip(status = question.status)
+            QuestionStatusChip(status = question.status)
         }
 
         // Content Preview
@@ -317,50 +321,85 @@ fun QuestionItem(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Author and Date
+            // Date
+            Text(
+                text = formatTimestamp(question.createdAt),
+                style = MaterialTheme.typography.labelMedium,
+                color = VerifAiColor.TextTertiary
+            )
+
+            // Views and Points
             Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = question.author,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = VerifAiColor.TextTertiary
-                )
-                Text(
-                    text = "•",
-                    color = VerifAiColor.TextTertiary
-                )
-                Text(
-                    text = question.formattedDate,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = VerifAiColor.TextTertiary
-                )
+                // View Count
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Visibility,
+                        contentDescription = "Views",
+                        modifier = Modifier.size(16.dp),
+                        tint = VerifAiColor.TextTertiary
+                    )
+                    Text(
+                        text = "${question.viewCount}",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = VerifAiColor.TextTertiary
+                    )
+                }
+
+                // Points
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Star,
+                        contentDescription = "Points",
+                        modifier = Modifier.size(16.dp),
+                        tint = VerifAiColor.TextTertiary
+                    )
+                    Text(
+                        text = "${question.points}P",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = VerifAiColor.TextTertiary
+                    )
+                }
             }
         }
     }
 }
+
 @Composable
-private fun StatusChip(
+private fun QuestionStatusChip(
     status: QuestionStatus,
     modifier: Modifier = Modifier
 ) {
-//    val (backgroundColor, textColor) = when (status) {
-//        QuestionStatus.DRAFT -> VerifAiColor.StatusDraftBg to VerifAiColor.StatusDraftText
-//        QuestionStatus.PUBLISHED -> VerifAiColor.StatusPublishedBg to VerifAiColor.StatusPublishedText
-//        QuestionStatus.CLOSED -> VerifAiColor.StatusClosedBg to VerifAiColor.StatusClosedText
-//        QuestionStatus.DELETED -> VerifAiColor.StatusDeletedBg to VerifAiColor.StatusDeletedText
-//        QuestionStatus.CONTROVERSIAL -> VerifAiColor.StatusControversialBg to VerifAiColor.StatusControversialText
-//    }
+    val (backgroundColor, textColor) = when (status) {
+        QuestionStatus.OPEN -> VerifAiColor.Status.PublishedBg to VerifAiColor.Status.PublishedText
+        QuestionStatus.CLOSED -> VerifAiColor.Status.ClosedBg to VerifAiColor.Status.ClosedText
+        QuestionStatus.EXPIRED -> VerifAiColor.Status.DeletedBg to VerifAiColor.Status.DeletedText
+        QuestionStatus.DELETED -> VerifAiColor.Status.DeletedBg to VerifAiColor.Status.DeletedText
+    }
 
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(4.dp),
+        color = backgroundColor
     ) {
         Text(
-            text = status.name,
+            text = when(status) {
+                QuestionStatus.OPEN -> "답변 대기"
+                QuestionStatus.CLOSED -> "답변 완료"
+                QuestionStatus.EXPIRED -> "만료됨"
+                QuestionStatus.DELETED -> "삭제됨"
+            },
             modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
             style = MaterialTheme.typography.labelSmall,
+            color = textColor
         )
     }
 }
@@ -427,13 +466,30 @@ fun ConversationItem(
             .padding(horizontal = 20.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        // Last Message
-        Text(
-            text = conversation.lastMessage,
-            style = MaterialTheme.typography.bodyMedium,
-            color = VerifAiColor.TextPrimary,
-            maxLines = 2
-        )
+        // Title and Type
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = conversation.title,
+                style = MaterialTheme.typography.titleMedium,
+                color = VerifAiColor.TextPrimary,
+                maxLines = 1
+            )
+            QuestionStatusChip(status = conversation.status)
+        }
+
+        // Last message preview if exists
+        conversation.messages.lastOrNull()?.let { lastMessage ->
+            Text(
+                text = lastMessage.content,
+                style = MaterialTheme.typography.bodyMedium,
+                color = VerifAiColor.TextSecondary,
+                maxLines = 2
+            )
+        }
 
         // Bottom Info
         Row(
@@ -442,7 +498,7 @@ fun ConversationItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = conversation.formattedDate,
+                text = formatTimestamp(conversation.updatedAt),
                 style = MaterialTheme.typography.labelMedium,
                 color = VerifAiColor.TextTertiary
             )
@@ -458,13 +514,49 @@ fun ConversationItem(
                     tint = VerifAiColor.TextTertiary
                 )
                 Text(
-                    text = "${conversation.participantCount}",
+                    text = "${conversation.participantIds.size}",
                     style = MaterialTheme.typography.labelMedium,
                     color = VerifAiColor.TextTertiary
                 )
             }
         }
     }
+}
+
+@Composable
+private fun QuestionStatusChip(
+    status: ConversationStatus,
+    modifier: Modifier = Modifier
+) {
+    val (backgroundColor, textColor) = when (status) {
+        ConversationStatus.ACTIVE -> VerifAiColor.Status.PublishedBg to VerifAiColor.Status.PublishedText
+        ConversationStatus.COMPLETED -> VerifAiColor.Status.ClosedBg to VerifAiColor.Status.ClosedText
+        ConversationStatus.EXPIRED -> VerifAiColor.Status.DeletedBg to VerifAiColor.Status.DeletedText
+        ConversationStatus.DELETED -> VerifAiColor.Status.DeletedBg to VerifAiColor.Status.DeletedText
+    }
+
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(4.dp),
+        color = backgroundColor
+    ) {
+        Text(
+            text = when(status) {
+                ConversationStatus.ACTIVE -> "진행중"
+                ConversationStatus.COMPLETED -> "완료"
+                ConversationStatus.EXPIRED -> "만료됨"
+                ConversationStatus.DELETED -> "삭제됨"
+            },
+            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+            style = MaterialTheme.typography.labelSmall,
+            color = textColor
+        )
+    }
+}
+
+private fun formatTimestamp(timestamp: Long): String {
+    val sdf = SimpleDateFormat("yyyy.MM.dd", Locale.getDefault())
+    return sdf.format(Date(timestamp))
 }
 
 @Composable

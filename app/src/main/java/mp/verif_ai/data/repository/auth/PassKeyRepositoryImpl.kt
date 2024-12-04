@@ -9,9 +9,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
-import mp.verif_ai.domain.model.passkey.PassKeyInfo
-import mp.verif_ai.domain.model.passkey.PassKeyRegistrationResult
-import mp.verif_ai.domain.model.passkey.PassKeySignInResult
+import mp.verif_ai.domain.model.auth.passkey.PassKeyInfo
+import mp.verif_ai.domain.model.auth.passkey.PassKeyRegistrationResult
+import mp.verif_ai.domain.model.auth.passkey.PassKeySignInResult
 import mp.verif_ai.domain.repository.PassKeyRepository
 import javax.inject.Inject
 import android.util.Log
