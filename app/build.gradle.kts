@@ -10,10 +10,11 @@ if (localPropertiesFile.exists()) {
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-    kotlin("kapt")
     alias(libs.plugins.hilt)
     id("com.google.gms.google-services")
     alias(libs.plugins.compose.compiler)
+    kotlin("plugin.serialization") version "2.0.21"
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -50,6 +51,9 @@ android {
             buildConfigField("String", "OPENAI_API_KEY", "\"${localProperties.getProperty("OPENAI_API_KEY", "")}\"")
         }
     }
+    ksp {
+        arg("room.schemaLocation", "$projectDir/schemas")
+    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -66,17 +70,6 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
-}
-
-kapt {
-    correctErrorTypes = true
-    useBuildCache = true
-
-    javacOptions {
-        option("-source", "17")
-        option("-target", "17")
-    }
-
 }
 
 
@@ -105,13 +98,14 @@ dependencies {
 
     // Hilt
     implementation(libs.hilt.android)
-    kapt(libs.hilt.android.compiler)
+    ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
     // Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
+    implementation(libs.firebase.storage)
 
     // Network
     implementation(libs.retrofit)
@@ -127,6 +121,10 @@ dependencies {
     implementation(libs.gms.play.services.auth)
     implementation(libs.gms.play.services.safetynet)
     implementation(libs.play.services.fido)
+
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler.v250)
 
 
     // Testing
@@ -148,6 +146,7 @@ dependencies {
 
     // import Kotlin API client BOM
     implementation(platform(libs.openai.client.bom))
+    implementation(libs.kotlinx.serialization.json.v173)
 
     // define dependencies without versions
     implementation(libs.openai.client)
