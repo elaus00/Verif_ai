@@ -4,6 +4,7 @@ plugins {
     id("kotlin-kapt")
     id("com.google.relay") version "0.3.12"
     alias(libs.plugins.hilt)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -63,6 +64,8 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.compose.material.icons.extended)
+    implementation("io.coil-kt:coil-compose:2.3.0")
+
 
     // Retrofit
     implementation(libs.retrofit)
@@ -79,6 +82,8 @@ dependencies {
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.firebase.functions.ktx)
     implementation(libs.androidx.appcompat)
+    implementation(libs.firebase.messaging.ktx)
+    implementation(libs.google.firebase.storage.ktx)
     testImplementation(libs.kotlinx.coroutines)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -112,4 +117,18 @@ dependencies {
 
     // WorkManager
     implementation(libs.androidx.work.runtime.ktx)
+
+    // Firebase BOM
+    implementation(platform(libs.firebase.bom.v3270))
+
+    // Firebase 의존성들
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.firestore.ktx)
+    implementation(libs.firebase.functions.ktx)
+
+    implementation(platform(libs.firebase.bom)) // Firebase BOM 적용
+
+    // Google Play Services
+    implementation(libs.gms.play.services.auth)
+    implementation(libs.gms.play.services.safetynet)
 }

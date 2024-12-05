@@ -2,6 +2,8 @@
 agp = "8.5.2"
 composeBomVersion = "2024.01.00"
 firebaseBom = "33.5.1"
+firebaseBomVersion = "32.7.0"
+googleFirebaseBom = "32.7.0"
 hiltAndroidGradlePlugin = "2.50"
 hiltNavigationCompose = "1.2.0"
 kotlin = "1.9.0"
@@ -26,6 +28,12 @@ firebaseAuthKtx = "23.1.0"
 firebaseFirestoreKtx = "25.1.1"
 firebaseFunctionsKtx = "21.0.0"
 appcompat = "1.7.0"
+benchmarkCommon = "1.3.3"
+gms-play-services-auth = "20.7.0"
+gms-play-services-safetynet = "18.0.1"
+firebaseMessagingKtx = "24.1.0"
+firebaseStorage = "20.1.1"
+firebaseStorageKtx = "21.0.1"
 
 [libraries]
 androidx-compose-bom-v20240100 = { module = "androidx.compose:compose-bom", version.ref = "composeBomVersion" }
@@ -37,6 +45,7 @@ androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-view
 androidx-navigation-compose-v277 = { module = "androidx.navigation:navigation-compose", version.ref = "navigationComposeVersion" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-bom-v3270 = { module = "com.google.firebase:firebase-bom", version.ref = "googleFirebaseBom" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroidGradlePlugin" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidGradlePlugin" }
 hilt-android-gradle-plugin = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hiltAndroidGradlePlugin" }
@@ -69,8 +78,16 @@ firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx",
 firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
 firebase-functions-ktx = { group = "com.google.firebase", name = "firebase-functions-ktx", version.ref = "firebaseFunctionsKtx" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+androidx-benchmark-common = { group = "androidx.benchmark", name = "benchmark-common", version.ref = "benchmarkCommon" }
+google-services-plugin = { group = "com.google.gms", name = "google-services", version = "4.4.2" }
+gms-play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "gms-play-services-auth" }
+gms-play-services-safetynet = { group = "com.google.android.gms", name = "play-services-safetynet", version.ref = "gms-play-services-safetynet" }
+firebase-messaging-ktx = { group = "com.google.firebase", name = "firebase-messaging-ktx", version.ref = "firebaseMessagingKtx" }
+firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebaseStorage" }
+google-firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebaseStorageKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 hilt = { id = "com.google.dagger.hilt.android", version = "2.50" }
+google-services = { id = "com.google.gms.google-services", version = "4.4.2" }
