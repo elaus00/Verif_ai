@@ -36,10 +36,9 @@ fun ConversationContent(
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .padding(bottom = 8.dp),
+            .padding(4.dp),
         reverseLayout = true,
-        contentPadding = PaddingValues(12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        contentPadding = PaddingValues(8.dp),
     ) {
         items(messages.reversed()) { message ->
             val isCurrentUser = message.messageSource?.type == SourceType.USER
@@ -83,13 +82,13 @@ fun ConversationContent(
                             if (message.messageSource?.type != SourceType.USER) {
                                 Text(
                                     text = when (message.messageSource?.type) {
-                                        SourceType.AI -> message.messageSource!!.model?.apiName ?: "AI"
+                                        SourceType.AI -> message.messageSource!!.model?.displayName ?: "AI"
                                         SourceType.EXPERT -> "전문가"
                                         else -> ""
                                     },
                                     style = MaterialTheme.typography.labelSmall,
                                     color = VerifAiColor.TextSecondary,
-                                    modifier = Modifier.padding(bottom = 4.dp)
+//                                    modifier = Modifier.padding(bottom = 4.dp)
                                 )
                             }
 

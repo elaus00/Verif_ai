@@ -56,7 +56,8 @@ fun CustomDropdownMenu(
         // Dropdown Header
         Box(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
+                .height(40.dp)
                 .clip(RoundedCornerShape(16.dp))
                 .background(
                     if (enabled) MaterialTheme.colorScheme.surface

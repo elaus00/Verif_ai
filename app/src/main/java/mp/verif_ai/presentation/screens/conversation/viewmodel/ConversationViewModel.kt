@@ -1,13 +1,12 @@
 package mp.verif_ai.presentation.screens.conversation.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import java.util.UUID
-import javax.inject.Inject
 import mp.verif_ai.domain.model.conversation.Message
 import mp.verif_ai.domain.model.conversation.MessageSource
 import mp.verif_ai.domain.model.conversation.SourceType
@@ -16,15 +15,18 @@ import mp.verif_ai.domain.model.question.Adoption
 import mp.verif_ai.domain.repository.AuthRepository
 import mp.verif_ai.domain.repository.ConversationRepository
 import mp.verif_ai.domain.repository.PointRepository
+import mp.verif_ai.domain.repository.ResponseRepository
 import mp.verif_ai.domain.service.AIModel
 import mp.verif_ai.presentation.screens.Screen
-
+import java.util.UUID
+import javax.inject.Inject
 
 @HiltViewModel
 class ConversationViewModel @Inject constructor(
     private val conversationRepository: ConversationRepository,
     private val authRepository: AuthRepository,
     private val pointRepository: PointRepository,
+    private val responseRepository: ResponseRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -41,119 +43,58 @@ class ConversationViewModel @Inject constructor(
         if (conversationId != null) {
             loadConversation()
         } else {
-            // 새로운 대화 시작 초기화
-            _uiState.value = ConversationUiState.Success(
-                messages = emptyList(),
-                aiModels = AIModel.entries,
-                selectedModel = null
-            )
+            initializeNewConversation()
         }
         observeUserPoints(userId)
+    }
+
+    private fun initializeNewConversation() {
+        _uiState.value = ConversationUiState.Success(
+            messages = emptyList(),
+            aiModels = AIModel.entries,
+            selectedModel = AIModel.GEMINI_1_5_PRO
+        )
     }
 
     fun sendMessage(inputContent: String) {
         viewModelScope.launch {
             try {
-                val currentState = _uiState.value as? ConversationUiState.Success ?: return@launch
+                val currentState = getCurrentStateOrNull() ?: return@launch
 
-                // 사용자 메시지 생성
-                val userMessage = Message.Text(
-                    id = UUID.randomUUID().toString(),
+                val userMessage = MessageFactory.createMessage(
                     content = inputContent,
-                    senderId = userId,
-                    messageSource = MessageSource(type = SourceType.USER)
+                    type = SourceType.USER,
+                    senderId = userId
                 )
 
-                // UI 상태 업데이트 (사용자 메시지 추가)
-                _uiState.update { state ->
-                    if (state is ConversationUiState.Success) {
-                        state.copy(
-                            messages = state.messages + userMessage
-                        )
-                    } else state
-                }
-
-                // 메시지를 DB에 저장
+                // 메시지 저장 시도
                 conversationRepository.sendMessage(conversationId.toString(), userMessage)
+                    .onSuccess { messageId ->
+                        // UI 업데이트 및 이벤트 발생
+                        updateMessages(userMessage)
+                        _events.emit(ConversationEvent.MessageSent(messageId))
 
-                // AI 응답이 필요한 경우
-                if (currentState.selectedModel != null) {
-                    _uiState.update { state ->
-                        if (state is ConversationUiState.Success) {
-                            state.copy(isAiResponding = true)
-                        } else state
-                    }
-
-                    var aiMessageContent = ""
-                    conversationRepository.getAiResponse(
-                        model = currentState.selectedModel,
-                        prompt = inputContent
-                    ).collect { response ->
-                        aiMessageContent += response
-
-                        // AI 메시지 생성 및 업데이트
-                        val aiMessage = Message.Text(
-                            id = UUID.randomUUID().toString(),
-                            content = aiMessageContent,
-                            senderId = "ai",
-                            messageSource = MessageSource(
-                                type = SourceType.AI,
-                                model = currentState.selectedModel
-                            )
-                        )
-
-                        // UI 상태 업데이트 (AI 메시지 추가/업데이트)
-                        _uiState.update { state ->
-                            if (state is ConversationUiState.Success) {
-                                val updatedMessages = state.messages.toMutableList()
-                                if (state.isAiResponding) {
-                                    // 마지막 메시지가 AI 메시지면 업데이트, 아니면 추가
-                                    if (updatedMessages.lastOrNull()?.messageSource?.type == SourceType.AI) {
-                                        updatedMessages[updatedMessages.lastIndex] = aiMessage
-                                    } else {
-                                        updatedMessages.add(aiMessage)
-                                    }
-                                }
-                                state.copy(
-                                    messages = updatedMessages,
-                                    isAiResponding = true
-                                )
-                            } else state
+                        // AI 응답 처리
+                        currentState.selectedModel?.let { model ->
+                            handleAiResponse(inputContent, model)
                         }
                     }
-
-                    // AI 응답 완료 후 상태 업데이트
-                    _uiState.update { state ->
-                        if (state is ConversationUiState.Success) {
-                            state.copy(isAiResponding = false)
-                        } else state
+                    .onFailure { e ->
+                        handleError("메시지 전송에 실패했습니다", e)
                     }
 
-                    // 최종 AI 메시지를 DB에 저장
-                    val finalAiMessage = Message.Text(
-                        id = UUID.randomUUID().toString(),
-                        content = aiMessageContent,
-                        senderId = "ai",
-                        messageSource = MessageSource(
-                            type = SourceType.AI,
-                            model = currentState.selectedModel
-                        )
-                    )
-                    conversationRepository.sendMessage(conversationId.toString(), finalAiMessage)
-                }
             } catch (e: Exception) {
-                _events.emit(ConversationEvent.ShowError(e.message ?: "메시지 전송에 실패했습니다"))
+                handleError("메시지 전송에 실패했습니다", e)
             }
         }
     }
-
 
     private fun loadConversation() {
         viewModelScope.launch {
             try {
                 conversationRepository.observeConversation(conversationId.toString())
                     .collect { conversation ->
-                        _uiState.update { currentState ->
+                        updateState { currentState ->
                             when (currentState) {
                                 is ConversationUiState.Success -> currentState.copy(
                                     messages = conversation.messages
@@ -167,20 +108,16 @@ class ConversationViewModel @Inject constructor(
                         }
                     }
             } catch (e: Exception) {
-                _events.emit(ConversationEvent.ShowError(e.message ?: "대화를 불러오는데 실패했습니다"))
-                _uiState.value = ConversationUiState.Error(e.message ?: "대화를 불러오는데 실패했습니다")
+                handleError("대화를 불러오는데 실패했습니다", e)
+                _uiState.value = ConversationUiState.Error("대화를 불러오는데 실패했습니다")
             }
         }
     }
 
-    private fun observeUserPoints(userId : String) {
+    private fun observeUserPoints(userId: String) {
         viewModelScope.launch {
             pointRepository.observeUserPoints(userId).collect { points ->
-                _uiState.update { currentState ->
-                    if (currentState is ConversationUiState.Success) {
-                        currentState.copy(pointBalance = points)
-                    } else currentState
-                }
+                updateState { it.copy(pointBalance = points) }
             }
         }
     }
@@ -188,7 +125,7 @@ class ConversationViewModel @Inject constructor(
     fun requestExpertReview() {
         viewModelScope.launch {
             try {
-                val currentState = _uiState.value as? ConversationUiState.Success ?: return@launch
+                val currentState = getCurrentStateOrNull() ?: return@launch
                 val points = pointRepository.getUserPoints().getOrThrow()
 
                 if (points < Adoption.EXPERT_REVIEW_POINTS) {
@@ -196,31 +133,157 @@ class ConversationViewModel @Inject constructor(
                     return@launch
                 }
 
-                conversationRepository.requestExpertReview(
+                responseRepository.requestExpertReview(
                     conversationId = conversationId.toString(),
                     points = Adoption.EXPERT_REVIEW_POINTS
                 ).onSuccess {
                     _events.emit(ConversationEvent.RequestExpertReviewSuccess)
                 }.onFailure { e ->
-                    _events.emit(ConversationEvent.ShowError(e.message ?: "전문가 검증 요청에 실패했습니다"))
+                    handleError("전문가 검증 요청에 실패했습니다", e)
                 }
             } catch (e: Exception) {
-                _events.emit(ConversationEvent.ShowError(e.message ?: "전문가 검증 요청에 실패했습니다"))
+                handleError("전문가 검증 요청에 실패했습니다", e)
             }
         }
     }
 
     fun selectAiModel(model: AIModel) {
-        _uiState.update { currentState ->
-            if (currentState is ConversationUiState.Success) {
-                currentState.copy(selectedModel = model)
-            } else currentState
+        updateState { it.copy(selectedModel = model) }
+    }
+
+    private fun getCurrentStateOrNull(): ConversationUiState.Success? {
+        val currentState = _uiState.value as? ConversationUiState.Success
+        if (currentState == null) {
+            Log.e("ConversationVM", "Failed to get current state: Invalid state")
         }
+        return currentState
+    }
+
+    private suspend fun handleUserMessage(content: String) {
+        Log.d("ConversationVM", "Creating user message with content: ${content.take(50)}...")
+
+        val userMessage = MessageFactory.createMessage(
+            content = content,
+            type = SourceType.USER,
+            senderId = userId
+        )
+
+        updateMessages(userMessage)
+        saveMessageToDatabase(userMessage)
+        _events.emit(ConversationEvent.MessageSent(userMessage.id))
+    }
+
+    private suspend fun updateMessages(message: Message, isAiMessage: Boolean = false) {
+        updateState { state ->
+            val updatedMessages = state.messages.toMutableList()
+
+            if (isAiMessage && state.isAiResponding) {
+                if (updatedMessages.lastOrNull()?.messageSource?.type == SourceType.AI) {
+                    Log.d("ConversationVM", "Updating existing AI message")
+                    updatedMessages[updatedMessages.lastIndex] = message
+                } else {
+                    Log.d("ConversationVM", "Adding new AI message")
+                    updatedMessages.add(message)
+                }
+            } else {
+                Log.d("ConversationVM", "Adding new message")
+                updatedMessages.add(message)
+            }
+
+            state.copy(
+                messages = updatedMessages,
+                isAiResponding = isAiMessage
+            )
+        }
+    }
+
+    private suspend fun saveMessageToDatabase(message: Message) {
+        Log.d("ConversationVM", "Saving message to DB for conversation: $conversationId")
+        conversationRepository.sendMessage(conversationId.toString(), message)
+    }
+
+    private suspend fun handleAiResponse(userContent: String, model: AIModel) {
+        try {
+            setAiResponding(true)
+
+            var aiMessageContent = ""
+            var currentAiMessage: Message.Text? = null
+
+            responseRepository.getAiResponse(model, userContent)
+                .catch { e ->
+                    handleError("AI 응답 처리 중 오류가 발생했습니다", e)
+                }
+                .onCompletion { error ->
+                    setAiResponding(false)
+                    if (error == null && currentAiMessage != null) {
+                        // 최종 AI 메시지 저장
+                        conversationRepository.sendMessage(conversationId.toString(), currentAiMessage!!)
+                            .onSuccess { messageId ->
+                                _events.emit(ConversationEvent.AiResponseReceived(messageId))
+                            }
+                            .onFailure { e ->
+                                handleError("AI 응답 저장에 실패했습니다", e)
+                            }
+                    }
+                }
+                .collect { response ->
+                    aiMessageContent += response
+
+                    currentAiMessage = MessageFactory.createMessage(
+                        content = aiMessageContent,
+                        type = SourceType.AI,
+                        senderId = "ai",
+                        model = model
+                    )
+                    updateMessages(currentAiMessage!!, isAiMessage = true)
+                }
+        } catch (e: Exception) {
+            handleError("AI 응답 처리 중 오류가 발생했습니다", e)
+        }
+    }
+    private fun setAiResponding(responding: Boolean) {
+        updateState { it.copy(isAiResponding = responding) }
+    }
+
+    private fun updateState(update: (ConversationUiState.Success) -> ConversationUiState) {
+        _uiState.update { state ->
+            if (state is ConversationUiState.Success) {
+                update(state)
+            } else state
+        }
+    }
+
+    private suspend fun handleError(message: String, error: Throwable) {
+        Log.e("ConversationVM", message, error)
+        val errorMessage = when (error) {
+            is IllegalStateException -> "대화 상태가 유효하지 않습니다"
+            is NetworkException -> "네트워크 연결을 확인해주세요"
+            is AIServiceException -> "AI 서비스 응답 중 오류가 발생했습니다"
+            else -> error.message ?: message
+        }
+        _events.emit(ConversationEvent.ShowError(errorMessage))
     }
 
     fun retry() {
         loadConversation()
     }
+}
+
+private object MessageFactory {
+    fun createMessage(
+        content: String,
+        type: SourceType,
+        senderId: String,
+        model: AIModel? = null
+    ): Message.Text = Message.Text(
+        id = UUID.randomUUID().toString(),
+        content = content,
+        senderId = senderId,
+        messageSource = MessageSource(
+            type = type,
+            model = model
+        )
+    )
 }
 
 sealed class ConversationUiState {
@@ -240,6 +303,12 @@ sealed class ConversationUiState {
 sealed class ConversationEvent {
     data class ShowError(val message: String) : ConversationEvent()
     data class NavigateToExpertProfile(val expertId: String) : ConversationEvent()
+    data class MessageSent(val messageId: String) : ConversationEvent()
+    data class AiResponseReceived(val messageId: String) : ConversationEvent()
     data object RequestExpertReviewSuccess : ConversationEvent()
     data object InsufficientPoints : ConversationEvent()
 }
+
+// Custom Exceptions
+class NetworkException : Exception("네트워크 연결을 확인해주세요")
+class AIServiceException : Exception("AI 서비스 응답 중 오류가 발생했습니다")

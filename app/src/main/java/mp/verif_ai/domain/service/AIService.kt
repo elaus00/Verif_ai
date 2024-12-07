@@ -3,7 +3,6 @@ package mp.verif_ai.domain.service
 import android.graphics.Bitmap
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
-import javax.inject.Inject
 
 // Core interfaces
 interface AIService {
@@ -57,12 +56,12 @@ enum class AIModel(
     // OpenAI
     GPT_4O(
         apiName = "gpt-4o",
-        displayName = "GPT-4 Opus",
+        displayName = "GPT-4o",
         description = "가장 강력한 성능을 제공하는 모델. 복잡한 작업과 전문적인 내용 처리에 적합"
     ),
     GPT_4O_MINI(
         apiName = "gpt-4o-mini",
-        displayName = "GPT-4 Opus Mini",
+        displayName = "GPT-4o Mini",
         description = "GPT-4의 경량화 버전. 빠른 응답과 효율적인 리소스 사용"
     ),
 
