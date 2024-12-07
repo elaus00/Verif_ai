@@ -8,13 +8,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import mp.verif_ai.presentation.screens.auth.CustomSnackbar
-import mp.verif_ai.presentation.screens.conversation.components.AIModelSelector
 import mp.verif_ai.presentation.screens.conversation.components.ConversationContent
 import mp.verif_ai.presentation.screens.conversation.components.ErrorContent
 import mp.verif_ai.presentation.screens.conversation.viewmodel.ConversationEvent
 import mp.verif_ai.presentation.screens.conversation.viewmodel.ConversationUiState
 import mp.verif_ai.presentation.screens.conversation.viewmodel.ConversationViewModel
-import mp.verif_ai.presentation.screens.theme.VerifAiColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,6 +50,24 @@ fun ConversationScreen(
                         actionLabel = "Dismiss",
                         duration = SnackbarDuration.Short
                     )
+                }
+
+
+                is ConversationEvent.MessageSent -> {
+                    // 메시지 전송 성공 시 처리
+                    // 예: 스크롤 위치 조정, 사운드 재생 등
+//                    snackbarHostState.showSnackbar(
+//                        message = "메시지가 전송되었습니다",
+//                        duration = SnackbarDuration.Short
+//                    )
+                }
+                is ConversationEvent.AiResponseReceived -> {
+                    // AI 응답 수신 완료 시 처리
+                    // 예: 로딩 인디케이터 숨기기, 스크롤 위치 조정 등
+//                    snackbarHostState.showSnackbar(
+//                        message = "AI 응답이 완료되었습니다",
+//                        duration = SnackbarDuration.Short
+//                    )
                 }
             }
         }
