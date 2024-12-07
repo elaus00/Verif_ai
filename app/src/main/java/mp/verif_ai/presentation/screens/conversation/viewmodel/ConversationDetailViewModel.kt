@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import mp.verif_ai.domain.repository.ConversationRepository
+import mp.verif_ai.domain.service.AIModel
 import mp.verif_ai.presentation.screens.Screen
 
 @HiltViewModel
@@ -34,7 +35,8 @@ class ConversationDetailViewModel @Inject constructor(
                     .collect { conversation ->
                         _uiState.value = ConversationUiState.Success(
                             messages = conversation.messages,
-                            aiModels = emptyList()
+                            aiModels = AIModel.entries,
+                            selectedModel = AIModel.GEMINI_1_5_PRO
                         )
                     }
             } catch (e: Exception) {

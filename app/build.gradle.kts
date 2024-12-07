@@ -46,9 +46,11 @@ android {
                 "proguard-rules.pro"
             )
             buildConfigField("String", "OPENAI_API_KEY", "\"${localProperties.getProperty("OPENAI_API_KEY", "")}\"")
+            buildConfigField("String", "GEMINI_API_KEY", "\"${localProperties.getProperty("GEMINI_API_KEY", "")}\"")
         }
         debug {
             buildConfigField("String", "OPENAI_API_KEY", "\"${localProperties.getProperty("OPENAI_API_KEY", "")}\"")
+            buildConfigField("String", "GEMINI_API_KEY", "\"${localProperties.getProperty("GEMINI_API_KEY", "")}\"")
         }
     }
     ksp {
@@ -151,5 +153,8 @@ dependencies {
     // define dependencies without versions
     implementation(libs.openai.client)
     implementation(libs.ktor.client.okhttp)
+
+    // Google AI client SDK (Gemini)
+    implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
 
 }

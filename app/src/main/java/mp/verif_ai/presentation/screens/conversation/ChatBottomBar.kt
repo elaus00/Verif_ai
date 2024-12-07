@@ -1,6 +1,7 @@
 package mp.verif_ai.presentation.screens.conversation
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -22,6 +23,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import mp.verif_ai.domain.service.AIModel
+import mp.verif_ai.presentation.screens.conversation.components.AIModelSelector
 import mp.verif_ai.presentation.screens.theme.VerifAiColor
 
 @Composable
@@ -31,39 +34,54 @@ fun ChatBottomBar(
     onSendMessage: () -> Unit,
     onVoiceRecognition: () -> Unit,
     onAddClick: () -> Unit,
+    models: List<AIModel>,
+    selectedModel: AIModel?,
+    onModelSelect: (AIModel) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Surface(
-        color = MaterialTheme.colorScheme.surface,
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(bottom = 16.dp)
+//        color = Color.Transparent,
+        color = MaterialTheme.colorScheme.surface.copy(0.6f),
+        modifier = modifier.fillMaxWidth()
     ) {
-        Surface(
+        Column(
             modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 12.dp)
-                .fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
-            border = BorderStroke(1.dp, VerifAiColor.DividerColor)
+                .padding(16.dp)
+                .padding(bottom = 4.dp)
         ) {
-            Row(
-                modifier = Modifier
-                    .padding(horizontal = 8.dp, vertical = 4.dp),
-                verticalAlignment = Alignment.CenterVertically
+            // AI Model Selector
+            AIModelSelector(
+                models = models,
+                selectedModel = selectedModel,
+                onModelSelect = onModelSelect,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            // Message Input Section
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                border = BorderStroke(1.dp, VerifAiColor.DividerColor)
             ) {
-                AddButton(onClick = onAddClick)
-                ChatTextField(
-                    value = userInput,
-                    onValueChange = onUserInputChange,
+                Row(
                     modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 8.dp)
-                )
-                ActionButton(
-                    isInputEmpty = userInput.isBlank(),
-                    onVoiceClick = onVoiceRecognition,
-                    onSendClick = onSendMessage
-                )
+                        .padding(horizontal = 8.dp, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    AddButton(onClick = onAddClick)
+                    ChatTextField(
+                        value = userInput,
+                        onValueChange = onUserInputChange,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 8.dp)
+                    )
+                    ActionButton(
+                        isInputEmpty = userInput.isBlank(),
+                        onVoiceClick = onVoiceRecognition,
+                        onSendClick = onSendMessage
+                    )
+                }
             }
         }
     }

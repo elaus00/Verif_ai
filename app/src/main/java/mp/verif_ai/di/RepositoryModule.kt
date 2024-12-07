@@ -18,6 +18,7 @@ import mp.verif_ai.data.local.dao.ParticipantDao
 import mp.verif_ai.data.repository.conversation.ConversationRepositoryImpl
 import mp.verif_ai.data.repository.inbox.InboxRepositoryImpl
 import mp.verif_ai.data.repository.point.PointRepositoryImpl
+import mp.verif_ai.data.service.AIServiceFactory
 import mp.verif_ai.domain.repository.AuthRepository
 import mp.verif_ai.domain.repository.ConversationRepository
 import mp.verif_ai.domain.repository.InboxRepository
@@ -72,6 +73,7 @@ abstract class RepositoryModule {
             conversationDao: ConversationDao,
             messageDao: MessageDao,
             participantDao: ParticipantDao,
+            aiServiceFactory: AIServiceFactory,
             @ApplicationScope scope: CoroutineScope,
             @IoDispatcher dispatcher: CoroutineDispatcher
         ): ConversationRepository = ConversationRepositoryImpl(
@@ -81,7 +83,8 @@ abstract class RepositoryModule {
             messageDao = messageDao,
             participantDao = participantDao,
             scope = scope,
-            dispatcher = dispatcher
+            dispatcher = dispatcher,
+            aiServiceFactory = aiServiceFactory
         )
 
         @Provides
