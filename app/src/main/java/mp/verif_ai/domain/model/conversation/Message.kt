@@ -3,6 +3,7 @@ package mp.verif_ai.domain.model.conversation
 import kotlinx.serialization.Serializable
 import mp.verif_ai.domain.model.expert.ExpertReview
 import mp.verif_ai.domain.model.question.Adoption
+import mp.verif_ai.domain.service.AIModel
 
 sealed class Message {
     abstract val id: String
@@ -101,19 +102,6 @@ enum class SourceType {
     AI
 }
 
-enum class AIModel(val apiName: String) {
-    // OpenAI
-    GPT_4O("gpt-4o"),
-    GPT_4O_MINI("gpt-4o-mini"),
-    O1("o1"),
-
-    // Google Gemini
-    GEMINI_1_5_PRO("gemini-1.5-pro"),
-    GEMINI_1_5_FLASH("gemini-1.5-flash"),
-    GEMINI_NANO("gemini-nano");
-
-    override fun toString(): String = apiName
-}
 
 enum class MessageStatus {
     PENDING,   // 검증 대기중

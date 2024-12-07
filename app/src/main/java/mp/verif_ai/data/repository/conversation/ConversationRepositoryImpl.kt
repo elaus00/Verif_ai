@@ -15,17 +15,22 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.json.Json
 import mp.verif_ai.data.local.dao.*
+import mp.verif_ai.data.service.AIServiceFactory
 import mp.verif_ai.di.IoDispatcher
 import mp.verif_ai.domain.model.*
-import mp.verif_ai.domain.model.conversation.AIModel
 import mp.verif_ai.domain.repository.ConversationRepository
 import mp.verif_ai.domain.model.conversation.Conversation
+import mp.verif_ai.domain.model.conversation.ConversationStatus
+import mp.verif_ai.domain.model.conversation.ConversationType
 import mp.verif_ai.domain.model.conversation.Message
 import mp.verif_ai.domain.model.conversation.ParticipantFirestoreDto
+import mp.verif_ai.domain.model.conversation.ParticipantType
+import mp.verif_ai.domain.model.conversation.ParticipationStatus
 import mp.verif_ai.domain.model.conversation.toRoomEntity
 import mp.verif_ai.domain.model.expert.ExpertReview
 import mp.verif_ai.domain.repository.FileInfo
 import mp.verif_ai.domain.repository.ImageInfo
+import mp.verif_ai.domain.service.AIModel
 import mp.verif_ai.domain.util.dto.ConversationFirestoreDto
 import java.util.UUID
 import kotlin.coroutines.resumeWithException
@@ -37,6 +42,7 @@ class ConversationRepositoryImpl @Inject constructor(
     private val conversationDao: ConversationDao,
     private val messageDao: MessageDao,
     private val participantDao: ParticipantDao,
+    private val aiServiceFactory: AIServiceFactory,
     private val scope: CoroutineScope,
     @IoDispatcher private val dispatcher: CoroutineDispatcher
 ) : ConversationRepository {
@@ -53,37 +59,6 @@ class ConversationRepositoryImpl @Inject constructor(
             subscribeToFirestoreChanges()
         }
     }
-
-    override suspend fun observeConversation(conversationId: String): Flow<Conversation> = flow {
-        // Room DB에서 먼저 데이터 방출
-        conversationDao.observeConversationWithDetails(conversationId).collect { localData ->
-            emit(localData.toDomainModel())
-        }
-
-        // Firestore 실시간 업데이트 구독
-        val snapshotListener = suspendCancellableCoroutine<Unit> { continuation ->
-            val listener = conversationsCollection.document(conversationId)
-                .addSnapshotListener { snapshot, error ->
-                    if (error != null) {
-                        if (continuation.isActive) {
-                            continuation.resumeWithException(error)
-                        }
-                        return@addSnapshotListener
-                    }
-
-                    snapshot?.let {
-                        scope.launch(dispatcher) {
-                            // Firestore 데이터를 Room에 동기화
-                            syncConversationToRoom(it)
-                        }
-                    }
-                }
-
-            continuation.invokeOnCancellation {
-                listener.remove()
-            }
-        }
-    }.flowOn(dispatcher)
 
     override suspend fun sendMessage(
         conversationId: String,
@@ -116,6 +91,102 @@ class ConversationRepositoryImpl @Inject constructor(
             throw lastError ?: Exception("Failed to send message after 3 retries")
         }
     }
+
+    override suspend fun observeConversation(conversationId: String): Flow<Conversation> = callbackFlow {
+        try {
+            // 1. 먼저 로컬 데이터베이스에서 초기 데이터 로드
+            conversationDao.getConversationWithDetails(conversationId)?.let { localData ->
+                trySend(localData.toDomainModel())
+            }
+
+            // 2. Firestore 대화 문서 변경 구독
+            val conversationRef = conversationsCollection.document(conversationId)
+            val conversationListener = conversationRef.addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+
+                snapshot?.let { conversationDoc ->
+                    scope.launch(dispatcher) {
+                        // 기본 대화 정보
+                        val conversationData = conversationDoc.data ?: return@launch
+
+                        // 3. 메시지 로드
+                        val messages = conversationRef
+                            .collection("messages")
+                            .orderBy("timestamp", Query.Direction.ASCENDING)
+                            .get()
+                            .await()
+                            .documents
+                            .mapNotNull { doc ->
+                                doc.toObject(Message::class.java)
+                            }
+
+                        // 4. Room DB 동기화
+                        messages.forEach { message ->
+                            messageDao.insertMessage(message.toRoomEntity(conversationId))
+                        }
+
+                        // 5. Conversation 객체 생성
+                        val conversation = Conversation(
+                            id = conversationId,
+                            title = conversationData["title"] as? String ?: "",
+                            participantIds = (conversationData["participantIds"] as? List<*>)?.mapNotNull { it as? String }
+                                ?: emptyList(),
+                            participantTypes = (conversationData["participantTypes"] as? Map<*, *>)?.mapNotNull { entry ->
+                                val id = entry.key as? String ?: return@mapNotNull null
+                                val type = try {
+                                    ParticipantType.valueOf(entry.value as? String ?: return@mapNotNull null)
+                                } catch (e: IllegalArgumentException) {
+                                    return@mapNotNull null
+                                }
+                                id to type
+                            }?.toMap() ?: emptyMap(),
+                            participantStatuses = (conversationData["participantStatuses"] as? Map<*, *>)?.mapNotNull { entry ->
+                                val id = entry.key as? String ?: return@mapNotNull null
+                                val status = try {
+                                    ParticipationStatus.valueOf(entry.value as? String ?: return@mapNotNull null)
+                                } catch (e: IllegalArgumentException) {
+                                    return@mapNotNull null
+                                }
+                                id to status
+                            }?.toMap() ?: emptyMap(),
+                            messages = messages,
+                            type = try {
+                                ConversationType.valueOf(conversationData["type"] as? String
+                                    ?: ConversationType.AI_CHAT.name)
+                            } catch (e: IllegalArgumentException) {
+                                ConversationType.AI_CHAT
+                            },
+                            status = try {
+                                ConversationStatus.valueOf(conversationData["status"] as? String
+                                    ?: ConversationStatus.ACTIVE.name)
+                            } catch (e: IllegalArgumentException) {
+                                ConversationStatus.ACTIVE
+                            },
+                            category = conversationData["category"] as? String,
+                            tags = (conversationData["tags"] as? List<*>)?.mapNotNull { it as? String }
+                                ?: emptyList(),
+                            createdAt = (conversationData["createdAt"] as? Number)?.toLong()
+                                ?: System.currentTimeMillis(),
+                            updatedAt = (conversationData["updatedAt"] as? Number)?.toLong()
+                                ?: System.currentTimeMillis()
+                        )
+
+                        trySend(conversation)
+                    }
+                }
+            }
+
+            // 6. Flow가 취소될 때 리스너 정리
+            awaitClose {
+                conversationListener.remove()
+            }
+        } catch (e: Exception) {
+            close(e)
+        }
+    }.flowOn(dispatcher)
 
     override suspend fun getConversationHistory(
         userId: String,
@@ -215,45 +286,13 @@ class ConversationRepositoryImpl @Inject constructor(
     override suspend fun getAiResponse(
         model: AIModel,
         prompt: String
-    ): Flow<String> = callbackFlow {
-        val responseRef = firestore.collection("ai_responses")
-            .document()
-
-        val request = hashMapOf(
-            "model" to model.name,
-            "prompt" to prompt,
-            "timestamp" to FieldValue.serverTimestamp()
-        )
-
-        // 요청 문서 생성
-        responseRef.set(request).await()
-
-        // 응답 리스너 설정
-        val listener = responseRef.addSnapshotListener { snapshot, error ->
-            if (error != null) {
-                close(error)
-                return@addSnapshotListener
-            }
-
-            snapshot?.let { doc ->
-                // completion 필드가 업데이트될 때마다 방출
-                val completion = doc.getString("completion")
-                if (completion != null) {
-                    trySend(completion)
-                }
-
-                // isComplete 플래그로 스트림 종료 여부 확인
-                if (doc.getBoolean("isComplete") == true) {
-                    close()
-                }
-            }
-        }
-
-        // Flow가 취소될 때 리스너 제거
-        awaitClose {
-            listener.remove()
+    ): Flow<String> = flow {
+        val aiService = aiServiceFactory.getService(model)
+        aiService.generateResponse(prompt, model).collect { response ->
+            emit(response)
         }
     }.flowOn(dispatcher)
+
 
     override suspend fun requestExpertReview(
         conversationId: String,

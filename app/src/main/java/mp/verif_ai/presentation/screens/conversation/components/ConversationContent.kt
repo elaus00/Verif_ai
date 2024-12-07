@@ -4,32 +4,31 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Star
+import androidx.compose.material.icons.rounded.Verified
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import kotlinx.coroutines.flow.collect
 import mp.verif_ai.domain.model.conversation.Message
+import mp.verif_ai.domain.model.conversation.SourceType
 import mp.verif_ai.domain.model.expert.ExpertReview
-import mp.verif_ai.domain.model.question.Adoption
-import mp.verif_ai.presentation.screens.auth.CustomSnackbar
 import mp.verif_ai.presentation.screens.conversation.viewmodel.ConversationViewModel
 import mp.verif_ai.presentation.screens.theme.VerifAiColor
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Star
-import androidx.compose.material.icons.rounded.Verified
-import androidx.compose.ui.text.style.TextAlign
-import mp.verif_ai.domain.model.conversation.SourceType
-
 
 @Composable
 fun ConversationContent(
     messages: List<Message>,
     expertReviews: List<ExpertReview>,
+    canRequestExpertReview: Boolean,
+    pointBalance: Int,
+    onRequestExpertReview: () -> Unit,
     onExpertProfileClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ConversationViewModel = hiltViewModel()
@@ -53,78 +52,87 @@ fun ConversationContent(
                     Alignment.CenterStart
                 }
             ) {
-                Surface(
-                    color = when (message.messageSource?.type) {
-                        SourceType.USER -> VerifAiColor.Primary.copy(alpha = 0.1f)
-                        SourceType.AI -> MaterialTheme.colorScheme.surface
-                        SourceType.EXPERT -> VerifAiColor.Secondary.copy(alpha = 0.1f)
-                        null -> MaterialTheme.colorScheme.surface
-                    },
-                    shape = RoundedCornerShape(16.dp),
-                    border = BorderStroke(
-                        1.dp,
-                        when (message.messageSource?.type) {
-                            SourceType.USER -> VerifAiColor.Primary.copy(alpha = 0.2f)
-                            SourceType.AI -> VerifAiColor.DividerColor
-                            SourceType.EXPERT -> VerifAiColor.Secondary.copy(alpha = 0.2f)
-                            null -> VerifAiColor.DividerColor
-                        }
-                    )
+                MessageWithContextMenu(
+                    message = message,
+                    canRequestExpertReview = canRequestExpertReview,
+                    pointBalance = pointBalance,
+                    onRequestExpertReview = onRequestExpertReview,
+                    onCopy = {},
+                    onShare = {},
                 ) {
-                    Column(modifier = Modifier.padding(12.dp)) {
-                        // Message source indicator (AI model or Expert)
-                        if (message.messageSource?.type != SourceType.USER) {
-                            Text(
-                                text = when (message.messageSource?.type) {
-                                    SourceType.AI -> message.messageSource!!.model?.apiName ?: "AI"
-                                    SourceType.EXPERT -> "전문가"
-                                    else -> ""
-                                },
-                                style = MaterialTheme.typography.labelSmall,
-                                color = VerifAiColor.TextSecondary,
-                                modifier = Modifier.padding(bottom = 4.dp)
-                            )
-                        }
-
-                        // Message content
-                        Text(
-                            text = message.content,
-                            color = VerifAiColor.TextPrimary,
-                            style = MaterialTheme.typography.bodyLarge
+                    Surface(
+                        color = when (message.messageSource?.type) {
+                            SourceType.USER -> VerifAiColor.Primary.copy(alpha = 0.1f)
+                            SourceType.AI -> MaterialTheme.colorScheme.surface
+                            SourceType.EXPERT -> VerifAiColor.Secondary.copy(alpha = 0.1f)
+                            null -> MaterialTheme.colorScheme.surface
+                        },
+                        shape = RoundedCornerShape(16.dp),
+                        border = BorderStroke(
+                            1.dp,
+                            when (message.messageSource?.type) {
+                                SourceType.USER -> VerifAiColor.Primary.copy(alpha = 0.2f)
+                                SourceType.AI -> VerifAiColor.DividerColor
+                                SourceType.EXPERT -> VerifAiColor.Secondary.copy(alpha = 0.2f)
+                                null -> VerifAiColor.DividerColor
+                            }
                         )
-
-                        // Verification status if applicable
-                        if (message is Message.Text && message.isVerified) {
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.End,
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Rounded.Verified,
-                                    contentDescription = "검증됨",
-                                    tint = VerifAiColor.Primary,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
+                    ) {
+                        Column(modifier = Modifier.padding(12.dp)) {
+                            // Message source indicator (AI model or Expert)
+                            if (message.messageSource?.type != SourceType.USER) {
                                 Text(
-                                    text = "검증됨",
+                                    text = when (message.messageSource?.type) {
+                                        SourceType.AI -> message.messageSource!!.model?.apiName ?: "AI"
+                                        SourceType.EXPERT -> "전문가"
+                                        else -> ""
+                                    },
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = VerifAiColor.Primary
+                                    color = VerifAiColor.TextSecondary,
+                                    modifier = Modifier.padding(bottom = 4.dp)
                                 )
                             }
-                        }
 
-                        // Expert reviews
-                        if (message is Message.Text && message.expertReviews.isNotEmpty()) {
-                            Spacer(modifier = Modifier.height(8.dp))
-                            message.expertReviews.forEach { review ->
-                                ExpertReviewItem(
-                                    review = review,
-                                    onExpertClick = onExpertProfileClick
-                                )
+                            // Message content
+                            Text(
+                                text = message.content,
+                                color = VerifAiColor.TextPrimary,
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+
+                            // Verification status if applicable
+                            if (message is Message.Text && message.isVerified) {
                                 Spacer(modifier = Modifier.height(4.dp))
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.End,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Verified,
+                                        contentDescription = "검증됨",
+                                        tint = VerifAiColor.Primary,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = "검증됨",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = VerifAiColor.Primary
+                                    )
+                                }
+                            }
+
+                            // Expert reviews
+                            if (message is Message.Text && message.expertReviews.isNotEmpty()) {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                message.expertReviews.forEach { review ->
+                                    ExpertReviewItem(
+                                        review = review,
+                                        onExpertClick = onExpertProfileClick
+                                    )
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                }
                             }
                         }
                     }
@@ -188,7 +196,6 @@ private fun ExpertReviewItem(
         }
     }
 }
-
 
 @Composable
 fun ErrorContent(

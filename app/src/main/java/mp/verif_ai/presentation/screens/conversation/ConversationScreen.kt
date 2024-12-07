@@ -1,16 +1,14 @@
 package mp.verif_ai.presentation.screens.conversation
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import kotlinx.coroutines.flow.collect
-import mp.verif_ai.domain.model.question.Adoption
 import mp.verif_ai.presentation.screens.auth.CustomSnackbar
+import mp.verif_ai.presentation.screens.conversation.components.AIModelSelector
 import mp.verif_ai.presentation.screens.conversation.components.ConversationContent
 import mp.verif_ai.presentation.screens.conversation.components.ErrorContent
 import mp.verif_ai.presentation.screens.conversation.viewmodel.ConversationEvent
@@ -27,8 +25,6 @@ fun ConversationScreen(
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     var userInput by remember { mutableStateOf("") }
-    val scope = rememberCoroutineScope()
-
 
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
@@ -69,6 +65,8 @@ fun ConversationScreen(
         },
         topBar = {
             TopAppBar(
+                modifier = Modifier
+                    .padding(top = 20.dp),
                 title = {
                     Text("Conversation")
                 },
@@ -76,35 +74,12 @@ fun ConversationScreen(
                     containerColor = MaterialTheme.colorScheme.background
                 )
             )
+
         },
         bottomBar = {
             Column {
                 when (val state = uiState) {
                     is ConversationUiState.Success -> {
-                        // AI 모델 선택기 (필요한 경우)
-                        if (state.selectedModel != null) {
-                            Surface(
-                                modifier = Modifier.fillMaxWidth(),
-                                color = VerifAiColor.SurfaceVariant
-                            ) {
-                                Row(
-                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        "AI 모델: ${state.selectedModel.apiName}",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = VerifAiColor.TextSecondary
-                                    )
-                                    Spacer(modifier = Modifier.weight(1f))
-                                    TextButton(onClick = { /* 모델 변경 */ }) {
-                                        Text("변경")
-                                    }
-                                }
-                            }
-                        }
-
-                        // 입력바
                         ChatBottomBar(
                             userInput = userInput,
                             onUserInputChange = { userInput = it },
@@ -115,45 +90,13 @@ fun ConversationScreen(
                                 }
                             },
                             onVoiceRecognition = { /* 음성 인식 */ },
-                            onAddClick = { /* 첨부 */ }
+                            onAddClick = { /* 첨부 */ },
+                            models = state.aiModels,
+                            selectedModel = state.selectedModel,
+                            onModelSelect = viewModel::selectAiModel
                         )
-
-                        // 전문가 검증 요청 버튼
-                        if (state.canRequestExpertReview) {
-                            Surface(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                                color = VerifAiColor.Primary.copy(alpha = 0.1f),
-                                shape = RoundedCornerShape(12.dp)
-                            ) {
-                                Row(
-                                    modifier = Modifier
-                                        .padding(16.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Column(modifier = Modifier.weight(1f)) {
-                                        Text(
-                                            "전문가 검증 요청",
-                                            style = MaterialTheme.typography.titleMedium
-                                        )
-                                        Text(
-                                            "필요 포인트: ${Adoption.EXPERT_REVIEW_POINTS}P",
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            color = VerifAiColor.TextSecondary
-                                        )
-                                    }
-                                    Button(
-                                        onClick = { viewModel.requestExpertReview() },
-                                        enabled = state.pointBalance >= Adoption.EXPERT_REVIEW_POINTS
-                                    ) {
-                                        Text("요청하기")
-                                    }
-                                }
-                            }
-                        }
                     }
-                    else -> Unit
+                    else -> {TODO()}
                 }
             }
         }
@@ -172,6 +115,9 @@ fun ConversationScreen(
                     ConversationContent(
                         messages = state.messages,
                         expertReviews = state.expertReviews,
+                        canRequestExpertReview = state.canRequestExpertReview,
+                        pointBalance = state.pointBalance,
+                        onRequestExpertReview = viewModel::requestExpertReview,
                         onExpertProfileClick = onNavigateToExpertProfile
                     )
                 }

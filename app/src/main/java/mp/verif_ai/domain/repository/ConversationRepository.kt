@@ -2,10 +2,10 @@ package mp.verif_ai.domain.repository
 
 import android.net.Uri
 import kotlinx.coroutines.flow.Flow
-import mp.verif_ai.domain.model.conversation.AIModel
 import mp.verif_ai.domain.model.conversation.Conversation
 import mp.verif_ai.domain.model.conversation.Message
 import mp.verif_ai.domain.model.expert.ExpertReview
+import mp.verif_ai.domain.service.AIModel
 
 interface ConversationRepository {
     /**
