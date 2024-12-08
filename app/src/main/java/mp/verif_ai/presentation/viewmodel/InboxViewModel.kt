@@ -25,8 +25,11 @@ class InboxViewModel @Inject constructor(
     init {
         loadNotifications()
     }
+
     fun loadNotifications() {
         viewModelScope.launch {
+            inboxRepository.insertMockData() // Insert mock data initially
+            inboxRepository.getNotifications().collect { notifications ->
             _uiState.value = InboxUiState.Loading
             try {
                 val notifications = if (useMockData) {
@@ -79,13 +82,30 @@ class InboxViewModel @Inject constructor(
         }
     }
 
+//    fun loadNotifications() {
+//        viewModelScope.launch {
+//            _uiState.value = InboxUiState.Loading
+//            try {
+//                val notifications = inboxRepository.getNotifications()
+//                _uiState.value = if (notifications.isEmpty()) {
+//                    InboxUiState.Empty
+//                } else {
+//                    InboxUiState.Success(notifications)
+//                }
+//            } catch (e: Exception) {
+//                _uiState.value = InboxUiState.Error(e.message ?: "알 수 없는 오류가 발생했습니다")
+//            }
+//        }
+//    }
+
     fun markAsRead(notificationId: String) {
         viewModelScope.launch {
             try {
                 inboxRepository.markAsRead(notificationId)
-                loadNotifications() // 변경 사항 반영
+                // Reload notifications to reflect changes
+                loadNotifications()
             } catch (e: Exception) {
-                // 에러 처리 (필요시 추가)
+                // Handle error
             }
         }
     }

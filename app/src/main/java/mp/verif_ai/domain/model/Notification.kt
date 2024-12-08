@@ -12,6 +12,8 @@ data class Notification(
 )
 
 enum class NotificationType {
+    COMMENT,
+    LIKE,
     QUESTION,
     ANSWER,
     CHAT,
