@@ -2,13 +2,13 @@ package mp.verif_ai.data.repository;
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import mp.verif_ai.data.room.dao.NotificationDao
+import mp.verif_ai.domain.RoomModel.NotificationEntity
 import mp.verif_ai.domain.model.Notification
+import mp.verif_ai.domain.model.NotificationType
 import mp.verif_ai.domain.repository.InboxRepository
 import javax.inject.Inject
 import javax.inject.Singleton
-import mp.verif_ai.data.room.dao.NotificationDao
-import mp.verif_ai.domain.RoomModel.NotificationEntity
-import mp.verif_ai.domain.model.NotificationType
 
 @Singleton
 class InboxRepositoryImpl @Inject constructor(
@@ -114,7 +114,7 @@ fun NotificationEntity.toDomainModel(): Notification {
         userId = this.userId,
         title = this.title,
         content = this.content,
-        type = NotificationType.valueOf(this.type),
+        type = NotificationType.valueOf(this.type).toString(),
         isRead = this.isRead,
         deepLink = this.deepLink,
         createdAt = this.createdAt

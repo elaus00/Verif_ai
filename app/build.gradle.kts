@@ -84,6 +84,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.firebase.messaging.ktx)
     implementation(libs.google.firebase.storage.ktx)
+    implementation(libs.androidx.room.common)
     testImplementation(libs.kotlinx.coroutines)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

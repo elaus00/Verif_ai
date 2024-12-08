@@ -34,6 +34,7 @@ gms-play-services-safetynet = "18.0.1"
 firebaseMessagingKtx = "24.1.0"
 firebaseStorage = "20.1.1"
 firebaseStorageKtx = "21.0.1"
+roomCommon = "2.6.1"
 
 [libraries]
 androidx-compose-bom-v20240100 = { module = "androidx.compose:compose-bom", version.ref = "composeBomVersion" }
@@ -85,6 +86,7 @@ gms-play-services-safetynet = { group = "com.google.android.gms", name = "play-s
 firebase-messaging-ktx = { group = "com.google.firebase", name = "firebase-messaging-ktx", version.ref = "firebaseMessagingKtx" }
 firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebaseStorage" }
 google-firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebaseStorageKtx" }
+androidx-room-common = { group = "androidx.room", name = "room-common", version.ref = "roomCommon" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
