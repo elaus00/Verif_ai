@@ -5,8 +5,8 @@ import androidx.room.PrimaryKey
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import mp.verif_ai.domain.model.expert.ExpertProfile
 import mp.verif_ai.domain.model.auth.UserType
+import mp.verif_ai.domain.model.expert.ExpertProfile
 import mp.verif_ai.domain.model.expert.ExpertReview
 import mp.verif_ai.domain.model.question.Adoption
 

@@ -16,7 +16,7 @@ data class Adoption(
     )
 
     companion object {
-        const val EXPERT_REVIEW_POINTS = 500
+        const val EXPERT_REVIEW_POINTS = 0
 
         fun fromMap(map: Map<String, Any?>): Adoption {
             return Adoption(

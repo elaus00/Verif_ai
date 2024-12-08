@@ -1,14 +1,10 @@
 package mp.verif_ai.presentation.screens.conversation.components
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Star
-import androidx.compose.material.icons.rounded.Verified
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,18 +14,15 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import mp.verif_ai.domain.model.conversation.Message
 import mp.verif_ai.domain.model.conversation.SourceType
-import mp.verif_ai.domain.model.expert.ExpertReview
 import mp.verif_ai.presentation.screens.conversation.viewmodel.ConversationViewModel
 import mp.verif_ai.presentation.screens.theme.VerifAiColor
 
 @Composable
 fun ConversationContent(
     messages: List<Message>,
-    expertReviews: List<ExpertReview>,
     canRequestExpertReview: Boolean,
     pointBalance: Int,
     onRequestExpertReview: () -> Unit,
-    onExpertProfileClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ConversationViewModel = hiltViewModel()
 ) {
@@ -38,13 +31,16 @@ fun ConversationContent(
             .fillMaxSize()
             .padding(4.dp),
         reverseLayout = true,
-        contentPadding = PaddingValues(8.dp),
+        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         items(messages.reversed()) { message ->
             val isCurrentUser = message.messageSource?.type == SourceType.USER
 
             Box(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
                 contentAlignment = if (isCurrentUser) {
                     Alignment.CenterEnd
                 } else {
@@ -77,7 +73,7 @@ fun ConversationContent(
                             }
                         )
                     ) {
-                        Column(modifier = Modifier.padding(12.dp)) {
+                        Column(modifier = Modifier.padding(16.dp)) {
                             // Message source indicator (AI model or Expert)
                             if (message.messageSource?.type != SourceType.USER) {
                                 Text(
@@ -88,7 +84,6 @@ fun ConversationContent(
                                     },
                                     style = MaterialTheme.typography.labelSmall,
                                     color = VerifAiColor.TextSecondary,
-//                                    modifier = Modifier.padding(bottom = 4.dp)
                                 )
                             }
 
@@ -98,98 +93,8 @@ fun ConversationContent(
                                 color = VerifAiColor.TextPrimary,
                                 style = MaterialTheme.typography.bodyLarge
                             )
-
-                            // Verification status if applicable
-                            if (message is Message.Text && message.isVerified) {
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.End,
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Verified,
-                                        contentDescription = "검증됨",
-                                        tint = VerifAiColor.Primary,
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(
-                                        text = "검증됨",
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = VerifAiColor.Primary
-                                    )
-                                }
-                            }
-
-                            // Expert reviews
-                            if (message is Message.Text && message.expertReviews.isNotEmpty()) {
-                                Spacer(modifier = Modifier.height(8.dp))
-                                message.expertReviews.forEach { review ->
-                                    ExpertReviewItem(
-                                        review = review,
-                                        onExpertClick = onExpertProfileClick
-                                    )
-                                    Spacer(modifier = Modifier.height(4.dp))
-                                }
-                            }
                         }
                     }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun ExpertReviewItem(
-    review: ExpertReview,
-    onExpertClick: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        color = VerifAiColor.SurfaceVariant,
-        shape = RoundedCornerShape(8.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .clickable { onExpertClick(review.expertId) }
-                .padding(8.dp)
-        ) {
-            Text(
-                text = review.content,
-                style = MaterialTheme.typography.bodyMedium,
-                color = VerifAiColor.TextPrimary
-            )
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "전문가 평가",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = VerifAiColor.TextSecondary
-                )
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(2.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.Star,
-                        contentDescription = "평점",
-                        tint = VerifAiColor.Primary,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Text(
-                        text = review.rating.toString(),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = VerifAiColor.Primary
-                    )
                 }
             }
         }

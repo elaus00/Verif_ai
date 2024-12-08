@@ -38,72 +38,77 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+    viewModel: HomeViewModel,
     navController: NavController,
-    onQuestionClick: (String) -> Unit,
-    onCreateQuestion: () -> Unit,
-    onSeeMoreQuestions: () -> Unit,
-    onSeeMoreConversations: () -> Unit,
-    onSeeMoreTrending: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val recentConversations by viewModel.recentConversations.collectAsState()
+    val trendingQuestions by viewModel.trendingQuestions.collectAsState()
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            HomeTopBar()
+            HomeTopBar(
+                onNotificationClick = {
+                    navController.navigate(Screen.MainNav.Inbox.InboxScreen.route)
+                },
+                onProfileClick = {
+                    navController.navigate(Screen.MainNav.Settings.Profile.View.route)
+                }
+            )
         },
         bottomBar = {
             AppBottomNavigation(navController = navController as NavHostController)
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { navController.navigate(Screen.MainNav.Conversation.Main.route) },
-                containerColor = VerifAiColor.Primary
+                onClick = { navController.navigate(Screen.MainNav.Home.ConversationDetail.route) },
+                containerColor = MaterialTheme.colorScheme.primary
             ) {
                 Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Open Prompt",
+                    imageVector = Icons.Default.Chat,
+                    contentDescription = "Start Conversation",
                     tint = Color.White
                 )
             }
         }
-
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 25.dp)
-                .padding(top = 10.dp, bottom = 10.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+                .padding(horizontal = 16.dp)
+                .padding(top = 8.dp, bottom = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Search Bar (Now clickable)
+            // Search Bar for Questions
             SearchBar(
-                onCreateQuestion = onCreateQuestion
+                onCreateQuestion = {
+                    navController.navigate(Screen.MainNav.Explore.Create.route)
+                }
             )
 
-            // My Questions Card
-            MyQuestionsCard(
-                questions = listOf(
-                    Question(title= "Is this answer accurate?", content = "Kotlin variables : var or val?"),
-                    Question(title = "This answer from AI does not work.", content = "How to implement OCR on application")
-                ),
-                onSeeMoreClick = onSeeMoreQuestions,
-                onQuestionClick = onQuestionClick
-            )
-
-            // Recent Conversations Card
+            // Recent Conversations with AI
             RecentConversationsCard(
-                conversations = listOf(/* ... */),
-                onSeeMoreClick = onSeeMoreConversations,
-                onConversationClick = { /* Handle conversation click */ }
+                conversations = recentConversations,
+                onSeeMoreClick = {
+                    navController.navigate(Screen.MainNav.Home.route)
+                },
+                onConversationClick = { conversationId ->
+                    navController.navigate(Screen.MainNav.Home.ConversationDetail.createRoute(conversationId))
+                }
             )
 
-            // Trending Questions Card
+            // Trending Questions
             TrendingQuestionsCard(
-                questions = listOf(/* ... */),
-                onSeeMoreClick = onSeeMoreTrending,
-                onQuestionClick = onQuestionClick
+                questions = trendingQuestions,
+                onSeeMoreClick = {
+                    navController.navigate(Screen.MainNav.Explore.ExploreScreen.route)
+                },
+                onQuestionClick = { questionId ->
+                    navController.navigate(Screen.MainNav.Explore.Detail.createRoute(questionId))
+                }
             )
         }
     }
@@ -112,8 +117,8 @@ fun HomeScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeTopBar(
-    onProfileClick: () -> Unit = {},
     onNotificationClick: () -> Unit = {},
+    onProfileClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     TopAppBar(
@@ -128,9 +133,7 @@ fun HomeTopBar(
         },
         actions = {
             // Notification Icon
-            IconButton(
-                onClick = onNotificationClick
-            ) {
+            IconButton(onClick = onNotificationClick) {
                 Icon(
                     imageVector = Icons.Default.Notifications,
                     contentDescription = "Notifications",
@@ -139,9 +142,7 @@ fun HomeTopBar(
             }
 
             // Profile Icon
-            IconButton(
-                onClick = onProfileClick
-            ) {
+            IconButton(onClick = onProfileClick) {
                 Surface(
                     shape = CircleShape,
                     modifier = Modifier.size(32.dp)
@@ -383,6 +384,7 @@ private fun QuestionStatusChip(
         QuestionStatus.CLOSED -> VerifAiColor.Status.ClosedBg to VerifAiColor.Status.ClosedText
         QuestionStatus.EXPIRED -> VerifAiColor.Status.DeletedBg to VerifAiColor.Status.DeletedText
         QuestionStatus.DELETED -> VerifAiColor.Status.DeletedBg to VerifAiColor.Status.DeletedText
+        QuestionStatus.IN_PROGRESS -> VerifAiColor.Status.DraftBg to VerifAiColor.Status.DraftText
     }
 
     Surface(
@@ -396,6 +398,7 @@ private fun QuestionStatusChip(
                 QuestionStatus.CLOSED -> "답변 완료"
                 QuestionStatus.EXPIRED -> "만료됨"
                 QuestionStatus.DELETED -> "삭제됨"
+                QuestionStatus.IN_PROGRESS -> "답변 중"
             },
             modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
             style = MaterialTheme.typography.labelSmall,

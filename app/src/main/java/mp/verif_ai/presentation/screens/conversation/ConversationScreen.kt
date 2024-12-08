@@ -130,11 +130,9 @@ fun ConversationScreen(
                 is ConversationUiState.Success -> {
                     ConversationContent(
                         messages = state.messages,
-                        expertReviews = state.expertReviews,
                         canRequestExpertReview = state.canRequestExpertReview,
                         pointBalance = state.pointBalance,
                         onRequestExpertReview = viewModel::requestExpertReview,
-                        onExpertProfileClick = onNavigateToExpertProfile
                     )
                 }
                 is ConversationUiState.Error -> {

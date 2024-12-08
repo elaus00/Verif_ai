@@ -34,6 +34,7 @@ import mp.verif_ai.util.getTimeAgo
 fun InboxScreen(
     viewModel: InboxViewModel = hiltViewModel(),
     onNotificationClick: (String) -> Unit,
+    onQuestionClick: (String) -> Unit,
     navController: NavHostController
 ) {
     val uiState by viewModel.uiState.collectAsState()

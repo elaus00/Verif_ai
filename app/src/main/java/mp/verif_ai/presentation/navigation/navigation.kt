@@ -2,6 +2,7 @@ package mp.verif_ai.presentation.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -11,22 +12,22 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
 import mp.verif_ai.presentation.screens.Screen
-import mp.verif_ai.presentation.screens.auth.signup.EmailVerificationScreen
+import mp.verif_ai.presentation.screens.auth.OnBoardingScreen
+import mp.verif_ai.presentation.screens.auth.SignInScreen
 import mp.verif_ai.presentation.screens.auth.expertsignup.ExpertOnboardingScreen
 import mp.verif_ai.presentation.screens.auth.expertsignup.ExpertSubmitScreen
 import mp.verif_ai.presentation.screens.auth.expertsignup.ExpertVerificationScreen
-import mp.verif_ai.presentation.screens.auth.OnBoardingScreen
-import mp.verif_ai.presentation.screens.auth.SignInScreen
+import mp.verif_ai.presentation.screens.auth.signup.EmailVerificationScreen
 import mp.verif_ai.presentation.screens.auth.signup.SignUpFormScreen
 import mp.verif_ai.presentation.screens.auth.signup.SignUpScreen
 import mp.verif_ai.presentation.screens.conversation.ConversationDetailScreen
-import mp.verif_ai.presentation.screens.conversation.ConversationHistoryScreen
-import mp.verif_ai.presentation.screens.conversation.ConversationScreen
+import mp.verif_ai.presentation.screens.explore.ExpertProfileScreen
+import mp.verif_ai.presentation.screens.explore.ExploreScreen
 import mp.verif_ai.presentation.screens.home.HomeScreen
-import mp.verif_ai.presentation.screens.home.question.QuestionDetailScreen
-import mp.verif_ai.presentation.screens.inbox.InboxQuestionDetailScreen
 import mp.verif_ai.presentation.screens.inbox.InboxScreen
+import mp.verif_ai.presentation.screens.inbox.NotificationDetailScreen
 import mp.verif_ai.presentation.screens.question.QuestionCreateScreen
+import mp.verif_ai.presentation.screens.question.QuestionDetailScreen
 import mp.verif_ai.presentation.screens.settings.*
 import mp.verif_ai.presentation.screens.settings.notification.NotificationSettingsScreen
 import mp.verif_ai.presentation.screens.settings.payment.PaymentMethodsScreen
@@ -149,80 +150,144 @@ private fun NavGraphBuilder.mainNavigation(navController: NavHostController) {
         startDestination = Screen.MainNav.Home.route,
         route = Screen.MainNav.route
     ) {
-        // Home
-        composable(Screen.MainNav.Home.route) {
+        // 1. Home Section
+        homeNavigation(navController)
+
+        // 2. Inbox Section
+        inboxNavigation(navController)
+
+        // 3. Explore Section
+        exploreNavigation(navController)
+
+        // 4. Settings Section
+        settingsNavigation(navController)
+    }
+}
+
+
+private fun NavGraphBuilder.homeNavigation(navController: NavHostController) {
+    navigation(
+        startDestination = Screen.MainNav.Home.HomeScreen.route,
+        route = Screen.MainNav.Home.route
+    ) {
+        composable(Screen.MainNav.Home.HomeScreen.route) {
             HomeScreen(
+                viewModel = hiltViewModel(),
+                navController = navController,
+                modifier = Modifier
+            )
+        }
+
+        composable(
+            route = Screen.MainNav.Home.ConversationDetail.route,
+            arguments = listOf(
+                navArgument(Screen.ARG_CONVERSATION_ID) { type = NavType.StringType }
+            )
+        ) {
+            ConversationDetailScreen(
+                conversationId = it.arguments?.getString(Screen.ARG_CONVERSATION_ID) ?: ""
+            )
+        }
+
+        composable(
+            route = Screen.MainNav.Home.ExpertProfile.route,
+            arguments = listOf(
+                navArgument(Screen.ARG_EXPERT_ID) { type = NavType.StringType }
+            )
+        ) {
+            ExpertProfileScreen(
+                expertId = it.arguments?.getString(Screen.ARG_EXPERT_ID) ?: ""
+            )
+        }
+    }
+}
+
+private fun NavGraphBuilder.inboxNavigation(navController: NavHostController) {
+    navigation(
+        startDestination = Screen.MainNav.Inbox.InboxScreen.route,
+        route = Screen.MainNav.Inbox.route
+    ) {
+        composable(Screen.MainNav.Inbox.InboxScreen.route) {
+            InboxScreen(
                 navController = navController,
                 onQuestionClick = { questionId ->
-                    navController.navigate(Screen.MainNav.Question.Detail.createRoute(questionId))
+                    navController.navigate(Screen.MainNav.Inbox.QuestionDetail.createRoute(questionId))
                 },
-                onCreateQuestion = {
-                    navController.navigate(Screen.MainNav.Question.Create.route)
-                },
-                onSeeMoreQuestions = {
-                    // Implement see more questions navigation
-                },
-                onSeeMoreConversations = {
-                    // Implement see more conversations navigation
-                },
-                onSeeMoreTrending = {
-                    // Implement see more trending navigation
+                onNotificationClick = { notificationId ->
+                    navController.navigate(Screen.MainNav.Inbox.NotificationDetail.createRoute(notificationId))
                 }
             )
         }
 
-        // Questions
-        composable(Screen.MainNav.Question.Create.route) {
+        composable(
+            route = Screen.MainNav.Inbox.QuestionDetail.route,
+            arguments = listOf(
+                navArgument(Screen.ARG_QUESTION_ID) { type = NavType.StringType }
+            )
+        ) {
+        }
+
+        composable(
+            route = Screen.MainNav.Inbox.NotificationDetail.route,
+            arguments = listOf(
+                navArgument(Screen.ARG_NOTIFICATION_ID) { type = NavType.StringType }
+            )
+        ) {
+            NotificationDetailScreen(
+                notificationId = it.arguments?.getString(Screen.ARG_NOTIFICATION_ID) ?: ""
+            )
+        }
+    }
+}
+
+private fun NavGraphBuilder.exploreNavigation(navController: NavHostController) {
+    navigation(
+        startDestination = Screen.MainNav.Explore.ExploreScreen.route,
+        route = Screen.MainNav.Explore.route
+    ) {
+        composable(Screen.MainNav.Explore.ExploreScreen.route) {
+            ExploreScreen(
+                modifier = Modifier,
+                navController = navController,
+                onCreateQuestion = {
+                    navController.navigate(Screen.MainNav.Explore.Create.route)
+                },
+                onQuestionClick = { questionId ->
+                    navController.navigate(Screen.MainNav.Explore.Detail.createRoute(questionId))
+                },
+            )
+        }
+
+        composable(Screen.MainNav.Explore.Create.route) {
             QuestionCreateScreen(
                 onQuestionCreated = { questionId ->
-                    navController.navigate(Screen.MainNav.Question.Detail.createRoute(questionId)) {
-                        popUpTo(Screen.MainNav.Question.Create.route) { inclusive = true }
+                    navController.navigate(Screen.MainNav.Explore.Detail.createRoute(questionId)) {
+                        popUpTo(Screen.MainNav.Explore.Create.route) { inclusive = true }
                     }
                 }
             )
         }
 
         composable(
-            route = Screen.MainNav.Question.Detail.route,
-            arguments = listOf(navArgument(Screen.ARG_QUESTION_ID) { type = NavType.StringType })
+            route = Screen.MainNav.Explore.Detail.route,
+            arguments = listOf(
+                navArgument(Screen.ARG_QUESTION_ID) { type = NavType.StringType }
+            )
         ) {
             QuestionDetailScreen(
-                questionId = it.arguments?.getString(Screen.ARG_QUESTION_ID)
+                questionId = it.arguments?.getString(Screen.ARG_QUESTION_ID) ?: "",
+                viewModel = hiltViewModel()
             )
         }
-
-        // Inbox
-        composable(Screen.MainNav.Inbox.Main.route) {
-            InboxScreen(
-                onNotificationClick = { questionId ->
-                    navController.navigate(Screen.MainNav.Inbox.QuestionDetail.createRoute(questionId))
-                },
-                navController = navController
-            )
-        }
-
-        composable(
-            route = Screen.MainNav.Inbox.QuestionDetail.route,
-            arguments = listOf(navArgument(Screen.ARG_QUESTION_ID) { type = NavType.StringType })
-        ) {
-            InboxQuestionDetailScreen(
-                questionId = it.arguments?.getString(Screen.ARG_QUESTION_ID)
-            )
-        }
-
-        // Settings
-        settingsNavigation(navController)
-
-        conversationNavigation(navController)
     }
 }
 
 private fun NavGraphBuilder.settingsNavigation(navController: NavHostController) {
     navigation(
-        startDestination = Screen.MainNav.Settings.Main.route,
-        route = "settings_graph"
+        startDestination = Screen.MainNav.Settings.SettingsScreen.route,
+        route = Screen.MainNav.Settings.route
     ) {
-        composable(Screen.MainNav.Settings.Main.route) {
+        composable(Screen.MainNav.Settings.SettingsScreen.route) {
             SettingsScreen(
                 onNavigateToProfile = {
                     navController.navigate(Screen.MainNav.Settings.Profile.View.route)
@@ -236,19 +301,22 @@ private fun NavGraphBuilder.settingsNavigation(navController: NavHostController)
             )
         }
 
-        // Profile
+        // Profile Navigation
         composable(Screen.MainNav.Settings.Profile.View.route) {
             ProfileViewScreen(
-                onEdit = { navController.navigate(Screen.MainNav.Settings.Profile.Edit.route) }
+                onEdit = {
+                    navController.navigate(Screen.MainNav.Settings.Profile.Edit.route)
+                }
             )
         }
+
         composable(Screen.MainNav.Settings.Profile.Edit.route) {
             ProfileEditScreen(
                 onComplete = { navController.navigateUp() }
             )
         }
 
-        // Payment & Subscription
+        // Payment Navigation
         composable(Screen.MainNav.Settings.Payment.Subscription.route) {
             SubscriptionScreen(
                 onManagePayment = {
@@ -256,6 +324,7 @@ private fun NavGraphBuilder.settingsNavigation(navController: NavHostController)
                 }
             )
         }
+
         composable(Screen.MainNav.Settings.Payment.Methods.route) {
             PaymentMethodsScreen(
                 onAddMethod = {
@@ -268,7 +337,7 @@ private fun NavGraphBuilder.settingsNavigation(navController: NavHostController)
             )
         }
 
-        // Notifications
+        // Notifications Settings
         composable(Screen.MainNav.Settings.Notifications.route) {
             NotificationSettingsScreen(
                 onComplete = { navController.navigateUp() }
@@ -277,54 +346,13 @@ private fun NavGraphBuilder.settingsNavigation(navController: NavHostController)
     }
 }
 
-private fun NavGraphBuilder.conversationNavigation(navController: NavHostController) {
-    navigation(
-        startDestination = Screen.MainNav.Conversation.Main.route,
-        route = "conversation_navigation_graph"  // Prompt -> Conversation으로 변경
-    ) {
-        // 메인 대화 화면
-        composable(Screen.MainNav.Conversation.Main.route) {
-            ConversationScreen(
-                onNavigateToExpertProfile = { expertId ->
-                    navController.navigate(Screen.MainNav.Expert.Profile.createRoute(expertId))
-                }
-            )
-        }
-
-        // 대화 히스토리 화면
-        composable(Screen.MainNav.Conversation.History.route) {
-            ConversationHistoryScreen(
-                onConversationClick = { conversationId ->
-                    navController.navigate(Screen.MainNav.Conversation.Detail.createRoute(conversationId))
-                }
-            )
-        }
-
-        // 대화 상세 화면
-        composable(
-            route = Screen.MainNav.Conversation.Detail.route,
-            arguments = listOf(
-                navArgument(Screen.ARG_CONVERSATION_ID) {
-                    type = NavType.StringType
-                }
-            )
-        ) {
-            ConversationDetailScreen(
-                conversationId = it.arguments?.getString(Screen.ARG_CONVERSATION_ID) ?: ""
-            )
-        }
-    }
-}
-
 fun NavController.navigateToMain() {
-    navigate(Screen.MainNav.Home.route) {
-        // Auth 관련 백스택을 모두 제거하여 뒤로가기 시 Auth 화면으로 돌아가지 않도록 함
+    navigate(Screen.MainNav.Home.HomeScreen.route) {
         popUpTo(Screen.Auth.route) {
             inclusive = true
             saveState = false
         }
         launchSingleTop = true
-        // Home 화면의 상태를 복원하지 않고 새로 시작
         restoreState = false
     }
 }

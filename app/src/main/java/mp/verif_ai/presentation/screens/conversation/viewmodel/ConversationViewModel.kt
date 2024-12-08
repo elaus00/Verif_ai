@@ -235,7 +235,7 @@ class ConversationViewModel @Inject constructor(
                         senderId = "ai",
                         model = model
                     )
-                    updateMessages(currentAiMessage!!, isAiMessage = true)
+                    updateMessages(currentAiMessage, isAiMessage = true)
                 }
         } catch (e: Exception) {
             handleError("AI 응답 처리 중 오류가 발생했습니다", e)

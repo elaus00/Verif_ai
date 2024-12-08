@@ -40,10 +40,6 @@ data object VerifAiColor {
         // Deleted - 삭제됨
         val DeletedBg = Color(0xFFFEE2E2)
         val DeletedText = Color(0xFFB91C1C)
-
-        // Controversial - 논쟁
-        val ControversialBg = Color(0xFFFEF3C7)
-        val ControversialText = Color(0xFFB45309)
     }
 
     data object Navy {

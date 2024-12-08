@@ -10,12 +10,15 @@ sealed class Screen(val route: String) {
         data object Verification : Auth("auth/verification/{$ARG_EMAIL}") {
             fun createRoute(email: String) = "auth/verification/$email"
         }
+
         data object CertificationOnBoarding : Auth("auth/certification/onboarding/{$ARG_USER_ID}") {
             fun createRoute(userId: String) = "auth/certification/onboarding/$userId"
         }
+
         data object ExpertCertification : Auth("auth/expert/certification/{$ARG_USER_ID}") {
             fun createRoute(userId: String) = "auth/expert/certification/$userId"
         }
+
         data object ExpertSubmit : Auth("auth/expert/submit/{$ARG_USER_ID}") {
             fun createRoute(userId: String) = "auth/expert/submit/$userId"
         }
@@ -31,42 +34,82 @@ sealed class Screen(val route: String) {
             const val route = "main_graph"
         }
 
-        data object Home : MainNav("main/home")
-
-        sealed class Question(route: String) : MainNav(route) {
+        sealed class Home(route: String) : MainNav(route) {
             companion object {
-                const val route = "main/question"
+                const val route = "main/home_nav"  // 네비게이션 그래프용 route
             }
 
-            data object Create : Question("main/question/create")
-            data class Detail(val questionId: String) : Question("main/question/detail/$questionId") {
+            data object HomeScreen : Home("main/home_screen")  // 실제 홈 화면용 route
+            data class ConversationDetail(val conversationId: String) :
+                Home("main/home/conversation/$conversationId") {
                 companion object {
-                    const val route = "main/question/detail/{$ARG_QUESTION_ID}"
-                    fun createRoute(questionId: String) = "main/question/detail/$questionId"
+                    const val route = "main/home/conversation/{$ARG_CONVERSATION_ID}"
+                    fun createRoute(conversationId: String) =
+                        "main/home/conversation/$conversationId"
+                }
+            }
+
+            data class ExpertProfile(val expertId: String) :
+                Home("main/home/expert/$expertId") {
+                companion object {
+                    const val route = "main/home/expert/{$ARG_EXPERT_ID}"
+                    fun createRoute(expertId: String) =
+                        "main/home/expert/$expertId"
                 }
             }
         }
 
+        // 2. Inbox Section
         sealed class Inbox(route: String) : MainNav(route) {
             companion object {
-                const val route = "main/inbox"
+                const val route = "main/inbox_nav"  // 네비게이션 그래프용 route
             }
 
-            data object Main : Inbox("main/inbox")
-            data class QuestionDetail(val questionId: String) : Inbox("main/inbox/question/$questionId") {
+            data object InboxScreen : Inbox("main/inbox_screen")  // 실제 inbox 화면용 route
+            data class QuestionDetail(val questionId: String) :
+                Inbox("main/inbox/question/$questionId") {
                 companion object {
                     const val route = "main/inbox/question/{$ARG_QUESTION_ID}"
-                    fun createRoute(questionId: String) = "main/inbox/question/$questionId"
+                    fun createRoute(questionId: String) =
+                        "main/inbox/question/$questionId"
+                }
+            }
+
+            data class NotificationDetail(val notificationId: String) :
+                Inbox("main/inbox/notification/$notificationId") {
+                companion object {
+                    const val route = "main/inbox/notification/{$ARG_NOTIFICATION_ID}"
+                    fun createRoute(notificationId: String) =
+                        "main/inbox/notification/$notificationId"
                 }
             }
         }
 
-        sealed class Settings(route: String) : MainNav(route) {
+        // 3. Explore Section (Question Creation & Browse)
+        sealed class Explore(route: String) : MainNav(route) {
             companion object {
-                const val route = "main/settings"
+                const val route = "main/explore_nav"  // 네비게이션 그래프용 route
             }
 
-            data object Main : Settings("main/settings")
+            data object ExploreScreen : Explore("main/explore_screen")  // 실제 explore 화면용 route
+            data object Create : Explore("main/explore/create")
+            data class Detail(val questionId: String) :
+                Explore("main/explore/detail/$questionId") {
+                companion object {
+                    const val route = "main/explore/detail/{$ARG_QUESTION_ID}"
+                    fun createRoute(questionId: String) =
+                        "main/explore/detail/$questionId"
+                }
+            }
+        }
+
+        // 4. Settings Section
+        sealed class Settings(route: String) : MainNav(route) {
+            companion object {
+                const val route = "main/settings_nav"  // 네비게이션 그래프용 route
+            }
+
+            data object SettingsScreen : Settings("main/settings_screen")  // 실제 settings 화면용 route
 
             sealed class Profile(route: String) : Settings(route) {
                 data object View : Profile("main/settings/profile")
@@ -84,45 +127,6 @@ sealed class Screen(val route: String) {
 
             data object Notifications : Settings("main/settings/notifications")
         }
-
-        sealed class Conversation(route: String) : MainNav(route) {
-            companion object {
-                const val route = "main/conversation"
-            }
-
-            // 메인 대화 화면
-            data object Main : Conversation("main/conversation")
-
-            // 대화 기록/히스토리 화면
-            data object History : Conversation("main/conversation/history")
-
-            // 특정 대화 상세 화면
-            data class Detail(val conversationId: String) : Conversation("main/conversation/detail/$conversationId") {
-                companion object {
-                    const val route = "main/conversation/detail/{$ARG_CONVERSATION_ID}"
-                    fun createRoute(conversationId: String) = "main/conversation/detail/$conversationId"
-                }
-            }
-
-            // 대화 템플릿 선택 화면
-            data object Templates : Conversation("main/conversation/templates")
-
-            // 대화 설정 화면
-            data object Settings : Conversation("main/conversation/settings")
-        }
-
-        sealed class Expert(route: String) : MainNav(route) {
-            companion object {
-                const val route = "main/expert"
-            }
-
-            data class Profile(val expertId: String) : Expert("main/expert/profile/$expertId") {
-                companion object {
-                    const val route = "main/expert/profile/{$ARG_EXPERT_ID}"
-                    fun createRoute(expertId: String) = "main/expert/profile/$expertId"
-                }
-            }
-        }
     }
 
     companion object {
@@ -133,5 +137,6 @@ sealed class Screen(val route: String) {
         const val ARG_RETURN_ROUTE = "return"
         const val ARG_CONVERSATION_ID = "conversationId"
         const val ARG_EXPERT_ID = "expertId"
+        const val ARG_NOTIFICATION_ID = "notificationId"
     }
 }

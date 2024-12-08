@@ -11,7 +11,7 @@ data class User(
     val nickname: String = "",
     val type: UserType = UserType.NORMAL,
     val status: UserStatus = UserStatus.ACTIVE,
-    val points: Int = 0,
+    val points: Int = 2000, // 기본 포인트 설정
     val emailVerified: Boolean = false,
     val expertVerificationStatus: String? = null,  // PENDING, APPROVED, REJECTED 추가
     val createdAt: Long = System.currentTimeMillis(),
