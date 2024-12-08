@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import mp.verif_ai.domain.model.conversation.Conversation
 import mp.verif_ai.domain.model.conversation.Message
 import mp.verif_ai.domain.model.conversation.MessageSource
 import mp.verif_ai.domain.model.conversation.SourceType
@@ -54,6 +55,66 @@ class ConversationViewModel @Inject constructor(
             aiModels = AIModel.entries,
             selectedModel = AIModel.GEMINI_1_5_PRO
         )
+    }
+
+    fun loadConversation(conversationId: String) {
+        viewModelScope.launch {
+            try {
+                conversationRepository.observeConversation(conversationId)
+                    .collect { conversation ->
+                        updateState { currentState ->
+                            currentState.copy(
+                                messages = conversation.messages
+                            )
+                        }
+                    }
+            } catch (e: Exception) {
+                handleError("대화를 불러오는데 실패했습니다", e)
+            }
+        }
+    }
+
+    private fun loadConversationHistory() {
+        viewModelScope.launch {
+            try {
+                val userId = authRepository.getCurrentUser()?.id
+                    ?: throw IllegalStateException("사용자 정보를 찾을 수 없습니다")
+
+                conversationRepository.getConversationHistory(userId)
+                    .onSuccess { conversations ->
+                        updateState { currentState ->
+                            currentState.copy(
+                                conversations = conversations,
+                                filteredConversations = conversations
+                            )
+                        }
+                    }
+                    .onFailure { e ->
+                        handleError("대화 목록을 불러오는데 실패했습니다", e)
+                    }
+            } catch (e: Exception) {
+                handleError("대화 목록을 불러오는데 실패했습니다", e)
+            }
+        }
+    }
+
+    fun searchConversations(query: String) {
+        viewModelScope.launch {
+            updateState { currentState ->
+                val filtered = if (query.isBlank()) {
+                    currentState.conversations
+                } else {
+                    currentState.conversations.filter { conversation ->
+                        conversation.title.contains(query, ignoreCase = true) ||
+                                conversation.messages.any { it.content.contains(query, ignoreCase = true) }
+                    }
+                }
+                currentState.copy(
+                    searchQuery = query,
+                    filteredConversations = filtered
+                )
+            }
+        }
     }
 
     fun sendMessage(inputContent: String) {
@@ -290,13 +351,16 @@ private object MessageFactory {
 sealed class ConversationUiState {
     data object Loading : ConversationUiState()
     data class Success(
-        val messages: List<Message>,
-        val aiModels: List<AIModel>,
-        val selectedModel: AIModel?,
+        val messages: List<Message> = emptyList(),
+        val conversations: List<Conversation> = emptyList(),
+        val aiModels: List<AIModel> = emptyList(),
+        val selectedModel: AIModel? = null,
         val isAiResponding: Boolean = false,
         val expertReviews: List<ExpertReview> = emptyList(),
         val canRequestExpertReview: Boolean = true,
-        val pointBalance: Int = 1000
+        val pointBalance: Int = 1000,
+        val searchQuery: String = "",
+        val filteredConversations: List<Conversation> = emptyList()
     ) : ConversationUiState()
     data class Error(val message: String) : ConversationUiState()
 }

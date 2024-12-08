@@ -1,4 +1,4 @@
-package mp.verif_ai.presentation.components
+package mp.verif_ai.presentation.screens.components
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background

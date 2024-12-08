@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 import mp.verif_ai.domain.model.conversation.Answer
 import mp.verif_ai.domain.model.question.Question
 import mp.verif_ai.domain.model.question.QuestionStatus
-import mp.verif_ai.presentation.screens.conversation.formatDate
+import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -365,4 +365,9 @@ fun formatTimestamp(timestamp: Long): String {
         diff < 24 * 60 * 60 * 1000 -> "${diff / (60 * 60 * 1000)}시간 전"
         else -> SimpleDateFormat("yyyy.MM.dd", Locale.getDefault()).format(Date(timestamp))
     }
+}
+
+fun formatDate(timestamp: Long): String {
+    return DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT)
+        .format(Date(timestamp))
 }

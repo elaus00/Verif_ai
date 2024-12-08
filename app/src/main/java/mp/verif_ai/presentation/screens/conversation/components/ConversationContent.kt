@@ -4,11 +4,13 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -129,5 +131,29 @@ fun ErrorContent(
         ) {
             Text("다시 시도")
         }
+    }
+}
+
+
+@Composable
+fun PagerContent(
+    modifier: Modifier = Modifier,
+    pagerState: PagerState,
+    pageIndex: Int,
+    content: @Composable () -> Unit
+) {
+    val scaleFactor = rememberPagerTransition(pagerState)
+    val alpha = if (pagerState.currentPage == pageIndex) 1f else 0.6f
+
+    Box(
+        modifier = modifier
+            .graphicsLayer {
+                scaleX = scaleFactor.scaleX
+                scaleY = scaleFactor.scaleY
+                this.alpha = alpha
+            }
+            .fillMaxSize()
+    ) {
+        content()
     }
 }

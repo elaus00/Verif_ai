@@ -170,7 +170,7 @@ fun CardHeader(
         Text(
             text = title,
             style = MaterialTheme.typography.titleMedium.copy(
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight(500),
                 fontSize = 18.sp,
                 letterSpacing = (-0.5).sp,
                 lineHeight = 24.sp

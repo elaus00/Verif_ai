@@ -157,4 +157,6 @@ dependencies {
     // Google AI client SDK (Gemini)
     implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
 
+    implementation(libs.accompanist.pager)
+
 }

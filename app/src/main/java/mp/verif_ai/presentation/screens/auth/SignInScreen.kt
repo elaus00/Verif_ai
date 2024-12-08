@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import mp.verif_ai.presentation.navigation.navigateToMain
+import mp.verif_ai.presentation.screens.components.CustomSnackbar
 import mp.verif_ai.presentation.viewmodel.AuthUiState
 import mp.verif_ai.presentation.viewmodel.AuthViewModel
 import mp.verif_ai.presentation.viewmodel.PassKeyEvent

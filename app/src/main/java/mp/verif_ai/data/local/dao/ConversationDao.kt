@@ -17,32 +17,32 @@ private val json = Json {
     coerceInputValues = true
 }
 
-@Dao
-interface ConversationDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertConversation(conversation: ConversationRoomEntity)
+    @Dao
+    interface ConversationDao {
+        @Insert(onConflict = OnConflictStrategy.REPLACE)
+        suspend fun insertConversation(conversation: ConversationRoomEntity)
 
-    @Query("SELECT * FROM conversations WHERE id = :conversationId")
-    suspend fun getConversationById(conversationId: String): ConversationRoomEntity?
+        @Query("SELECT * FROM conversations WHERE id = :conversationId")
+        suspend fun getConversationById(conversationId: String): ConversationRoomEntity?
 
-    @Query("SELECT * FROM conversations ORDER BY updatedAt DESC LIMIT :limit OFFSET :offset")
-    suspend fun getConversations(limit: Int, offset: Int): List<ConversationRoomEntity>
+        @Query("SELECT * FROM conversations ORDER BY updatedAt DESC LIMIT :limit OFFSET :offset")
+        suspend fun getConversations(limit: Int, offset: Int): List<ConversationRoomEntity>
 
-    @Delete
-    suspend fun deleteConversation(conversation: ConversationRoomEntity)
+        @Delete
+        suspend fun deleteConversation(conversation: ConversationRoomEntity)
 
-    @Transaction
-    @Query("SELECT * FROM conversations WHERE id = :conversationId")
-    fun observeConversationWithDetails(conversationId: String): Flow<ConversationWithDetails>
+        @Transaction
+        @Query("SELECT * FROM conversations WHERE id = :conversationId")
+        fun observeConversationWithDetails(conversationId: String): Flow<ConversationWithDetails>
 
-    @Transaction
-    @Query("SELECT * FROM conversations ORDER BY updatedAt DESC LIMIT :limit OFFSET :offset")
-    suspend fun getConversationsWithDetails(limit: Int, offset: Int): List<ConversationWithDetails>
+        @Transaction
+        @Query("SELECT * FROM conversations ORDER BY updatedAt DESC LIMIT :limit OFFSET :offset")
+        suspend fun getConversationsWithDetails(limit: Int, offset: Int): List<ConversationWithDetails>
 
-    @Transaction
-    @Query("SELECT * FROM conversations WHERE id = :conversationId")
-    suspend fun getConversationWithDetails(conversationId: String): ConversationWithDetails?
-}
+        @Transaction
+        @Query("SELECT * FROM conversations WHERE id = :conversationId")
+        suspend fun getConversationWithDetails(conversationId: String): ConversationWithDetails?
+    }
 
 @Dao
 interface MessageDao {

@@ -20,10 +20,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import mp.verif_ai.presentation.screens.auth.CustomSnackbar
-import mp.verif_ai.presentation.screens.auth.OnBoardingButton
-import mp.verif_ai.presentation.screens.auth.WelcomeText
-import mp.verif_ai.presentation.screens.theme.VerifAiColor
 import mp.verif_ai.presentation.viewmodel.AuthEvent
 import mp.verif_ai.presentation.viewmodel.AuthUiState
 import mp.verif_ai.presentation.viewmodel.AuthViewModel

@@ -20,7 +20,6 @@ import mp.verif_ai.presentation.screens.auth.expertsignup.ExpertVerificationScre
 import mp.verif_ai.presentation.screens.auth.signup.EmailVerificationScreen
 import mp.verif_ai.presentation.screens.auth.signup.SignUpFormScreen
 import mp.verif_ai.presentation.screens.auth.signup.SignUpScreen
-import mp.verif_ai.presentation.screens.conversation.ConversationDetailScreen
 import mp.verif_ai.presentation.screens.conversation.ConversationScreen
 import mp.verif_ai.presentation.screens.explore.ExpertProfileScreen
 import mp.verif_ai.presentation.screens.explore.ExploreScreen
@@ -180,17 +179,9 @@ private fun NavGraphBuilder.homeNavigation(navController: NavHostController) {
         }
 
         composable(Screen.MainNav.Home.ConversationScreen.route) {
-            ConversationScreen()
-        }
-
-        composable(
-            route = Screen.MainNav.Home.ConversationDetail.route,
-            arguments = listOf(
-                navArgument(Screen.ARG_CONVERSATION_ID) { type = NavType.StringType }
-            )
-        ) {
-            ConversationDetailScreen(
-                conversationId = it.arguments?.getString(Screen.ARG_CONVERSATION_ID) ?: ""
+            ConversationScreen(
+                viewModel = hiltViewModel(),
+                onNavigateToExpertProfile = {TODO()}
             )
         }
 

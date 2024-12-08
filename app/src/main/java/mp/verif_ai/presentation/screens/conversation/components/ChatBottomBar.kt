@@ -1,4 +1,4 @@
-package mp.verif_ai.presentation.screens.conversation
+package mp.verif_ai.presentation.screens.conversation.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
@@ -24,11 +24,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import mp.verif_ai.domain.service.AIModel
-import mp.verif_ai.presentation.screens.conversation.components.AIModelSelector
 import mp.verif_ai.presentation.screens.theme.VerifAiColor
 
 @Composable
 fun ChatBottomBar(
+    modifier: Modifier = Modifier,
     userInput: String,
     onUserInputChange: (String) -> Unit,
     onSendMessage: () -> Unit,
@@ -37,7 +37,6 @@ fun ChatBottomBar(
     models: List<AIModel>,
     selectedModel: AIModel?,
     onModelSelect: (AIModel) -> Unit,
-    modifier: Modifier = Modifier
 ) {
     Surface(
 //        color = Color.Transparent,

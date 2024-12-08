@@ -2,25 +2,22 @@ package mp.verif_ai.presentation.screens.conversation.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.PopupProperties
 import kotlinx.coroutines.launch
 import mp.verif_ai.domain.model.conversation.Message
 import mp.verif_ai.domain.model.question.Adoption
-import mp.verif_ai.presentation.screens.auth.CustomSnackbar
+import mp.verif_ai.presentation.screens.components.CustomContextMenu
+import mp.verif_ai.presentation.screens.components.CustomSnackbar
 import mp.verif_ai.presentation.screens.theme.VerifAiColor
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -161,55 +158,6 @@ fun MessageWithContextMenu(
             CustomSnackbar(
                 snackbarData = snackbarData,
                 modifier = Modifier.padding(16.dp)
-            )
-        }
-    }
-}
-
-@Composable
-fun CustomContextMenu(
-    expanded: Boolean,
-    onDismissRequest: () -> Unit,
-    items: List<String>,
-    modifier: Modifier = Modifier,
-    itemContent: (@Composable (String) -> Unit)? = null
-) {
-    DropdownMenu(
-        expanded = expanded,
-        onDismissRequest = onDismissRequest,
-        modifier = modifier
-            .background(
-                color = MaterialTheme.colorScheme.surface,
-                shape = RoundedCornerShape(16.dp)
-            )
-            .width(IntrinsicSize.Max)
-            .border(
-                width = 1.dp,
-                color = VerifAiColor.BorderColor,
-                shape = RoundedCornerShape(16.dp)
-            ),
-        properties = PopupProperties(focusable = true)
-    ) {
-        items.forEach { item ->
-            DropdownMenuItem(
-                text = {
-                    if (itemContent != null) {
-                        itemContent(item)
-                    } else {
-                        Text(
-                            text = item,
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = VerifAiColor.TextPrimary
-                        )
-                    }
-                },
-                onClick = {
-                    onDismissRequest()
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surface)
-                    .clip(RoundedCornerShape(8.dp))
             )
         }
     }

@@ -1,27 +1,18 @@
 package mp.verif_ai.presentation.screens.auth
 
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import mp.verif_ai.presentation.screens.theme.VerifAiColor
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Phone
-import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.dp
+import mp.verif_ai.presentation.screens.theme.VerifAiColor
 
 @Composable
 fun WelcomeText(
@@ -128,52 +119,6 @@ fun LoginButton(
                     text = text,
                     style = MaterialTheme.typography.bodyLarge
                 )
-            }
-        }
-    }
-}
-
-
-@Composable
-fun CustomSnackbar(
-    snackbarData: SnackbarData,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier
-            .padding(8.dp),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = VerifAiColor.Navy.Dark
-        )
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-                .padding(horizontal = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = snackbarData.visuals.message,
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.White,
-                modifier = Modifier.weight(1f)
-            )
-
-            if (snackbarData.visuals.actionLabel != null) {
-                TextButton(
-                    onClick = { snackbarData.performAction() },
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = VerifAiColor.Navy.Light
-                    )
-                ) {
-                    Text(
-                        text = snackbarData.visuals.actionLabel!!,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
             }
         }
     }

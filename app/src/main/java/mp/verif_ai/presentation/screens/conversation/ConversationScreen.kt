@@ -1,27 +1,43 @@
 package mp.verif_ai.presentation.screens.conversation
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import mp.verif_ai.presentation.screens.auth.CustomSnackbar
-import mp.verif_ai.presentation.screens.conversation.components.ConversationContent
-import mp.verif_ai.presentation.screens.conversation.components.ErrorContent
+import kotlinx.coroutines.launch
+import mp.verif_ai.presentation.screens.components.CustomSnackbar
+import mp.verif_ai.presentation.screens.conversation.components.ConversationDetailPage
+import mp.verif_ai.presentation.screens.conversation.components.ConversationDetailTopBar
+import mp.verif_ai.presentation.screens.conversation.components.ConversationHistoryPage
+import mp.verif_ai.presentation.screens.conversation.components.ConversationHistoryTopBar
+import mp.verif_ai.presentation.screens.conversation.components.ConversationPagerContainer
+import mp.verif_ai.presentation.screens.conversation.components.ConversationSearchBar
+import mp.verif_ai.presentation.screens.conversation.components.PagerContent
 import mp.verif_ai.presentation.screens.conversation.viewmodel.ConversationEvent
-import mp.verif_ai.presentation.screens.conversation.viewmodel.ConversationUiState
 import mp.verif_ai.presentation.screens.conversation.viewmodel.ConversationViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConversationScreen(
-    viewModel: ConversationViewModel = hiltViewModel()
+    viewModel: ConversationViewModel = hiltViewModel(),
+    onNavigateToExpertProfile: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
-    var userInput by remember { mutableStateOf("") }
+    var searchQuery by remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
+    val pagerState = rememberPagerState(
+        initialPage = 1,
+        pageCount = { 2 }
+    )
 
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
@@ -41,7 +57,7 @@ fun ConversationScreen(
                     )
                 }
                 is ConversationEvent.NavigateToExpertProfile -> {
-                    TODO()
+                    onNavigateToExpertProfile(event.expertId)
                 }
                 is ConversationEvent.RequestExpertReviewSuccess -> {
                     snackbarHostState.showSnackbar(
@@ -50,24 +66,7 @@ fun ConversationScreen(
                         duration = SnackbarDuration.Short
                     )
                 }
-
-
-                is ConversationEvent.MessageSent -> {
-                    // 메시지 전송 성공 시 처리
-                    // 예: 스크롤 위치 조정, 사운드 재생 등
-//                    snackbarHostState.showSnackbar(
-//                        message = "메시지가 전송되었습니다",
-//                        duration = SnackbarDuration.Short
-//                    )
-                }
-                is ConversationEvent.AiResponseReceived -> {
-                    // AI 응답 수신 완료 시 처리
-                    // 예: 로딩 인디케이터 숨기기, 스크롤 위치 조정 등
-//                    snackbarHostState.showSnackbar(
-//                        message = "AI 응답이 완료되었습니다",
-//                        duration = SnackbarDuration.Short
-//                    )
-                }
+                else -> { /* 다른 이벤트 처리 */ }
             }
         }
     }
@@ -79,66 +78,66 @@ fun ConversationScreen(
             }
         },
         topBar = {
-            TopAppBar(
-                modifier = Modifier
-                    .padding(start = 16.dp, top = 16.dp),
-                title = {
-                    Text("Conversation")
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                )
-            )
-
-        },
-        bottomBar = {
-            Column {
-                when (val state = uiState) {
-                    is ConversationUiState.Success -> {
-                        ChatBottomBar(
-                            userInput = userInput,
-                            onUserInputChange = { userInput = it },
-                            onSendMessage = {
-                                if (userInput.isNotBlank()) {
-                                    viewModel.sendMessage(userInput)
-                                    userInput = ""
-                                }
-                            },
-                            onVoiceRecognition = { /* 음성 인식 */ },
-                            onAddClick = { /* 첨부 */ },
-                            models = state.aiModels,
-                            selectedModel = state.selectedModel,
-                            onModelSelect = viewModel::selectAiModel
+            AnimatedContent(
+                targetState = pagerState.currentPage,
+                transitionSpec = {
+                    fadeIn() + slideInVertically() togetherWith
+                            fadeOut() + slideOutVertically()
+                }, label = ""
+            ) { page ->
+                when (page) {
+                    0 -> Column {
+                        ConversationHistoryTopBar()
+                        ConversationSearchBar(
+                            searchQuery = searchQuery,
+                            onSearchQueryChange = {
+                                searchQuery = it
+                                viewModel.searchConversations(it)
+                            }
                         )
                     }
-                    else -> {TODO()}
+                    1 -> ConversationDetailTopBar(
+                        onBackClick = {
+                            scope.launch {
+                                pagerState.animateScrollToPage(0)
+                            }
+                        }
+                    )
                 }
             }
         }
-    ) { padding ->
-        Box(modifier = Modifier.padding(padding)) {
-            when (val state = uiState) {
-                is ConversationUiState.Loading -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize()
+        ) {
+            ConversationPagerContainer(
+                pagerState = pagerState,
+                modifier = Modifier.fillMaxSize()
+            ) { page ->
+                PagerContent(
+                    pagerState = pagerState,
+                    pageIndex = page
+                ) {
+                    when (page) {
+                        0 -> ConversationHistoryPage(
+                            uiState = uiState,
+                            searchQuery = searchQuery,
+                            onConversationClick = { conversationId ->
+                                viewModel.loadConversation(conversationId)
+                                scope.launch {
+                                    pagerState.animateScrollToPage(1)
+                                }
+                            }
+                        )
+                        1 -> ConversationDetailPage(
+                            uiState = uiState,
+                            onSendMessage = viewModel::sendMessage,
+                            onRequestExpertReview = viewModel::requestExpertReview,
+                            onModelSelect = viewModel::selectAiModel
+                        )
                     }
-                }
-                is ConversationUiState.Success -> {
-                    ConversationContent(
-                        messages = state.messages,
-                        canRequestExpertReview = state.canRequestExpertReview,
-                        pointBalance = state.pointBalance,
-                        onRequestExpertReview = viewModel::requestExpertReview,
-                    )
-                }
-                is ConversationUiState.Error -> {
-                    ErrorContent(
-                        message = state.message,
-                        onRetry = viewModel::retry
-                    )
                 }
             }
         }
