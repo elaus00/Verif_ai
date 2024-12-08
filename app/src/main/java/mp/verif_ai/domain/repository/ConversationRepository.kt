@@ -2,6 +2,7 @@ package mp.verif_ai.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import mp.verif_ai.domain.model.conversation.Conversation
+import mp.verif_ai.domain.model.conversation.ConversationStatus
 import mp.verif_ai.domain.model.conversation.Message
 
 /**
@@ -43,4 +44,11 @@ interface ConversationRepository {
      * @return Result containing the complete conversation if successful
      */
     suspend fun getFullConversation(conversationId: String): Result<Conversation>
+
+    suspend fun createConversation(conversation: Conversation): Result<Unit>
+    suspend fun updateConversation(conversation: Conversation): Result<Unit>
+    suspend fun updateConversationStatus(
+        conversationId: String,
+        status: ConversationStatus
+    ): Result<Unit>
 }

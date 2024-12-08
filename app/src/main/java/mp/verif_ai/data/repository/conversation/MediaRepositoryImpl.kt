@@ -3,10 +3,8 @@ package mp.verif_ai.data.repository.conversation
 import android.net.Uri
 import android.util.Log
 import com.google.firebase.storage.FirebaseStorage
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.tasks.await
 import mp.verif_ai.data.util.FirestoreErrorHandler
-import mp.verif_ai.di.IoDispatcher
 import mp.verif_ai.domain.model.attachment.FileInfo
 import mp.verif_ai.domain.model.attachment.ImageInfo
 import mp.verif_ai.domain.repository.MediaRepository
@@ -17,8 +15,7 @@ import javax.inject.Singleton
 @Singleton
 class MediaRepositoryImpl @Inject constructor(
     private val storage: FirebaseStorage,
-    private val errorHandler: FirestoreErrorHandler,
-    @IoDispatcher private val dispatcher: CoroutineDispatcher
+    private val errorHandler: FirestoreErrorHandler
 ) : MediaRepository {
 
     companion object {

@@ -4,7 +4,6 @@ import android.util.Log
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.ListenerRegistration
-import com.google.firebase.firestore.Query
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -12,6 +11,7 @@ import kotlinx.coroutines.tasks.await
 import mp.verif_ai.domain.model.conversation.Conversation
 import mp.verif_ai.domain.model.conversation.ConversationStatus
 import mp.verif_ai.domain.model.conversation.ConversationType
+import mp.verif_ai.domain.model.conversation.Message
 import mp.verif_ai.domain.model.conversation.ParticipantType
 import mp.verif_ai.domain.model.conversation.ParticipationStatus
 import javax.inject.Inject
@@ -47,6 +47,16 @@ class ConversationMapper @Inject constructor() {
 
     suspend fun mapDocumentToConversation(doc: DocumentSnapshot): Conversation? {
         val data = doc.data ?: return null
+
+        val messages = doc.reference.collection("messages")
+            .orderBy("timestamp")
+            .get()
+            .await()
+            .documents
+            .mapNotNull { messageDoc ->
+                Message.Text.fromMap(messageDoc.data ?: return@mapNotNull null)
+            }
+
         return Conversation(
             id = doc.id,
             title = data["title"] as? String ?: "",
@@ -54,7 +64,7 @@ class ConversationMapper @Inject constructor() {
                 ?: emptyList(),
             participantTypes = mapParticipantTypes(data.getOrDefault("participantTypes", emptyMap<String, Any>()) as Map<*, *>),
             participantStatuses = mapParticipantStatuses(data.getOrDefault("participantStatuses", emptyMap<String, Any>()) as Map<*, *>),
-            messages = emptyList(),
+            messages = messages,
             type = mapConversationType(data["type"] as? String),
             status = mapConversationStatus(data["status"] as? String),
             category = data["category"] as? String,
@@ -102,35 +112,5 @@ class ConversationMapper @Inject constructor() {
         } catch (e: IllegalArgumentException) {
             ConversationStatus.ACTIVE
         }
-    }
-
-    suspend fun getFirestoreConversations(
-        collection: CollectionReference,
-        userId: String,
-        limit: Int
-    ): List<Conversation> {
-        return collection
-            .whereArrayContains("participants", userId)
-            .orderBy("updatedAt", Query.Direction.DESCENDING)
-            .limit(limit.toLong())
-            .get()
-            .await()
-            .documents
-            .mapNotNull { doc ->
-                mapDocumentToConversation(doc)
-            }
-    }
-
-    suspend fun getFirestoreConversation(
-        collection: CollectionReference,
-        conversationId: String
-    ): Conversation {
-        val doc = collection
-            .document(conversationId)
-            .get()
-            .await()
-
-        return mapDocumentToConversation(doc)
-            ?: throw IllegalStateException("Conversation not found")
     }
 }

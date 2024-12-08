@@ -50,6 +50,25 @@ private val json = Json {
     coerceInputValues = true
 }
 
+fun MessageRoomEntity.toDomainModel(): Message {
+    val additionalData = json.decodeFromString<MessageTextData>(additionalData)
+    val messageSourceData = messageSource?.let { json.decodeFromString<MessageSource>(it) }
+
+    return Message.Text(
+        id = id,
+        content = content,
+        senderId = senderId,
+        timestamp = timestamp,
+        replyTo = replyTo,
+        messageSource = messageSourceData,
+        expertReviews = additionalData.expertReviews,
+        adoption = additionalData.adoption,
+        isVerified = additionalData.isVerified,
+        references = additionalData.references
+    )
+}
+
+
 fun Conversation.toRoomEntity() = ConversationRoomEntity(
     id = id,
     title = title,
@@ -60,6 +79,26 @@ fun Conversation.toRoomEntity() = ConversationRoomEntity(
     createdAt = createdAt,
     updatedAt = updatedAt
 )
+
+fun Message.toRoomEntity(conversationId: String): MessageRoomEntity {
+    return when (this) {
+        is Message.Text -> MessageRoomEntity(
+            id = id,
+            conversationId = conversationId,
+            content = content,
+            senderId = senderId,
+            replyTo = replyTo,
+            messageSource = messageSource?.let { json.encodeToString(it) },
+            additionalData = json.encodeToString(MessageTextData(
+                expertReviews = expertReviews,
+                adoption = adoption,
+                isVerified = isVerified,
+                references = references
+            )),
+            timestamp = timestamp
+        )
+    }
+}
 
 fun Participant.toRoomEntity(conversationId: String) = ParticipantRoomEntity(
     id = id,
@@ -82,23 +121,6 @@ fun Participant.toRoomEntity(conversationId: String) = ParticipantRoomEntity(
             ParticipantUserData(type, participationStatus))
         is Participant.Assistant -> "{}"
     }
-)
-
-
-fun Message.toRoomEntity(conversationId: String) = MessageRoomEntity(
-    id = id,
-    conversationId = conversationId,
-    content = content,
-    senderId = senderId,
-    replyTo = replyTo,
-    messageSource = messageSource?.let { json.encodeToString(it) },
-    additionalData = json.encodeToString(MessageTextData(
-        expertReviews = (this as Message.Text).expertReviews,
-        adoption = this.adoption,
-        isVerified = this.isVerified,
-        references = this.references
-    )),
-    timestamp = timestamp
 )
 
 

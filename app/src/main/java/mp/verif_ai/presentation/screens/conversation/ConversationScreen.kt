@@ -12,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import mp.verif_ai.presentation.screens.components.CustomSnackbar
 import mp.verif_ai.presentation.screens.conversation.components.ConversationDetailPage
@@ -27,8 +28,10 @@ import mp.verif_ai.presentation.screens.conversation.viewmodel.ConversationViewM
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConversationScreen(
+    navController : NavHostController,
     viewModel: ConversationViewModel = hiltViewModel(),
-    onNavigateToExpertProfile: (String) -> Unit
+    onNavigateToExpertProfile: (String) -> Unit,
+    onNavigateToPointCharge: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -45,16 +48,19 @@ fun ConversationScreen(
                 is ConversationEvent.ShowError -> {
                     snackbarHostState.showSnackbar(
                         message = event.message,
-                        actionLabel = "Dismiss",
+                        actionLabel = "닫기",
                         duration = SnackbarDuration.Long
                     )
                 }
                 is ConversationEvent.InsufficientPoints -> {
-                    snackbarHostState.showSnackbar(
+                    val result = snackbarHostState.showSnackbar(
                         message = "포인트가 부족합니다",
                         actionLabel = "충전하기",
                         duration = SnackbarDuration.Long
                     )
+                    if (result == SnackbarResult.ActionPerformed) {
+                        onNavigateToPointCharge()
+                    }
                 }
                 is ConversationEvent.NavigateToExpertProfile -> {
                     onNavigateToExpertProfile(event.expertId)
@@ -62,11 +68,11 @@ fun ConversationScreen(
                 is ConversationEvent.RequestExpertReviewSuccess -> {
                     snackbarHostState.showSnackbar(
                         message = "전문가 검증 요청이 완료되었습니다",
-                        actionLabel = "Dismiss",
+                        actionLabel = "닫기",
                         duration = SnackbarDuration.Short
                     )
                 }
-                else -> { /* 다른 이벤트 처리 */ }
+                else -> Unit
             }
         }
     }
@@ -83,11 +89,15 @@ fun ConversationScreen(
                 transitionSpec = {
                     fadeIn() + slideInVertically() togetherWith
                             fadeOut() + slideOutVertically()
-                }, label = ""
+                },
+                label = "TopBar Animation"
             ) { page ->
                 when (page) {
                     0 -> Column {
-                        ConversationHistoryTopBar()
+                        ConversationHistoryTopBar(
+                            onBackClick = { navController.navigateUp() },
+                            onRefresh = { viewModel.loadConversationHistory() }
+                        )
                         ConversationSearchBar(
                             searchQuery = searchQuery,
                             onSearchQueryChange = {
@@ -100,6 +110,13 @@ fun ConversationScreen(
                         onBackClick = {
                             scope.launch {
                                 pagerState.animateScrollToPage(0)
+                            }
+                        },
+                        currentConversation = viewModel.getCurrentConversation(),
+                        onNewConversationClick = {
+                            viewModel.startNewConversation()
+                            scope.launch {
+                                pagerState.animateScrollToPage(1)
                             }
                         }
                     )
@@ -125,8 +142,8 @@ fun ConversationScreen(
                             uiState = uiState,
                             searchQuery = searchQuery,
                             onConversationClick = { conversationId ->
-                                viewModel.loadConversation(conversationId)
                                 scope.launch {
+                                    viewModel.loadConversation()
                                     pagerState.animateScrollToPage(1)
                                 }
                             }
@@ -135,7 +152,8 @@ fun ConversationScreen(
                             uiState = uiState,
                             onSendMessage = viewModel::sendMessage,
                             onRequestExpertReview = viewModel::requestExpertReview,
-                            onModelSelect = viewModel::selectAiModel
+                            onModelSelect = viewModel::selectAiModel,
+                            onRetry = viewModel::retry
                         )
                     }
                 }

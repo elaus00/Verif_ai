@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Comment
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -197,6 +198,54 @@ fun CardHeader(
             Icon(
                 imageVector = Icons.Default.ArrowForward,
                 contentDescription = "See more",
+                modifier = Modifier.size(16.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun CardHeaderWithRefresh(
+    title: String,
+    onRefreshClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium.copy(
+                fontWeight = FontWeight(500),
+                fontSize = 18.sp,
+                letterSpacing = (-0.5).sp,
+                lineHeight = 24.sp
+            ),
+            color = VerifAiColor.TextPrimary
+        )
+
+        TextButton(
+            onClick = onRefreshClick,
+            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+            colors = ButtonDefaults.textButtonColors(
+                contentColor = VerifAiColor.Primary.copy(alpha = 0.8f)
+            )
+        ) {
+            Text(
+                text = "새로고침",
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 13.sp,
+                    letterSpacing = 0.sp
+                )
+            )
+            Spacer(Modifier.width(4.dp))
+            Icon(
+                imageVector = Icons.Default.Refresh,
+                contentDescription = "Refresh",
                 modifier = Modifier.size(16.dp)
             )
         }

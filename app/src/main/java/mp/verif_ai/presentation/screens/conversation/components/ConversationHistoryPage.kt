@@ -72,11 +72,20 @@ fun ConversationDetailPage(
     uiState: ConversationUiState,
     onSendMessage: (String) -> Unit,
     onRequestExpertReview: () -> Unit,
-    onModelSelect: (AIModel) -> Unit
+    onModelSelect: (AIModel) -> Unit,
+    onRetry: () -> Unit
 ) {
     var userInput by remember { mutableStateOf("") }
 
     when (uiState) {
+        is ConversationUiState.Loading -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
         is ConversationUiState.Success -> {
             Column {
                 ConversationContent(
@@ -104,13 +113,11 @@ fun ConversationDetailPage(
                 )
             }
         }
-        else -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
+        is ConversationUiState.Error -> {
+            ErrorContent(
+                message = uiState.message,
+                onRetry = onRetry
+            )
         }
     }
 }

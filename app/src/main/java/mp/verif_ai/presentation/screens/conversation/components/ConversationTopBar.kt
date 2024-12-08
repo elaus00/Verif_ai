@@ -4,32 +4,51 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import mp.verif_ai.domain.model.conversation.Conversation
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ConversationHistoryTopBar() {
-    TopAppBar(
+fun ConversationHistoryTopBar(
+    onBackClick: () -> Unit,
+    onRefresh: () -> Unit
+) {
+    CenterAlignedTopAppBar(
+        modifier = Modifier.padding(12.dp),
         title = { Text("대화 목록") },
-        colors = TopAppBarDefaults.topAppBarColors(
+        navigationIcon = {
+            IconButton(onClick = onBackClick) {
+                Icon(Icons.Default.ArrowBack, contentDescription = "뒤로가기")
+            }
+        },
+        actions = {
+            IconButton(onClick = onRefresh) {
+                Icon(Icons.Default.Refresh, contentDescription = "새로고침")
+            }
+        },
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
             containerColor = MaterialTheme.colorScheme.surface
         )
     )
 }
+
 
 @Composable
 fun ConversationSearchBar(
@@ -62,16 +81,30 @@ fun ConversationSearchBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConversationDetailTopBar(
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    currentConversation: Conversation?,
+    onNewConversationClick: () -> Unit
 ) {
-    TopAppBar(
-        title = { Text("대화") },
+    CenterAlignedTopAppBar(
+        modifier = Modifier.padding(12.dp),
+        title = {
+            Text(
+                text = currentConversation?.title ?: "대화",
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        },
         navigationIcon = {
             IconButton(onClick = onBackClick) {
                 Icon(Icons.Default.ArrowBack, contentDescription = "뒤로가기")
             }
         },
-        colors = TopAppBarDefaults.topAppBarColors(
+        actions = {
+            IconButton(onClick = onNewConversationClick) {
+                Icon(Icons.Default.Add, contentDescription = "새 대화")
+            }
+        },
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
             containerColor = MaterialTheme.colorScheme.surface
         )
     )

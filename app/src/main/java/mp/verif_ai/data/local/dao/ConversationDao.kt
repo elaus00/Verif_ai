@@ -11,6 +11,7 @@ import mp.verif_ai.domain.model.conversation.MessageRoomEntity
 import mp.verif_ai.domain.model.conversation.ParticipantRoomEntity
 import mp.verif_ai.domain.model.conversation.ParticipantType
 import mp.verif_ai.domain.model.conversation.ParticipationStatus
+import mp.verif_ai.domain.model.conversation.toDomainModel
 
 private val json = Json {
     ignoreUnknownKeys = true
@@ -106,6 +107,7 @@ data class ConversationWithDetails(
             participantIds = participants.map { it.id },
             participantTypes = participantTypes,
             participantStatuses = participantStatuses,
+            messages = messages.map { it.toDomainModel() },
             type = ConversationType.valueOf(conversation.type),
             status = ConversationStatus.valueOf(conversation.status),
             category = conversation.category,

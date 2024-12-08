@@ -77,3 +77,27 @@ enum class ConversationStatus {
     EXPIRED,    // 만료됨
     DELETED     // 삭제됨
 }
+
+fun Conversation.addMessage(message: Message): Conversation {
+    return this.copy(
+        messages = messages + message,
+        updatedAt = System.currentTimeMillis()
+    )
+}
+
+fun Conversation.updateStatus(status: ConversationStatus): Conversation {
+    return this.copy(
+        status = status,
+        updatedAt = System.currentTimeMillis()
+    )
+}
+
+fun Conversation.updateParticipantStatus(
+    participantId: String,
+    status: ParticipationStatus
+): Conversation {
+    return this.copy(
+        participantStatuses = participantStatuses + (participantId to status),
+        updatedAt = System.currentTimeMillis()
+    )
+}

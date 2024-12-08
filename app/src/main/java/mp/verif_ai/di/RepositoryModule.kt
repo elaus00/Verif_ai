@@ -114,19 +114,13 @@ abstract class RepositoryModule {
         fun provideConversationRepository(
             firestore: FirebaseFirestore,
             localDataSource: LocalDataSource,
-            syncManager: SyncManager,
             errorHandler: FirestoreErrorHandler,
-            conversationMapper: ConversationMapper,
-            @ApplicationScope scope: CoroutineScope,
             @IoDispatcher dispatcher: CoroutineDispatcher
         ): ConversationRepository = ConversationRepositoryImpl(
-            firestore,
-            localDataSource,
-            syncManager,
-            errorHandler,
-            conversationMapper,
-            scope,
-            dispatcher
+            firestore = firestore,
+            localDataSource = localDataSource,
+            errorHandler = errorHandler,
+            dispatcher = dispatcher
         )
 
         @Provides
@@ -135,7 +129,7 @@ abstract class RepositoryModule {
             storage: FirebaseStorage,
             errorHandler: FirestoreErrorHandler,
             @IoDispatcher dispatcher: CoroutineDispatcher
-        ): MediaRepository = MediaRepositoryImpl(storage, errorHandler, dispatcher)
+        ): MediaRepository = MediaRepositoryImpl(storage, errorHandler)
 
         @Provides
         @Singleton

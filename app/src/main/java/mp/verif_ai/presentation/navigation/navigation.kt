@@ -21,6 +21,7 @@ import mp.verif_ai.presentation.screens.auth.signup.EmailVerificationScreen
 import mp.verif_ai.presentation.screens.auth.signup.SignUpFormScreen
 import mp.verif_ai.presentation.screens.auth.signup.SignUpScreen
 import mp.verif_ai.presentation.screens.conversation.ConversationScreen
+import mp.verif_ai.presentation.screens.conversation.viewmodel.ConversationViewModel
 import mp.verif_ai.presentation.screens.explore.ExpertProfileScreen
 import mp.verif_ai.presentation.screens.explore.ExploreScreen
 import mp.verif_ai.presentation.screens.home.HomeScreen
@@ -180,8 +181,9 @@ private fun NavGraphBuilder.homeNavigation(navController: NavHostController) {
 
         composable(Screen.MainNav.Home.ConversationScreen.route) {
             ConversationScreen(
-                viewModel = hiltViewModel(),
-                onNavigateToExpertProfile = {TODO()}
+                navController = navController,
+                viewModel = hiltViewModel<ConversationViewModel>(),
+                onNavigateToExpertProfile = { TODO() }
             )
         }
 

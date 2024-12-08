@@ -39,7 +39,7 @@ import kotlin.collections.forEach
 @Composable
 fun RecentConversationsCard(
     conversations: List<Conversation>,
-    onSeeMoreClick: () -> Unit,
+    onSubClick: () -> Unit,
     onConversationClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -49,9 +49,9 @@ fun RecentConversationsCard(
         shape = MaterialTheme.shapes.large
     ) {
         Column {
-            CardHeader(
+            CardHeaderWithRefresh(
                 title = "Recent Conversations with AI",
-                onSeeMoreClick = onSeeMoreClick
+                onRefreshClick = onSubClick
             )
 
             AnimatedVisibility(

@@ -72,7 +72,7 @@ fun HomeScreen(
             // Recent Conversations with AI
             RecentConversationsCard(
                 conversations = recentConversations,
-                onSeeMoreClick = {
+                onSubClick = {
                     navController.navigate(Screen.MainNav.Home.route)
                 },
                 onConversationClick = { conversationId ->

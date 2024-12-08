@@ -45,20 +45,21 @@ fun ChatBottomBar(
     ) {
         Column(
             modifier = Modifier
-                .padding(16.dp)
-                .padding(bottom = 4.dp)
+                .padding(4.dp)
         ) {
             // AI Model Selector
             AIModelSelector(
                 models = models,
                 selectedModel = selectedModel,
                 onModelSelect = onModelSelect,
-                modifier = Modifier.padding(bottom = 8.dp)
+//                modifier = Modifier.padding(bottom = 8.dp)
             )
 
             // Message Input Section
             Surface(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .padding(bottom = 4.dp)
+                    .fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),
                 border = BorderStroke(1.dp, VerifAiColor.DividerColor)
             ) {
