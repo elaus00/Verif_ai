@@ -22,7 +22,7 @@ import java.util.Date
         MessageRoomEntity::class,
         ParticipantRoomEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = true
 )
 @TypeConverters(

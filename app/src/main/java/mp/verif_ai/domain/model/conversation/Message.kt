@@ -21,7 +21,6 @@ sealed class Message {
         override val timestamp: Long = System.currentTimeMillis(),
         override val replyTo: String? = null,
         override val messageSource: MessageSource? = null,
-        val status: MessageStatus = MessageStatus.PENDING,
         val expertReviews: List<ExpertReview> = emptyList(),
         val adoption: Adoption? = null,
         val isVerified: Boolean = false,
@@ -35,7 +34,6 @@ sealed class Message {
             "replyTo" to replyTo,
             "messageSource" to messageSource?.toMap(),
             "type" to "TEXT",
-            "status" to status.name,
             "expertReviews" to expertReviews.map { it.toMap() },
             "adoption" to adoption?.toMap(),
             "isVerified" to isVerified,
@@ -54,7 +52,6 @@ sealed class Message {
                         messageSource = (map["messageSource"] as? Map<*, *>)?.let {
                             MessageSource.fromMap(it.mapKeys { entry -> entry.key.toString() })
                         },
-                        status = MessageStatus.valueOf(map["status"] as? String ?: MessageStatus.PENDING.name),
                         expertReviews = (map["expertReviews"] as? List<*>)?.mapNotNull {
                             (it as? Map<*, *>)?.let { reviewMap ->
                                 ExpertReview.fromMap(reviewMap.mapKeys { entry -> entry.key.toString() })
@@ -95,16 +92,8 @@ data class MessageSource(
     }
 }
 
-
 enum class SourceType {
     USER,
     EXPERT,
     AI
-}
-
-
-enum class MessageStatus {
-    PENDING,   // 검증 대기중
-    VERIFIED,  // 검증됨
-    REJECTED   // 거부됨
 }

@@ -81,7 +81,7 @@ fun ConversationScreen(
         topBar = {
             TopAppBar(
                 modifier = Modifier
-                    .padding(top = 20.dp),
+                    .padding(start = 16.dp, top = 16.dp),
                 title = {
                     Text("Conversation")
                 },

@@ -40,7 +40,6 @@ data class MessageRoomEntity(
     val senderId: String,
     val replyTo: String?,
     val messageSource: String?, // MessageSource JSON
-    val status: String,
     val additionalData: String,  // 추가 데이터 (expertReviews, adoption, isVerified, references 등) JSON
     val timestamp: Long
 )
@@ -93,12 +92,11 @@ fun Message.toRoomEntity(conversationId: String) = MessageRoomEntity(
     senderId = senderId,
     replyTo = replyTo,
     messageSource = messageSource?.let { json.encodeToString(it) },
-    status = (this as Message.Text).status.name,
     additionalData = json.encodeToString(MessageTextData(
         expertReviews = (this as Message.Text).expertReviews,
-        adoption = (this as Message.Text).adoption,
-        isVerified = (this as Message.Text).isVerified,
-        references = (this as Message.Text).references
+        adoption = this.adoption,
+        isVerified = this.isVerified,
+        references = this.references
     )),
     timestamp = timestamp
 )

@@ -3,7 +3,6 @@ package mp.verif_ai.data.local.dao
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.json.Json
-import mp.verif_ai.domain.model.*
 import mp.verif_ai.domain.model.conversation.Conversation
 import mp.verif_ai.domain.model.conversation.ConversationRoomEntity
 import mp.verif_ai.domain.model.conversation.ConversationStatus
@@ -58,9 +57,6 @@ interface MessageDao {
 
     @Query("SELECT * FROM messages WHERE conversationId = :conversationId ORDER BY timestamp DESC LIMIT :limit OFFSET :offset")
     suspend fun getMessages(conversationId: String, limit: Int, offset: Int): List<MessageRoomEntity>
-
-    @Query("UPDATE messages SET status = :status WHERE id = :messageId")
-    suspend fun updateMessageStatus(messageId: String, status: String)
 }
 
 @Dao

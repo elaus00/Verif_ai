@@ -59,6 +59,7 @@ class ConversationViewModel @Inject constructor(
     fun sendMessage(inputContent: String) {
         viewModelScope.launch {
             try {
+                Log.d("sendMesage", "inputContent: $inputContent")
                 val currentState = getCurrentStateOrNull() ?: return@launch
 
                 val userMessage = MessageFactory.createMessage(
