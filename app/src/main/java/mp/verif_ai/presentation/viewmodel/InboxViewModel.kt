@@ -19,15 +19,55 @@ class InboxViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<InboxUiState>(InboxUiState.Loading)
     val uiState: StateFlow<InboxUiState> = _uiState.asStateFlow()
 
+    // 목 데이터 사용 여부 플래그
+    private val useMockData = true
+
     init {
         loadNotifications()
     }
-
     fun loadNotifications() {
         viewModelScope.launch {
             _uiState.value = InboxUiState.Loading
             try {
-                val notifications = inboxRepository.getNotifications()
+                val notifications = if (useMockData) {
+                    // 목 데이터 생성 (필요한 모든 매개변수 포함)
+                    listOf(
+                        Notification(
+                            id = "1",
+                            title = "What is MVVM?",
+                            content = "Alice replied to your question.",
+                            isRead = false,
+                            createdAt = System.currentTimeMillis(),
+                            deepLink = "https://example.com/question/1",
+                            type = "reply",
+                            userId = "user_1"
+                        ),
+                        Notification(
+                            id = "2",
+                            title = "How to implement Room DB?",
+                            content = "Bob commented on your question.",
+                            isRead = true,
+                            createdAt = System.currentTimeMillis() - 3600000,
+                            deepLink = "https://example.com/question/2",
+                            type = "comment",
+                            userId = "user_2"
+                        ),
+                        Notification(
+                            id = "3",
+                            title = "What is Clean Architecture?",
+                            content = "Charlie upvoted your question.",
+                            isRead = true,
+                            createdAt = System.currentTimeMillis() - 7200000,
+                            deepLink = "https://example.com/question/3",
+                            type = "upvote",
+                            userId = "user_3"
+                        )
+                    )
+                } else {
+                    // 실제 데이터 가져오기
+                    inboxRepository.getNotifications()
+                }
+
                 _uiState.value = if (notifications.isEmpty()) {
                     InboxUiState.Empty
                 } else {
@@ -43,10 +83,9 @@ class InboxViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 inboxRepository.markAsRead(notificationId)
-                // Reload notifications to reflect changes
-                loadNotifications()
+                loadNotifications() // 변경 사항 반영
             } catch (e: Exception) {
-                // Handle error
+                // 에러 처리 (필요시 추가)
             }
         }
     }

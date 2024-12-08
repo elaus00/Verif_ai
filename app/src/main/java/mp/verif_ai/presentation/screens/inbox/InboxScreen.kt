@@ -9,6 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import mp.verif_ai.domain.model.Notification
@@ -127,7 +128,7 @@ private fun InboxNotificationItem(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = notification.createdAt.formatToString(), // Extension function needed
+                text = notification.createdAt.formatToString(),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -183,4 +184,3 @@ private fun EmptyInbox(
         )
     }
 }
-

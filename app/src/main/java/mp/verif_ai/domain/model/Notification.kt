@@ -5,7 +5,7 @@ data class Notification(
     val userId: String,
     val title: String,
     val content: String,
-    val type: NotificationType,
+    val type: String,
     val isRead: Boolean,
     val deepLink: String?,
     val createdAt: Long

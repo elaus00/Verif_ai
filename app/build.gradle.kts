@@ -64,6 +64,8 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.compose.material.icons.extended)
+    implementation("io.coil-kt:coil-compose:2.3.0")
+
 
     // Retrofit
     implementation(libs.retrofit)
@@ -80,6 +82,8 @@ dependencies {
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.firebase.functions.ktx)
     implementation(libs.androidx.appcompat)
+    implementation(libs.firebase.messaging.ktx)
+    implementation(libs.google.firebase.storage.ktx)
     testImplementation(libs.kotlinx.coroutines)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -121,6 +125,8 @@ dependencies {
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.firebase.functions.ktx)
+
+    implementation(platform(libs.firebase.bom)) // Firebase BOM 적용
 
     // Google Play Services
     implementation(libs.gms.play.services.auth)
