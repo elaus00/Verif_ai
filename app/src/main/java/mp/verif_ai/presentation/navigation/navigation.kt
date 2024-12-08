@@ -8,6 +8,7 @@ import mp.verif_ai.presentation.screens.Screen
 import mp.verif_ai.presentation.screens.home.HomeScreen
 import mp.verif_ai.presentation.screens.inbox.InboxScreen
 import mp.verif_ai.presentation.screens.settings.SettingsScreen
+import mp.verif_ai.presentation.screens.settings.payment.PaymentMethodsScreen
 import mp.verif_ai.presentation.viewmodel.SettingsViewModel as SettingsViewModel1
 
 fun NavHostController.navigateToMain() {
@@ -50,6 +51,16 @@ fun AppNavigation(navController: NavHostController) {
                 viewModel = SettingsViewModel1() // Provide the view model, potentially via DI
             )
         }
+
+        composable(Screen.MainNav.Settings.Payment.Methods.route) {
+            PaymentMethodsScreen(
+                navController = navController,
+                onAddMethod = {
+                    navController.navigate(Screen.MainNav.Settings.Payment.AddMethod.createRoute(Screen.MainNav.Settings.Payment.Methods.route))
+                }
+            )
+        }
+
     }
 }
 

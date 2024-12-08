@@ -85,6 +85,7 @@ dependencies {
     implementation(libs.firebase.messaging.ktx)
     implementation(libs.google.firebase.storage.ktx)
     implementation(libs.androidx.room.common)
+    implementation(libs.androidx.room.ktx)
     testImplementation(libs.kotlinx.coroutines)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -132,4 +133,11 @@ dependencies {
     // Google Play Services
     implementation(libs.gms.play.services.auth)
     implementation(libs.gms.play.services.safetynet)
+
+    val room_version = "2.6.1"
+
+    implementation("androidx.room:room-runtime:$room_version")
+    kapt ("androidx.room:room-compiler:2.6.0")
+    implementation ("androidx.room:room-ktx:2.6.0")
+
 }

@@ -27,33 +27,33 @@ class InboxRepositoryImpl @Inject constructor(
         val mockNotifications = listOf(
             NotificationEntity(
                 id = "1",
-                userId = "user_123",
-                title = "새 댓글이 달렸습니다.",
-                content = "당신의 질문에 새로운 댓글이 달렸습니다.",
-                type = "COMMENT",
+                title = "What is MVVM?",
+                content = "Alice replied to your question.",
                 isRead = false,
-                deepLink = "app://comments/1",
-                createdAt = System.currentTimeMillis()
+                createdAt = System.currentTimeMillis(),
+                deepLink = "https://example.com/question/1",
+                type = "REPLY",
+                userId = "user_1"
             ),
             NotificationEntity(
                 id = "2",
-                userId = "user_456",
-                title = "좋아요 알림",
-                content = "당신의 답변이 좋아요를 받았습니다.",
-                type = "LIKE",
+                title = "How to implement Room DB?",
+                content = "Bob commented on your question.",
                 isRead = true,
-                deepLink = "app://answers/like/2",
-                createdAt = System.currentTimeMillis() - 100000
+                createdAt = System.currentTimeMillis() - 3600000,
+                deepLink = "https://example.com/question/2",
+                type = "COMMENT",
+                userId = "user_2"
             ),
             NotificationEntity(
                 id = "3",
-                userId = "user_789",
-                title = "새 댓글이 달렸습니다",
-                content = "당신의 질문에 새로운 댓글이 달렸습니다.",
-                type = "COMMENT",
-                isRead = false,
-                deepLink = null,
-                createdAt = System.currentTimeMillis() - 200000
+                title = "What is Clean Architecture?",
+                content = "Charlie upvoted your question.",
+                isRead = true,
+                createdAt = System.currentTimeMillis() - 7200000,
+                deepLink = "https://example.com/question/3",
+                type = "UPVOTE",
+                userId = "user_3"
             )
         )
         notificationDao.insertNotification(mockNotifications)

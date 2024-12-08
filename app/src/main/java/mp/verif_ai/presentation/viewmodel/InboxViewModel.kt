@@ -35,50 +35,50 @@ class InboxViewModel @Inject constructor(
                 } else {
                     InboxUiState.Success(notifications)
                 }
-            _uiState.value = InboxUiState.Loading
-            try {
-                val notifications = if (useMockData) {
-                    // 목 데이터 생성 (필요한 모든 매개변수 포함)
-                    listOf(
-                        Notification(
-                            id = "1",
-                            title = "What is MVVM?",
-                            content = "Alice replied to your question.",
-                            isRead = false,
-                            createdAt = System.currentTimeMillis(),
-                            deepLink = "https://example.com/question/1",
-                            type = "reply",
-                            userId = "user_1"
-                        ),
-                        Notification(
-                            id = "2",
-                            title = "How to implement Room DB?",
-                            content = "Bob commented on your question.",
-                            isRead = true,
-                            createdAt = System.currentTimeMillis() - 3600000,
-                            deepLink = "https://example.com/question/2",
-                            type = "comment",
-                            userId = "user_2"
-                        ),
-                        Notification(
-                            id = "3",
-                            title = "What is Clean Architecture?",
-                            content = "Charlie upvoted your question.",
-                            isRead = true,
-                            createdAt = System.currentTimeMillis() - 7200000,
-                            deepLink = "https://example.com/question/3",
-                            type = "upvote",
-                            userId = "user_3"
-                        )
-                    )
-                } else {
-                    // 실제 데이터 가져오기
-                    inboxRepository.getNotifications()
-                }
-
-            } catch (e: Exception) {
-                _uiState.value = InboxUiState.Error(e.message ?: "알 수 없는 오류가 발생했습니다")
-            }
+//            _uiState.value = InboxUiState.Loading
+//            try {
+//                val notifications = if (useMockData) {
+//                    // 목 데이터 생성 (필요한 모든 매개변수 포함)
+//                    listOf(
+//                        Notification(
+//                            id = "1",
+//                            title = "What is MVVM?",
+//                            content = "Alice replied to your question.",
+//                            isRead = false,
+//                            createdAt = System.currentTimeMillis(),
+//                            deepLink = "https://example.com/question/1",
+//                            type = "reply",
+//                            userId = "user_1"
+//                        ),
+//                        Notification(
+//                            id = "2",
+//                            title = "How to implement Room DB?",
+//                            content = "Bob commented on your question.",
+//                            isRead = true,
+//                            createdAt = System.currentTimeMillis() - 3600000,
+//                            deepLink = "https://example.com/question/2",
+//                            type = "comment",
+//                            userId = "user_2"
+//                        ),
+//                        Notification(
+//                            id = "3",
+//                            title = "What is Clean Architecture?",
+//                            content = "Charlie upvoted your question.",
+//                            isRead = true,
+//                            createdAt = System.currentTimeMillis() - 7200000,
+//                            deepLink = "https://example.com/question/3",
+//                            type = "upvote",
+//                            userId = "user_3"
+//                        )
+//                    )
+//                } else {
+//                    // 실제 데이터 가져오기
+//                    inboxRepository.getNotifications()
+//                }
+//
+//            } catch (e: Exception) {
+//                _uiState.value = InboxUiState.Error(e.message ?: "알 수 없는 오류가 발생했습니다")
+//            }
         }
     }
 
