@@ -40,6 +40,8 @@ sealed class Screen(val route: String) {
             }
 
             data object HomeScreen : Home("main/home_screen")  // 실제 홈 화면용 route
+            data object ConversationScreen : Home("main/home/conversation") // 대화 화면용 route
+
             data class ConversationDetail(val conversationId: String) :
                 Home("main/home/conversation/$conversationId") {
                 companion object {

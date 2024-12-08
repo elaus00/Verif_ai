@@ -17,7 +17,6 @@ import mp.verif_ai.presentation.screens.conversation.viewmodel.ConversationViewM
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConversationScreen(
-    onNavigateToExpertProfile: (String) -> Unit,
     viewModel: ConversationViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -42,7 +41,7 @@ fun ConversationScreen(
                     )
                 }
                 is ConversationEvent.NavigateToExpertProfile -> {
-                    onNavigateToExpertProfile(event.expertId)
+                    TODO()
                 }
                 is ConversationEvent.RequestExpertReviewSuccess -> {
                     snackbarHostState.showSnackbar(

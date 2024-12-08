@@ -20,17 +20,19 @@ import mp.verif_ai.data.repository.conversation.MediaRepositoryImpl
 import mp.verif_ai.data.repository.conversation.ResponseRepositoryImpl
 import mp.verif_ai.data.repository.inbox.InboxRepositoryImpl
 import mp.verif_ai.data.repository.point.PointRepositoryImpl
+import mp.verif_ai.data.repository.question.QuestionRepositoryImpl
 import mp.verif_ai.data.service.AIServiceFactory
 import mp.verif_ai.data.util.ConversationMapper
 import mp.verif_ai.data.util.FirestoreErrorHandler
 import mp.verif_ai.data.util.LocalDataSource
 import mp.verif_ai.data.util.SyncManager
-import mp.verif_ai.domain.repository.ConversationRepository
 import mp.verif_ai.domain.repository.AuthRepository
+import mp.verif_ai.domain.repository.ConversationRepository
 import mp.verif_ai.domain.repository.InboxRepository
 import mp.verif_ai.domain.repository.MediaRepository
 import mp.verif_ai.domain.repository.PassKeyRepository
 import mp.verif_ai.domain.repository.PointRepository
+import mp.verif_ai.domain.repository.QuestionRepository
 import mp.verif_ai.domain.repository.ResponseRepository
 import javax.inject.Singleton
 
@@ -145,6 +147,18 @@ abstract class RepositoryModule {
         ): ResponseRepository = ResponseRepositoryImpl(
             firestore,
             aiServiceFactory,
+            errorHandler,
+            dispatcher
+        )
+
+        @Provides
+        @Singleton
+        fun provideQuestionRepository(
+            firestore: FirebaseFirestore,
+            errorHandler: FirestoreErrorHandler,
+            @IoDispatcher dispatcher: CoroutineDispatcher
+        ): QuestionRepository = QuestionRepositoryImpl(
+            firestore,
             errorHandler,
             dispatcher
         )
