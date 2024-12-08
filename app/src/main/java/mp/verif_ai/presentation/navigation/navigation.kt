@@ -247,6 +247,7 @@ private fun NavGraphBuilder.exploreNavigation(navController: NavHostController) 
             ExploreScreen(
                 modifier = Modifier,
                 navController = navController,
+                onBackClick = { navController.navigateUp() },
                 onCreateQuestion = {
                     navController.navigate(Screen.MainNav.Explore.Create.route)
                 },

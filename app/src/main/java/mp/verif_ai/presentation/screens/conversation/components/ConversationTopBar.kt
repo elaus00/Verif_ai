@@ -31,7 +31,7 @@ fun ConversationHistoryTopBar(
     onRefresh: () -> Unit
 ) {
     CenterAlignedTopAppBar(
-        modifier = Modifier.padding(12.dp),
+        modifier = Modifier.padding(vertical = 12.dp),
         title = { Text("대화 목록") },
         navigationIcon = {
             IconButton(onClick = onBackClick) {
@@ -86,7 +86,7 @@ fun ConversationDetailTopBar(
     onNewConversationClick: () -> Unit
 ) {
     CenterAlignedTopAppBar(
-        modifier = Modifier.padding(12.dp),
+        modifier = Modifier.padding(vertical = 12.dp),
         title = {
             Text(
                 text = currentConversation?.title ?: "대화",
