@@ -1,7 +1,7 @@
 package mp.verif_ai.data.room.dao
 
 import androidx.room.*
-import mp.verif_ai.domain.RoomModel.AnswerEntity
+import mp.verif_ai.domain.room.AnswerEntity
 
 @Dao
 interface AnswerDao {
