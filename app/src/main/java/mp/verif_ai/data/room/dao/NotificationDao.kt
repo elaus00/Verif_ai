@@ -6,6 +6,7 @@ import mp.verif_ai.domain.model.notification.Notification
 import mp.verif_ai.domain.model.notification.NotificationChange
 import mp.verif_ai.domain.model.notification.NotificationType
 import mp.verif_ai.domain.room.NotificationEntity
+import mp.verif_ai.domain.util.JsonUtils.gson
 
 @Dao
 interface NotificationDao {
@@ -89,23 +90,52 @@ interface NotificationDao {
 
 }
 
+fun Notification.toEntity(): NotificationEntity {
+    val (typeString, metadata) = when (val notificationType = type) {
+        is NotificationType.Answer -> "ANSWER" to mapOf(
+            "questionId" to notificationType.questionId,
+            "answerId" to notificationType.answerId,
+            "answerContent" to notificationType.answerContent,
+            "expertId" to notificationType.expertId,
+            "expertName" to notificationType.expertName
+        )
+        is NotificationType.Adoption -> "ADOPTION" to mapOf(
+            "questionId" to notificationType.questionId,
+            "answerId" to notificationType.answerId,
+            "points" to notificationType.points.toString()
+        )
+        is NotificationType.Comment -> "COMMENT" to mapOf(
+            "targetId" to notificationType.targetId,
+            "targetType" to notificationType.targetType,
+            "commentId" to notificationType.commentId,
+            "commentContent" to notificationType.commentContent
+        )
+        is NotificationType.Like -> "LIKE" to mapOf(
+            "targetId" to notificationType.targetId,
+            "targetType" to notificationType.targetType,
+            "userId" to notificationType.userId,
+            "userName" to notificationType.userName
+        )
+        is NotificationType.Point -> "POINT" to mapOf(
+            "amount" to notificationType.amount.toString(),
+            "type" to notificationType.type,
+            "reason" to notificationType.reason
+        )
+        is NotificationType.System -> "SYSTEM" to notificationType.metadata
+    }
 
-fun Notification.toEntity(): NotificationEntity = NotificationEntity(
-    id = id,
-    title = title,
-    content = content,
-    timestamp = timestamp,
-    isRead = isRead,
-    type = when (type) {
-        is NotificationType.Reply -> "REPLY"
-        is NotificationType.Like -> "LIKE"
-        is NotificationType.System -> "SYSTEM"
-        else -> "COMMENT"
-    },
-    priority = 0,
-    userId = userId,
-    groupId = null,
-    deepLink = "",
-    metadata = null,
-    typeMetadata = TODO()
-)
+    return NotificationEntity(
+        id = id,
+        type = typeString,
+        typeMetadata = gson.toJson(metadata),  // Converters에서 정의한 gson 사용
+        title = title,
+        content = content,
+        timestamp = timestamp,
+        isRead = isRead,
+        priority = priority,
+        userId = userId,
+        groupId = groupId,
+        deepLink = deepLink,
+        metadata = metadata
+    )
+}

@@ -72,8 +72,11 @@ class PointRepositoryImpl @Inject constructor(
                     userId = doc.getString("userId") ?: return@mapNotNull null,
                     amount = doc.getLong("amount")?.toInt() ?: return@mapNotNull null,
                     type = TransactionType.valueOf(doc.getString("type") ?: return@mapNotNull null),
-                    timestamp = doc.getDate("timestamp")?.time ?: return@mapNotNull null,  // Date를 Long으로 변환
-                    relatedId = doc.getString("relatedId")
+                    timestamp = doc.getDate("timestamp")?.time
+                        ?: return@mapNotNull null,  // Date를 Long으로 변환
+                    relatedId = doc.getString("relatedId"),
+                    description = TODO(),
+                    status = TODO()
                 )
             } catch (e: Exception) {
                 null

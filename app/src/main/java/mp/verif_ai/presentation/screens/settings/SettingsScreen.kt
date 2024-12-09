@@ -41,7 +41,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import mp.verif_ai.presentation.navigation.AppBottomNavigation
@@ -50,7 +49,7 @@ import mp.verif_ai.presentation.viewmodel.SettingsViewModel
 
 @Composable
 fun SettingsScreen(
-    navController: NavController,
+    navController: NavHostController,
     viewModel: SettingsViewModel
 ) {
     val context = LocalContext.current
@@ -78,7 +77,9 @@ fun SettingsScreen(
     }
 
     Scaffold(
-        bottomBar = { AppBottomNavigation(navController = navController as NavHostController) },
+        bottomBar = {
+            AppBottomNavigation(navController)
+        },
         content = { paddingValues ->
             Column(
                 modifier = Modifier

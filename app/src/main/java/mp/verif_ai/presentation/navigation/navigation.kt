@@ -207,6 +207,7 @@ private fun NavGraphBuilder.inboxNavigation(navController: NavHostController) {
     ) {
         composable(Screen.MainNav.Inbox.InboxScreen.route) {
             InboxScreen(
+                navController = navController,
                 onNotificationClick = { notificationId ->
                     navController.navigate(Screen.MainNav.Inbox.NotificationDetail.createRoute(
                         notificationId.toString()

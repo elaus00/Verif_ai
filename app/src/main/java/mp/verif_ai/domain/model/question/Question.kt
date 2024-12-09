@@ -1,6 +1,6 @@
 package mp.verif_ai.domain.model.question
 
-import mp.verif_ai.domain.model.conversation.Answer
+import mp.verif_ai.domain.model.answer.Answer
 import java.util.UUID
 
 data class Question(

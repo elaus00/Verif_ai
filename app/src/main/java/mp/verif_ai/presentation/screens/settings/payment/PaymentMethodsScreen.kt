@@ -24,7 +24,7 @@ fun PaymentMethodsScreen(
 ) {
     Scaffold(
         bottomBar = {
-            AppBottomNavigation(navController = navController as NavHostController)
+            AppBottomNavigation(navController = navController)
         }
     ){paddingValues ->
         Column(

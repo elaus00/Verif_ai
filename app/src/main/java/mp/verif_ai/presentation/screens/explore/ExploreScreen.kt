@@ -59,18 +59,18 @@ fun ExploreScreen(
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .padding(top = paddingValues.calculateTopPadding().times(0.7f))
+                .padding(top = paddingValues.calculateTopPadding().times(0.6f))
                 .padding(horizontal = 16.dp)
         ) {
             // Search Bar
             ExploreSearchBar(
                 onCreateQuestion = onCreateQuestion,
-                modifier = Modifier.padding(vertical = 8.dp)
+                modifier = Modifier.padding(vertical = 4.dp)
             )
 
             // Categories or Filters
             CategoryChips(
-                modifier = Modifier.padding(vertical = 8.dp)
+                modifier = Modifier.padding(vertical = 4.dp)
             )
 
             // Questions List

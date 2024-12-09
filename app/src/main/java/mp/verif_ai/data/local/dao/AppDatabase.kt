@@ -9,7 +9,7 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 import mp.verif_ai.data.room.dao.NotificationDao
-import mp.verif_ai.data.util.MapConverter
+import mp.verif_ai.domain.util.Converters
 import mp.verif_ai.domain.model.conversation.ConversationRoomEntity
 import mp.verif_ai.domain.model.conversation.MessageRoomEntity
 import mp.verif_ai.domain.model.conversation.MessageSource
@@ -33,7 +33,7 @@ import java.util.Date
 @TypeConverters(
     DateConverter::class,
     JsonConverter::class,
-    MapConverter::class
+    Converters::class
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun conversationDao(): ConversationDao

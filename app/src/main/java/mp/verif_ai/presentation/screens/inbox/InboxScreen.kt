@@ -1,30 +1,27 @@
+
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.updateTransition
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DeleteOutline
-import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import mp.verif_ai.domain.model.notification.Notification
 import mp.verif_ai.domain.model.notification.SwipeAction
+import mp.verif_ai.presentation.navigation.AppBottomNavigation
 import mp.verif_ai.presentation.viewmodel.InboxUiState
 import mp.verif_ai.presentation.viewmodel.InboxViewModel
 import java.text.SimpleDateFormat
@@ -35,6 +32,7 @@ import kotlin.math.roundToInt
 @Composable
 fun InboxScreen(
     modifier: Modifier = Modifier,
+    navController: NavHostController,
     viewModel: InboxViewModel = hiltViewModel(),
     onNotificationClick: (Notification) -> Unit
 ) {
@@ -59,7 +57,10 @@ fun InboxScreen(
                     }
                 }
             )
-        }
+        },
+        bottomBar = {
+            AppBottomNavigation(navController = navController)
+        },
     ) { paddingValues ->
         SwipeRefresh(
             state = swipeRefreshState,

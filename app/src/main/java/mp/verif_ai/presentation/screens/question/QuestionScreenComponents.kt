@@ -31,7 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import mp.verif_ai.domain.model.conversation.Answer
+import mp.verif_ai.domain.model.answer.Answer
 import mp.verif_ai.domain.model.question.Question
 import mp.verif_ai.domain.model.question.QuestionStatus
 import java.text.DateFormat

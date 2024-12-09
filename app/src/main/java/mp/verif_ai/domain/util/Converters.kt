@@ -1,10 +1,10 @@
-package mp.verif_ai.data.util
+package mp.verif_ai.domain.util
 
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
-class MapConverter {
+class Converters {
     private val gson = Gson()
     private val mapType = object : TypeToken<Map<String, Any>>() {}.type
 
@@ -17,4 +17,5 @@ class MapConverter {
     fun toMap(json: String?): Map<String, Any>? {
         return json?.let { gson.fromJson(it, mapType) }
     }
+
 }

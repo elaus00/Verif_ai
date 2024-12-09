@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
-import mp.verif_ai.data.util.MapConverter
+import mp.verif_ai.domain.util.Converters
 
 @Entity(
     tableName = "notifications",
@@ -25,7 +25,7 @@ data class NotificationEntity(
     val userId: String,
     val groupId: String?,
     val deepLink: String,
-    @TypeConverters(MapConverter::class)
+    @TypeConverters(Converters::class)
     val metadata: Map<String, Any>?,
     val typeMetadata: String // JSON string for type-specific data
 )

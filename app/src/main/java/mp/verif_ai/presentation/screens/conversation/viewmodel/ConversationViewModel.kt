@@ -12,9 +12,12 @@ import mp.verif_ai.domain.model.conversation.Message
 import mp.verif_ai.domain.model.conversation.SourceType
 import mp.verif_ai.domain.model.expert.ExpertReview
 import mp.verif_ai.domain.model.question.Adoption
+import mp.verif_ai.domain.model.question.Question
+import mp.verif_ai.domain.model.question.QuestionStatus
 import mp.verif_ai.domain.repository.AuthRepository
 import mp.verif_ai.domain.repository.ConversationRepository
 import mp.verif_ai.domain.repository.PointRepository
+import mp.verif_ai.domain.repository.QuestionRepository
 import mp.verif_ai.domain.repository.ResponseRepository
 import mp.verif_ai.domain.service.AIModel
 import mp.verif_ai.presentation.screens.Screen
@@ -28,6 +31,7 @@ class ConversationViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val pointRepository: PointRepository,
     private val responseRepository: ResponseRepository,
+    private val questionRepository: QuestionRepository, // 추가
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -193,14 +197,40 @@ class ConversationViewModel @Inject constructor(
                     return@launch
                 }
 
-                responseRepository.requestExpertReview(
-                    conversationId = conversationId.toString(),
-                    points = Adoption.EXPERT_REVIEW_POINTS
-                ).onSuccess {
-                    _events.emit(ConversationEvent.RequestExpertReviewSuccess)
-                }.onFailure { e ->
-                    handleError("전문가 검증 요청에 실패했습니다", e)
-                }
+                val currentUser = authRepository.getCurrentUser()
+                    ?: throw IllegalStateException("User not found")
+
+                val conversation = currentConversation
+                    ?: throw IllegalStateException("Current conversation not found")
+
+                // Question 생성
+                val question = Question(
+                    title = "AI 응답 검증 요청: ${conversation.title}",
+                    content = "", // ToDo
+                    aiConversationId = conversation.id,
+                    authorId = currentUser.id,
+                    authorName = currentUser.nickname,
+                    points = Adoption.EXPERT_REVIEW_POINTS,
+                    status = QuestionStatus.OPEN
+                )
+
+                // Question 저장
+                questionRepository.createQuestion(question)
+                    .onSuccess { questionId ->
+                        // 전문가 검증 요청
+                        responseRepository.requestExpertReview(
+                            conversationId = conversationId.toString(),
+                            points = Adoption.EXPERT_REVIEW_POINTS
+                        ).onSuccess {
+                            _events.emit(ConversationEvent.RequestExpertReviewSuccess)
+                        }.onFailure { e ->
+                            handleError("전문가 검증 요청에 실패했습니다", e)
+                        }
+                    }
+                    .onFailure { e ->
+                        handleError("질문 생성에 실패했습니다", e)
+                    }
+
             } catch (e: Exception) {
                 handleError("전문가 검증 요청에 실패했습니다", e)
             }
