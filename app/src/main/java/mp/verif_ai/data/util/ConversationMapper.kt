@@ -4,6 +4,7 @@ import android.util.Log
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.Query
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -112,5 +113,35 @@ class ConversationMapper @Inject constructor() {
         } catch (e: IllegalArgumentException) {
             ConversationStatus.ACTIVE
         }
+    }
+
+    suspend fun getFirestoreConversations(
+        collection: CollectionReference,
+        userId: String,
+        limit: Int
+    ): List<Conversation> {
+        return collection
+            .whereArrayContains("participants", userId)
+            .orderBy("updatedAt", Query.Direction.DESCENDING)
+            .limit(limit.toLong())
+            .get()
+            .await()
+            .documents
+            .mapNotNull { doc ->
+                mapDocumentToConversation(doc)
+            }
+    }
+
+    suspend fun getFirestoreConversation(
+        collection: CollectionReference,
+        conversationId: String
+    ): Conversation {
+        val doc = collection
+            .document(conversationId)
+            .get()
+            .await()
+
+        return mapDocumentToConversation(doc)
+            ?: throw IllegalStateException("Conversation not found")
     }
 }

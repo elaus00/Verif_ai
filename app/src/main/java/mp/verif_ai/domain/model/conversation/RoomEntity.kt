@@ -80,26 +80,6 @@ fun Conversation.toRoomEntity() = ConversationRoomEntity(
     updatedAt = updatedAt
 )
 
-fun Message.toRoomEntity(conversationId: String): MessageRoomEntity {
-    return when (this) {
-        is Message.Text -> MessageRoomEntity(
-            id = id,
-            conversationId = conversationId,
-            content = content,
-            senderId = senderId,
-            replyTo = replyTo,
-            messageSource = messageSource?.let { json.encodeToString(it) },
-            additionalData = json.encodeToString(MessageTextData(
-                expertReviews = expertReviews,
-                adoption = adoption,
-                isVerified = isVerified,
-                references = references
-            )),
-            timestamp = timestamp
-        )
-    }
-}
-
 fun Participant.toRoomEntity(conversationId: String) = ParticipantRoomEntity(
     id = id,
     conversationId = conversationId,
@@ -121,6 +101,25 @@ fun Participant.toRoomEntity(conversationId: String) = ParticipantRoomEntity(
             ParticipantUserData(type, participationStatus))
         is Participant.Assistant -> "{}"
     }
+)
+
+
+fun Message.toRoomEntity(conversationId: String) = MessageRoomEntity(
+    id = id,
+    conversationId = conversationId,
+    content = content,
+    senderId = senderId,
+    replyTo = replyTo,
+    messageSource = messageSource?.let { json.encodeToString(it) },
+    additionalData = json.encodeToString(
+        MessageTextData(
+            expertReviews = (this as Message.Text).expertReviews,
+            adoption = (this as Message.Text).adoption,
+            isVerified = (this as Message.Text).isVerified,
+            references = (this as Message.Text).references
+        )
+    ),
+    timestamp = timestamp,
 )
 
 
