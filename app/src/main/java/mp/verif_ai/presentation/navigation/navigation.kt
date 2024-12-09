@@ -1,7 +1,9 @@
 package mp.verif_ai.presentation.navigation
 
+import InboxScreen
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -11,12 +13,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
 import mp.verif_ai.presentation.screens.Screen
-import mp.verif_ai.presentation.screens.auth.signup.EmailVerificationScreen
+import mp.verif_ai.presentation.screens.auth.OnBoardingScreen
+import mp.verif_ai.presentation.screens.auth.SignInScreen
 import mp.verif_ai.presentation.screens.auth.expertsignup.ExpertOnboardingScreen
 import mp.verif_ai.presentation.screens.auth.expertsignup.ExpertSubmitScreen
 import mp.verif_ai.presentation.screens.auth.expertsignup.ExpertVerificationScreen
-import mp.verif_ai.presentation.screens.auth.OnBoardingScreen
-import mp.verif_ai.presentation.screens.auth.SignInScreen
+import mp.verif_ai.presentation.screens.auth.signup.EmailVerificationScreen
 import mp.verif_ai.presentation.screens.auth.signup.SignUpFormScreen
 import mp.verif_ai.presentation.screens.auth.signup.SignUpScreen
 import mp.verif_ai.presentation.screens.conversation.ConversationDetailScreen
@@ -25,7 +27,6 @@ import mp.verif_ai.presentation.screens.conversation.ConversationScreen
 import mp.verif_ai.presentation.screens.home.HomeScreen
 import mp.verif_ai.presentation.screens.home.question.QuestionDetailScreen
 import mp.verif_ai.presentation.screens.inbox.InboxQuestionDetailScreen
-import mp.verif_ai.presentation.screens.inbox.InboxScreen
 import mp.verif_ai.presentation.screens.question.QuestionCreateScreen
 import mp.verif_ai.presentation.screens.settings.*
 import mp.verif_ai.presentation.screens.settings.notification.NotificationSettingsScreen
@@ -195,9 +196,10 @@ private fun NavGraphBuilder.mainNavigation(navController: NavHostController) {
         composable(Screen.MainNav.Inbox.Main.route) {
             InboxScreen(
                 onNotificationClick = { questionId ->
-                    navController.navigate(Screen.MainNav.Inbox.QuestionDetail.createRoute(questionId))
+                    navController.navigate(Screen.MainNav.Inbox.QuestionDetail.createRoute(
+                        questionId.toString()
+                    ))
                 },
-                navController = navController
             )
         }
 
@@ -224,15 +226,8 @@ private fun NavGraphBuilder.settingsNavigation(navController: NavHostController)
     ) {
         composable(Screen.MainNav.Settings.Main.route) {
             SettingsScreen(
-                onNavigateToProfile = {
-                    navController.navigate(Screen.MainNav.Settings.Profile.View.route)
-                },
-                onNavigateToPayment = {
-                    navController.navigate(Screen.MainNav.Settings.Payment.Subscription.route)
-                },
-                onNavigateToNotifications = {
-                    navController.navigate(Screen.MainNav.Settings.Notifications.route)
-                }
+                navController,
+                viewModel = hiltViewModel()
             )
         }
 
@@ -258,6 +253,7 @@ private fun NavGraphBuilder.settingsNavigation(navController: NavHostController)
         }
         composable(Screen.MainNav.Settings.Payment.Methods.route) {
             PaymentMethodsScreen(
+                navController,
                 onAddMethod = {
                     navController.navigate(
                         Screen.MainNav.Settings.Payment.AddMethod.createRoute(

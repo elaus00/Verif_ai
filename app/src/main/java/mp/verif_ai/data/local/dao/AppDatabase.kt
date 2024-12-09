@@ -8,31 +8,38 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
+import mp.verif_ai.data.room.dao.NotificationDao
+import mp.verif_ai.data.util.MapConverter
 import mp.verif_ai.domain.model.conversation.ConversationRoomEntity
 import mp.verif_ai.domain.model.conversation.MessageRoomEntity
 import mp.verif_ai.domain.model.conversation.MessageSource
 import mp.verif_ai.domain.model.conversation.ParticipantRoomEntity
 import mp.verif_ai.domain.model.expert.ExpertReview
 import mp.verif_ai.domain.model.question.Adoption
+import mp.verif_ai.domain.room.NotificationEntity
 import java.util.Date
 
 @Database(
     entities = [
         ConversationRoomEntity::class,
         MessageRoomEntity::class,
-        ParticipantRoomEntity::class
+        ParticipantRoomEntity::class,
+        NotificationEntity::class
     ],
-    version = 1,
+    version = 3,
     exportSchema = true
 )
+
 @TypeConverters(
     DateConverter::class,
-    JsonConverter::class
+    JsonConverter::class,
+    MapConverter::class
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun conversationDao(): ConversationDao
     abstract fun messageDao(): MessageDao
     abstract fun participantDao(): ParticipantDao
+    abstract fun notificationDao(): NotificationDao  // 추가
 
     companion object {
         const val DATABASE_NAME = "verif_ai_db"

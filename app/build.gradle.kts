@@ -101,6 +101,7 @@ dependencies {
     // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
+    implementation (libs.androidx.hilt.work)
     implementation(libs.androidx.hilt.navigation.compose)
 
     // Firebase
@@ -155,6 +156,14 @@ dependencies {
     implementation(libs.ktor.client.okhttp)
 
     // Google AI client SDK (Gemini)
-    implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
+    implementation(libs.generativeai)
+    implementation(libs.firebase.messaging.ktx)
+    implementation (libs.coil.compose)
+
+    implementation(libs.moshi.kotlin)
+    ksp(libs.moshi.kotlin.codegen)
+    implementation(libs.gson)
+
+    implementation(libs.accompanist.swiperefresh)
 
 }

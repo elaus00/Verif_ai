@@ -1,54 +1,20 @@
 package mp.verif_ai.presentation.screens.settings.payment
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import mp.verif_ai.presentation.navigation.AppBottomNavigation
-import mp.verif_ai.presentation.screens.home.HomeTopBar
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
-import mp.verif_ai.R
-import mp.verif_ai.domain.model.chat.Conversation
-import mp.verif_ai.domain.model.chat.Question
-import mp.verif_ai.domain.model.chat.QuestionStatus
-import mp.verif_ai.domain.model.TrendingQuestion
 import mp.verif_ai.presentation.navigation.AppBottomNavigation
-import mp.verif_ai.presentation.screens.Screen
-import mp.verif_ai.presentation.screens.auth.SignInScreen
-import mp.verif_ai.presentation.screens.theme.BuyButton
-import mp.verif_ai.presentation.screens.theme.OnBoardingButton
 import mp.verif_ai.presentation.screens.theme.VerifAiColor
-import mp.verif_ai.presentation.viewmodel.UiState
 
 
 @Composable
@@ -259,10 +225,6 @@ fun PointsItem(
                 modifier = Modifier
                     .width(215.dp)
                     .height(30.dp)
-            )
-            BuyButton(
-                text = "Buy",
-                onClick = onBuyClick
             )
         }
     }

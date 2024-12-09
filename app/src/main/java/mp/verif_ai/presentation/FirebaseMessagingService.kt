@@ -16,6 +16,10 @@ import com.google.firebase.messaging.RemoteMessage
 import mp.verif_ai.R
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
+    override fun onNewToken(token: String) {
+        super.onNewToken(token)
+        Log.d("FCM", "Refreshed token: $token")
+    }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         Log.d("FCM", "Message received from: ${remoteMessage.from}")

@@ -3,7 +3,6 @@ package mp.verif_ai.di
 import android.content.Context
 import androidx.room.Room
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.aallam.openai.client.OpenAI
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -13,7 +12,7 @@ import mp.verif_ai.data.local.dao.AppDatabase
 import mp.verif_ai.data.local.dao.ConversationDao
 import mp.verif_ai.data.local.dao.MessageDao
 import mp.verif_ai.data.local.dao.ParticipantDao
-
+import mp.verif_ai.data.room.dao.NotificationDao
 import javax.inject.Singleton
 
 @Module
@@ -48,6 +47,11 @@ object DatabaseModule {
     @Provides
     fun provideParticipantDao(appDatabase: AppDatabase): ParticipantDao {
         return appDatabase.participantDao()
+    }
+
+    @Provides
+    fun provideNotificationDao(appDatabase: AppDatabase): NotificationDao {
+        return appDatabase.notificationDao()
     }
 
     @Singleton

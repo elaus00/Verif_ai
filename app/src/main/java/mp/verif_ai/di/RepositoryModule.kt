@@ -1,9 +1,11 @@
 ﻿package mp.verif_ai.di
 
 import android.content.Context
+import androidx.work.WorkManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -25,8 +27,8 @@ import mp.verif_ai.data.util.ConversationMapper
 import mp.verif_ai.data.util.FirestoreErrorHandler
 import mp.verif_ai.data.util.LocalDataSource
 import mp.verif_ai.data.util.SyncManager
-import mp.verif_ai.domain.repository.ConversationRepository
 import mp.verif_ai.domain.repository.AuthRepository
+import mp.verif_ai.domain.repository.ConversationRepository
 import mp.verif_ai.domain.repository.InboxRepository
 import mp.verif_ai.domain.repository.MediaRepository
 import mp.verif_ai.domain.repository.PassKeyRepository
@@ -37,6 +39,12 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {
+
+    @Binds
+    @Singleton
+    abstract fun bindInboxRepository(
+        inboxRepositoryImpl: InboxRepositoryImpl
+    ): InboxRepository
 
     companion object {
         @Provides
@@ -57,9 +65,6 @@ abstract class RepositoryModule {
             return AuthRepositoryImpl(auth, firestore, passKeyRepository)
         }
 
-        @Provides
-        @Singleton
-        fun provideInboxRepository(): InboxRepository = InboxRepositoryImpl()
 
         @Provides
         @Singleton
@@ -92,6 +97,14 @@ abstract class RepositoryModule {
             @ApplicationScope scope: CoroutineScope,
             @IoDispatcher dispatcher: CoroutineDispatcher
         ): SyncManager = SyncManager(scope, dispatcher)
+
+        @Provides
+        @Singleton
+        fun provideWorkManager(
+            @ApplicationContext context: Context
+        ): WorkManager {
+            return WorkManager.getInstance(context)
+        }
 
         @Provides
         @Singleton
@@ -148,5 +161,6 @@ abstract class RepositoryModule {
             errorHandler,
             dispatcher
         )
+
     }
 }
