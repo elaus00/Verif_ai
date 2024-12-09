@@ -1,26 +1,28 @@
 package mp.verif_ai.domain.model.answer
 
 import kotlinx.serialization.Serializable
+import mp.verif_ai.domain.model.question.Comment
 import java.util.UUID
 
 @Serializable
 data class Answer(
     val id: String = UUID.randomUUID().toString(),
-    val questionId: String = "",           // 질문 ID 추가
+    val questionId: String = "",
     val content: String = "",
     val authorId: String = "",
     val authorName: String = "",
-    val expertId: String? = null,          // 전문가 ID 추가
+    val expertId: String? = null,
     val isExpertAnswer: Boolean = false,
     val helpfulCount: Int = 0,
     val commentCount: Int = 0,
+    val comments: List<Comment> = emptyList(),
     val isVerified: Boolean = false,
-    val isAdopted: Boolean = false,        // 채택 여부 추가
-    val adoptedAt: Long? = null,           // 채택 시간 추가
+    val isAdopted: Boolean = false,
+    val adoptedAt: Long? = null,
     val references: List<String> = emptyList(),
     val attachments: List<String> = emptyList(),
-    val reportCount: Int = 0,              // 신고 횟수 추가
-    val isReported: Boolean = false,       // 신고 여부 추가
+    val reportCount: Int = 0,
+    val isReported: Boolean = false,
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis(),
     val status: AnswerStatus = AnswerStatus.ACTIVE
@@ -35,6 +37,7 @@ data class Answer(
         "isExpertAnswer" to isExpertAnswer,
         "helpfulCount" to helpfulCount,
         "commentCount" to commentCount,
+        "comments" to comments,
         "isVerified" to isVerified,
         "isAdopted" to isAdopted,
         "adoptedAt" to adoptedAt,
@@ -48,10 +51,10 @@ data class Answer(
     )
 
     companion object {
-        const val MAX_CONTENT_LENGTH = 5000    // 답변 최대 길이
-        const val MAX_REFERENCES = 10          // 최대 참조 문헌 수
-        const val MAX_ATTACHMENTS = 5          // 최대 첨부 파일 수
-        const val REPORT_THRESHOLD = 5         // 신고 임계값
+        const val MAX_CONTENT_LENGTH = 5000
+        const val MAX_REFERENCES = 10
+        const val MAX_ATTACHMENTS = 5
+        const val REPORT_THRESHOLD = 5
 
         fun fromMap(map: Map<String, Any?>): Answer = Answer(
             id = map["id"] as? String ?: UUID.randomUUID().toString(),
@@ -63,6 +66,7 @@ data class Answer(
             isExpertAnswer = map["isExpertAnswer"] as? Boolean ?: false,
             helpfulCount = (map["helpfulCount"] as? Number)?.toInt() ?: 0,
             commentCount = (map["commentCount"] as? Number)?.toInt() ?: 0,
+            comments = (map["comments"] as? List<Map<String, Any?>>)?.map { Comment.fromMap(it) } ?: emptyList(),
             isVerified = map["isVerified"] as? Boolean ?: false,
             isAdopted = map["isAdopted"] as? Boolean ?: false,
             adoptedAt = (map["adoptedAt"] as? Number)?.toLong(),

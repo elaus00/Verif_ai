@@ -1,205 +1,98 @@
 package mp.verif_ai.presentation.screens.question
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
-import mp.verif_ai.domain.model.question.Question
-import mp.verif_ai.presentation.viewmodel.QuestionDetailState
-import mp.verif_ai.presentation.viewmodel.QuestionDetailViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import mp.verif_ai.presentation.screens.components.CustomSnackbar
+import mp.verif_ai.presentation.screens.question.components.QuestionDetailContent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QuestionDetailScreen(
-    viewModel: QuestionDetailViewModel,
     questionId: String,
+    viewModel: QuestionViewModel = hiltViewModel(),
+    navController: NavController,
+    modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(questionId) {
-        viewModel.loadQuestion(questionId)
+        viewModel.getQuestionById(questionId)
     }
 
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                CustomSnackbar(snackbarData = data)
+            }
+        },
         topBar = {
             TopAppBar(
-                title = {
-                    Text(
-                        text = uiState.question?.title ?: "질문 상세",
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                },
+                title = { Text("질문 상세") },
                 navigationIcon = {
-                    IconButton(onClick = { /* Handle navigation back */ }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "뒤로가기")
-                    }
-                },
-                actions = {
-                    // Share button
-                    IconButton(onClick = { /* Handle share */ }) {
-                        Icon(Icons.Default.Share, contentDescription = "공유하기")
-                    }
-                    // More options menu
-                    IconButton(onClick = { /* Handle more options */ }) {
-                        Icon(Icons.Default.MoreVert, contentDescription = "더보기")
+                    IconButton(onClick = { navController.navigateUp() }) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 }
             )
         }
-    ) { paddingValues ->
+    ) { padding ->
         when (uiState) {
-            is QuestionDetailState.Loading -> {
+            is QuestionUiState.Success -> {
+                val question = (uiState as QuestionUiState.Success).question
+                if (question != null) {
+                    QuestionDetailContent(
+                        question = question,
+                        onAnswerClick = { answerId ->
+                            navController.navigate("answer/$answerId")
+                        },
+                        onCommentClick = { /* TODO: 댓글 기능 구현 */ },
+                        onLikeClick = { /* TODO: 좋아요 기능 구현 */ },
+                        onReportClick = { /* TODO: 신고 기능 구현 */ },
+                        modifier = Modifier.padding(padding)
+                    )
+                }
+            }
+            is QuestionUiState.Error -> {
+                LaunchedEffect(Unit) {
+                    snackbarHostState.showSnackbar(
+                        message = (uiState as QuestionUiState.Error).message,
+                        actionLabel = "Dismiss"
+                    )
+                }
+            }
+            is QuestionUiState.Loading -> {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(paddingValues),
+                        .padding(padding),
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator()
                 }
             }
-            is QuestionDetailState.Error -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("오류가 발생했습니다: ${uiState.errorMessage}")
-                }
-            }
-            is QuestionDetailState.Success -> {
-                QuestionDetailContent(
-                    question = uiState.question!!,
-                    modifier = Modifier.padding(paddingValues)
-                )
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-private fun QuestionDetailContent(
-    question: Question,
-    modifier: Modifier = Modifier
-) {
-    LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        // Question header
-        item {
-            QuestionHeader(question)
-        }
-
-        // Question content
-        item {
-            Text(
-                text = question.content,
-                style = MaterialTheme.typography.bodyLarge
-            )
-        }
-
-        // Tags
-        item {
-            FlowRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                question.tags.forEach { tag ->
-                    SuggestionChip(
-                        onClick = { },
-                        label = { Text(tag) }
-                    )
-                }
-            }
-        }
-
-        // Metadata (views, comments, etc.)
-        item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                // Views
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Visibility,
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Text(
-                        text = "${question.viewCount}회",
-                        style = MaterialTheme.typography.labelMedium
-                    )
-                }
-
-                // Points
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Star,
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Text(
-                        text = "${question.points}P",
-                        style = MaterialTheme.typography.labelMedium
-                    )
-                }
-            }
-        }
-
-        // Divider
-        item {
-            Divider()
-        }
-
-        // Answers list header
-        item {
-            Text(
-                text = "답변",
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
-        }
-
-        // Answers
-        if (question.answers.isEmpty()) {
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 32.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "아직 답변이 없습니다",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-        } else {
-            items(question.answers) { answer ->
-                AnswerItem(answer)
-            }
+            else -> {}
         }
     }
 }

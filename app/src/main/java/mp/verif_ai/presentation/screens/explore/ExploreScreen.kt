@@ -75,7 +75,8 @@ fun ExploreScreen(
 
             // Questions List
             QuestionsContent(
-                onQuestionClick = onQuestionClick
+                onQuestionClick = onQuestionClick,
+                onCreateQuestion = onCreateQuestion
             )
         }
     }

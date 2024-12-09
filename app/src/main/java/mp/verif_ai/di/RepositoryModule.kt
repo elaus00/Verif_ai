@@ -17,6 +17,7 @@ import mp.verif_ai.data.auth.AuthRepositoryImpl
 import mp.verif_ai.data.local.dao.ConversationDao
 import mp.verif_ai.data.local.dao.MessageDao
 import mp.verif_ai.data.local.dao.ParticipantDao
+import mp.verif_ai.data.repository.answer.AnswerRepositoryImpl
 import mp.verif_ai.data.repository.conversation.ConversationRepositoryImpl
 import mp.verif_ai.data.repository.conversation.MediaRepositoryImpl
 import mp.verif_ai.data.repository.conversation.ResponseRepositoryImpl
@@ -28,6 +29,7 @@ import mp.verif_ai.data.util.ConversationMapper
 import mp.verif_ai.data.util.FirestoreErrorHandler
 import mp.verif_ai.data.util.LocalDataSource
 import mp.verif_ai.data.util.SyncManager
+import mp.verif_ai.domain.repository.AnswerRepository
 import mp.verif_ai.domain.repository.AuthRepository
 import mp.verif_ai.domain.repository.ConversationRepository
 import mp.verif_ai.domain.repository.InboxRepository
@@ -170,5 +172,15 @@ abstract class RepositoryModule {
             errorHandler,
             dispatcher
         )
+
+        @Provides
+        @Singleton
+        fun provideAnswerRepository(
+            firestore: FirebaseFirestore,
+            errorHandler: FirestoreErrorHandler,
+            @IoDispatcher dispatcher: CoroutineDispatcher
+        ): AnswerRepository {
+            return AnswerRepositoryImpl(firestore, errorHandler, dispatcher)
+        }
     }
 }

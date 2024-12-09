@@ -87,16 +87,16 @@ private val bottomNavItems = listOf(
         label = "홈"
     ),
     BottomNavItem(
-        route = Screen.MainNav.Inbox.route,
-        icon = Icons.Outlined.Mail,
-        selectedIcon = Icons.Filled.Mail,
-        label = "인박스"
-    ),
-    BottomNavItem(
         route = Screen.MainNav.Explore.route,
         icon = Icons.Outlined.Search,
         selectedIcon = Icons.Filled.Search,
         label = "탐색"
+    ),
+    BottomNavItem(
+        route = Screen.MainNav.Inbox.route,
+        icon = Icons.Outlined.Mail,
+        selectedIcon = Icons.Filled.Mail,
+        label = "인박스"
     ),
     BottomNavItem(
         route = Screen.MainNav.Settings.route,

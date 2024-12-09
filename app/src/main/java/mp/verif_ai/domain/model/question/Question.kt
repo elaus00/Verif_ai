@@ -11,9 +11,10 @@ data class Question(
     val content: String = "",
     val aiConversationId: String? = null,
     val authorId: String = "",
-    val authorName: String = "",  // 작성자 이름 추가
-    val answers: List<Answer> = emptyList(), // 답변 목록 추가
-    val selectedAnswerId: String? = null, // 채택된 답변 ID 추가
+    val authorName: String = "",
+    val answers: List<Answer> = emptyList(),
+    val comments: List<Comment> = emptyList(),
+    val selectedAnswerId: String? = null,
     val status: QuestionStatus = QuestionStatus.OPEN,
     val points: Int = Adoption.EXPERT_REVIEW_POINTS,
     val viewCount: Int = 0,
@@ -31,6 +32,7 @@ data class Question(
         "authorId" to authorId,
         "authorName" to authorName,
         "answers" to answers.map { it.toMap() },
+        "comments" to comments.map { it.toMap() },
         "selectedAnswerId" to selectedAnswerId,
         "status" to status.name,
         "points" to points,

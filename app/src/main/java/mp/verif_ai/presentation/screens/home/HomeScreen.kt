@@ -1,11 +1,15 @@
 package mp.verif_ai.presentation.screens.home
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -29,6 +33,7 @@ fun HomeScreen(
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
+    var isExpanded by remember { mutableStateOf(false) }
     val recentConversations by viewModel.recentConversations.collectAsState()
     val trendingQuestions by viewModel.trendingQuestions.collectAsState()
 
@@ -49,15 +54,67 @@ fun HomeScreen(
             AppBottomNavigation(navController = navController as NavHostController)
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { navController.navigate(Screen.MainNav.Home.ConversationScreen.route) },
-                containerColor = MaterialTheme.colorScheme.primary
+            Column(
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Chat,
-                    contentDescription = "Start Conversation",
-                    tint = Color.White
-                )
+                // AI Chat FAB
+                AnimatedVisibility(
+                    visible = isExpanded,
+                    enter = slideInVertically() + fadeIn(),
+                    exit = slideOutVertically() + fadeOut()
+                ) {
+                    FloatingActionButton(
+                        onClick = {
+                            navController.navigate(Screen.MainNav.Home.ConversationScreen.route)
+                            isExpanded = false
+                        },
+                        containerColor = VerifAiColor.Navy.Light,
+                        contentColor = Color.White,
+                        modifier = Modifier.size(48.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.SmartToy,
+                            contentDescription = "AI와 대화하기"
+                        )
+                    }
+                }
+
+                // Question FAB
+                AnimatedVisibility(
+                    visible = isExpanded,
+                    enter = slideInVertically() + fadeIn(),
+                    exit = slideOutVertically() + fadeOut()
+                ) {
+                    FloatingActionButton(
+                        onClick = {
+                            navController.navigate(Screen.MainNav.Explore.Question.Create.route)
+                            isExpanded = false
+                        },
+                        containerColor = VerifAiColor.Navy.Medium,
+                        contentColor = Color.White,
+                        modifier = Modifier.size(48.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.QuestionAnswer,
+                            contentDescription = "질문하기"
+                        )
+                    }
+                }
+
+                // Main FAB
+                FloatingActionButton(
+                    onClick = { isExpanded = !isExpanded },
+                    containerColor = VerifAiColor.Navy.Deep,
+                    contentColor = Color.White,
+                    modifier = Modifier.size(56.dp)
+                ) {
+                    Icon(
+                        imageVector = if (isExpanded) Icons.Default.Close else Icons.Default.Add,
+                        contentDescription = if (isExpanded) "메뉴 닫기" else "메뉴 열기",
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
             }
         }
     ) { paddingValues ->
@@ -87,7 +144,7 @@ fun HomeScreen(
                     navController.navigate(Screen.MainNav.Explore.ExploreScreen.route)
                 },
                 onQuestionClick = { questionId ->
-                    navController.navigate(Screen.MainNav.Explore.Detail.createRoute(questionId))
+                    navController.navigate(Screen.MainNav.Explore.Question.Detail.createRoute(questionId))
                 }
             )
         }

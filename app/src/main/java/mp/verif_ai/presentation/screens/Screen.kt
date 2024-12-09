@@ -90,17 +90,25 @@ sealed class Screen(val route: String) {
         // 3. Explore Section (Question Creation & Browse)
         sealed class Explore(route: String) : MainNav(route) {
             companion object {
-                const val route = "main/explore_nav"  // 네비게이션 그래프용 route
+                const val route = "main/explore_nav"
             }
 
-            data object ExploreScreen : Explore("main/explore_screen")  // 실제 explore 화면용 route
-            data object Create : Explore("main/explore/create")
-            data class Detail(val questionId: String) :
-                Explore("main/explore/detail/$questionId") {
-                companion object {
-                    const val route = "main/explore/detail/{$ARG_QUESTION_ID}"
-                    fun createRoute(questionId: String) =
-                        "main/explore/detail/$questionId"
+            data object ExploreScreen : Explore("main/explore_screen")
+
+            // Question 관련 route들
+            sealed class Question(route: String) : Explore(route) {
+                data object Create : Question("main/explore/question/create")
+                data object List : Question("main/explore/question/list")
+                data object Trending : Question("main/explore/question/trending")
+                data object QuestionScreen : Question("main/explore/question/view")
+
+                data class Detail(val questionId: String) :
+                    Question("main/explore/question/detail/$questionId") {
+                    companion object {
+                        const val route = "main/explore/question/detail/{$ARG_QUESTION_ID}"
+                        fun createRoute(questionId: String) =
+                            "main/explore/question/detail/$questionId"
+                    }
                 }
             }
         }

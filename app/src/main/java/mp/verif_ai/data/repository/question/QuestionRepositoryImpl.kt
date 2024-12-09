@@ -2,6 +2,7 @@ package mp.verif_ai.data.repository.question
 
 import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -10,6 +11,8 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.tasks.await
 import mp.verif_ai.data.util.FirestoreErrorHandler
 import mp.verif_ai.di.IoDispatcher
+import mp.verif_ai.domain.model.answer.Answer
+import mp.verif_ai.domain.model.question.Adoption
 import mp.verif_ai.domain.model.question.Question
 import mp.verif_ai.domain.model.question.QuestionStatus
 import mp.verif_ai.domain.model.question.TrendingQuestion
@@ -26,22 +29,24 @@ class QuestionRepositoryImpl @Inject constructor(
 
     companion object {
         private const val TAG = "QuestionRepo"
+        private const val QUESTIONS_COLLECTION = "questions"
+        private const val ANSWERS_COLLECTION = "answers"
     }
 
-    private val questionsCollection = firestore.collection("questions")
+    private val questionsCollection = firestore.collection(QUESTIONS_COLLECTION)
+    private val answersCollection = firestore.collection(ANSWERS_COLLECTION)
 
     override suspend fun createQuestion(question: Question): Result<String> {
         return try {
-            val questionData = hashMapOf(
-                "title" to question.title,
-                "content" to question.content,
-                "authorId" to question.authorId,
-                "createdAt" to com.google.firebase.Timestamp.now(),
-                "viewCount" to question.viewCount,
-                "points" to question.points,
-                "status" to question.status.name,
-                "tags" to question.tags
-            )
+            val questionData = question.toMap().apply {
+                // 생성 시점의 필드들 업데이트
+                plus(
+                    mapOf(
+                        "createdAt" to com.google.firebase.Timestamp.now(),
+                        "updatedAt" to com.google.firebase.Timestamp.now()
+                    )
+                )
+            }
 
             val documentRef = questionsCollection.document()
             documentRef.set(questionData).await()
@@ -53,37 +58,55 @@ class QuestionRepositoryImpl @Inject constructor(
         }
     }
 
-
     override suspend fun getQuestion(questionId: String): Result<Question> {
         return try {
-            val snapshot = questionsCollection.document(questionId).get().await()
+            val questionDoc = questionsCollection.document(questionId).get().await()
 
-            if (!snapshot.exists()) {
+            if (!questionDoc.exists()) {
                 return Result.failure(NoSuchElementException("Question not found with id: $questionId"))
             }
 
-            val question = try {
-                Question(
-                    id = snapshot.id,
-                    title = snapshot.getString("title") ?: "",
-                    content = snapshot.getString("content") ?: "",
-                    authorId = snapshot.getString("authorId") ?: "",
-                    createdAt = snapshot.getTimestamp("createdAt")?.toDate()?.time
-                        ?: System.currentTimeMillis(),
-                    viewCount = snapshot.getLong("viewCount")?.toInt() ?: 0,
-                    points = snapshot.getLong("points")?.toInt() ?: 0,
-                    status = try {
-                        QuestionStatus.valueOf(snapshot.getString("status") ?: QuestionStatus.OPEN.name)
-                    } catch (e: IllegalArgumentException) {
-                        QuestionStatus.OPEN
-                    },
-                    tags = (snapshot.get("tags") as? List<String>) ?: emptyList(),
-                    answers = emptyList()
-                )
-            } catch (e: Exception) {
-                Log.e(TAG, "Error converting question document", e)
-                throw e
+            // 답변 목록 조회
+            val answersSnapshot = answersCollection
+                .whereEqualTo("questionId", questionId)
+                .orderBy("createdAt", Query.Direction.DESCENDING)
+                .get()
+                .await()
+
+            val answers = answersSnapshot.documents.mapNotNull { doc ->
+                try {
+                    Answer.fromMap(doc.data?.plus(mapOf("id" to doc.id)) ?: emptyMap())
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error converting answer document", e)
+                    null
+                }
             }
+
+            val questionMap = questionDoc.data?.plus(mapOf("id" to questionDoc.id)) ?: emptyMap()
+            val question = Question(
+                id = questionDoc.id,
+                title = questionDoc.getString("title") ?: "",
+                category = questionDoc.getString("category") ?: "",
+                tags = (questionDoc.get("tags") as? List<String>) ?: emptyList(),
+                content = questionDoc.getString("content") ?: "",
+                aiConversationId = questionDoc.getString("aiConversationId"),
+                authorId = questionDoc.getString("authorId") ?: "",
+                authorName = questionDoc.getString("authorName") ?: "",
+                answers = answers,
+                selectedAnswerId = questionDoc.getString("selectedAnswerId"),
+                status = try {
+                    QuestionStatus.valueOf(questionDoc.getString("status") ?: QuestionStatus.OPEN.name)
+                } catch (e: IllegalArgumentException) {
+                    QuestionStatus.OPEN
+                },
+                points = questionDoc.getLong("points")?.toInt() ?: Adoption.EXPERT_REVIEW_POINTS,
+                viewCount = questionDoc.getLong("viewCount")?.toInt() ?: 0,
+                commentCount = questionDoc.getLong("commentCount")?.toInt() ?: 0,
+                createdAt = questionDoc.getTimestamp("createdAt")?.toDate()?.time
+                    ?: System.currentTimeMillis(),
+                updatedAt = questionDoc.getTimestamp("updatedAt")?.toDate()?.time
+                    ?: System.currentTimeMillis()
+            )
 
             Result.success(question)
         } catch (e: Exception) {
@@ -94,7 +117,7 @@ class QuestionRepositoryImpl @Inject constructor(
 
     override suspend fun getTrendingQuestions(limit: Int): Flow<List<TrendingQuestion>> = callbackFlow {
         val listener = questionsCollection
-            .orderBy("viewCount", com.google.firebase.firestore.Query.Direction.DESCENDING)
+            .orderBy("viewCount", Query.Direction.DESCENDING)
             .limit(limit.toLong())
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
@@ -128,7 +151,7 @@ class QuestionRepositoryImpl @Inject constructor(
     override suspend fun getMyQuestions(userId: String, limit: Int): Flow<List<Question>> = callbackFlow {
         val listener = questionsCollection
             .whereEqualTo("authorId", userId)
-            .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
+            .orderBy("createdAt", Query.Direction.DESCENDING)
             .limit(limit.toLong())
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
@@ -142,12 +165,25 @@ class QuestionRepositoryImpl @Inject constructor(
                         Question(
                             id = doc.id,
                             title = doc.getString("title") ?: "",
+                            category = doc.getString("category") ?: "",
+                            tags = (doc.get("tags") as? List<String>) ?: emptyList(),
                             content = doc.getString("content") ?: "",
+                            aiConversationId = doc.getString("aiConversationId"),
                             authorId = doc.getString("authorId") ?: "",
+                            authorName = doc.getString("authorName") ?: "",
+                            selectedAnswerId = doc.getString("selectedAnswerId"),
+                            status = try {
+                                QuestionStatus.valueOf(doc.getString("status") ?: QuestionStatus.OPEN.name)
+                            } catch (e: IllegalArgumentException) {
+                                QuestionStatus.OPEN
+                            },
+                            points = doc.getLong("points")?.toInt() ?: Adoption.EXPERT_REVIEW_POINTS,
+                            viewCount = doc.getLong("viewCount")?.toInt() ?: 0,
+                            commentCount = doc.getLong("commentCount")?.toInt() ?: 0,
                             createdAt = doc.getTimestamp("createdAt")?.toDate()?.time
                                 ?: System.currentTimeMillis(),
-                            viewCount = doc.getLong("viewCount")?.toInt() ?: 0,
-                            points = doc.getLong("points")?.toInt() ?: 0
+                            updatedAt = doc.getTimestamp("updatedAt")?.toDate()?.time
+                                ?: System.currentTimeMillis()
                         )
                     } catch (e: Exception) {
                         Log.e(TAG, "Error converting question document", e)
@@ -158,21 +194,13 @@ class QuestionRepositoryImpl @Inject constructor(
                 trySend(questions)
             }
 
-        awaitClose {
-            listener.remove()
-        }
+        awaitClose { listener.remove() }
     }.flowOn(dispatcher)
 
     override suspend fun updateQuestion(question: Question): Result<Unit> {
         return try {
-            val questionData = hashMapOf(
-                "title" to question.title,
-                "content" to question.content,
-                "authorId" to question.authorId,
-                "viewCount" to question.viewCount,
-                "points" to question.points,
-                "status" to question.status.name,
-                "tags" to question.tags
+            val questionData = question.toMap().plus(
+                mapOf("updatedAt" to com.google.firebase.Timestamp.now())
             )
 
             questionsCollection.document(question.id)

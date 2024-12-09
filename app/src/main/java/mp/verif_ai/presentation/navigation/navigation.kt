@@ -27,8 +27,11 @@ import mp.verif_ai.presentation.screens.explore.ExpertProfileScreen
 import mp.verif_ai.presentation.screens.explore.ExploreScreen
 import mp.verif_ai.presentation.screens.home.HomeScreen
 import mp.verif_ai.presentation.screens.inbox.NotificationDetailScreen
-import mp.verif_ai.presentation.screens.question.QuestionCreateScreen
+import mp.verif_ai.presentation.screens.question.CreateQuestionScreen
 import mp.verif_ai.presentation.screens.question.QuestionDetailScreen
+import mp.verif_ai.presentation.screens.question.QuestionScreen
+import mp.verif_ai.presentation.screens.question.TrendingQuestionsScreen
+import mp.verif_ai.presentation.screens.question.components.QuestionContent
 import mp.verif_ai.presentation.screens.settings.*
 import mp.verif_ai.presentation.screens.settings.notification.NotificationSettingsScreen
 import mp.verif_ai.presentation.screens.settings.payment.PaymentMethodsScreen
@@ -248,33 +251,53 @@ private fun NavGraphBuilder.exploreNavigation(navController: NavHostController) 
                 navController = navController,
                 onBackClick = { navController.navigateUp() },
                 onCreateQuestion = {
-                    navController.navigate(Screen.MainNav.Explore.Create.route)
+                    navController.navigate(Screen.MainNav.Explore.Question.Create.route)
                 },
                 onQuestionClick = { questionId ->
-                    navController.navigate(Screen.MainNav.Explore.Detail.createRoute(questionId))
+                    navController.navigate(Screen.MainNav.Explore.Question.Detail.createRoute(questionId))
                 },
             )
         }
 
-        composable(Screen.MainNav.Explore.Create.route) {
-            QuestionCreateScreen(
-                onQuestionCreated = { questionId ->
-                    navController.navigate(Screen.MainNav.Explore.Detail.createRoute(questionId)) {
-                        popUpTo(Screen.MainNav.Explore.Create.route) { inclusive = true }
-                    }
+        composable(Screen.MainNav.Explore.Question.QuestionScreen.route) {
+            QuestionScreen(
+                navController = navController)
+        }
+
+        // Question Creation
+        composable(Screen.MainNav.Explore.Question.Create.route) {
+            CreateQuestionScreen(
+                navController = navController)
+        }
+
+        // Question List
+        composable(Screen.MainNav.Explore.Question.List.route) {
+            QuestionContent(
+                onQuestionClick = { questionId ->
+                    navController.navigate(Screen.MainNav.Explore.Question.Detail.createRoute(questionId))
                 }
             )
         }
 
+        // Trending Questions
+        composable(Screen.MainNav.Explore.Question.Trending.route) {
+            TrendingQuestionsScreen(
+                onQuestionClick = { questionId ->
+                    navController.navigate(Screen.MainNav.Explore.Question.Detail.createRoute(questionId))
+                }
+            )
+        }
+
+        // Question Detail
         composable(
-            route = Screen.MainNav.Explore.Detail.route,
+            route = Screen.MainNav.Explore.Question.Detail.route,
             arguments = listOf(
                 navArgument(Screen.ARG_QUESTION_ID) { type = NavType.StringType }
             )
-        ) {
+        ) { backStackEntry ->
             QuestionDetailScreen(
-                questionId = it.arguments?.getString(Screen.ARG_QUESTION_ID) ?: "",
-                viewModel = hiltViewModel()
+                questionId = backStackEntry.arguments?.getString(Screen.ARG_QUESTION_ID) ?: "",
+                navController = navController
             )
         }
     }

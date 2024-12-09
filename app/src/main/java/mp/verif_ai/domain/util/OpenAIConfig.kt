@@ -1,4 +1,4 @@
-package mp.verif_ai.domain.util.prompt
+package mp.verif_ai.domain.util
 
 import android.R.attr.apiKey
 import com.aallam.openai.api.http.Timeout
