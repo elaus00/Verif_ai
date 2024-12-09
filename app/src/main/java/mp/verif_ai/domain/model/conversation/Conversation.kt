@@ -1,5 +1,7 @@
 package mp.verif_ai.domain.model.conversation
 
+import mp.verif_ai.domain.model.expert.ExpertFields
+
 data class Conversation(
     val id: String = "",
     val title: String = "",

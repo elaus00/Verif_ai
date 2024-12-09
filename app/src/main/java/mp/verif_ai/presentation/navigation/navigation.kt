@@ -1,5 +1,6 @@
 package mp.verif_ai.presentation.navigation
 
+import InboxScreen
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -25,7 +26,6 @@ import mp.verif_ai.presentation.screens.conversation.viewmodel.ConversationViewM
 import mp.verif_ai.presentation.screens.explore.ExpertProfileScreen
 import mp.verif_ai.presentation.screens.explore.ExploreScreen
 import mp.verif_ai.presentation.screens.home.HomeScreen
-import mp.verif_ai.presentation.screens.inbox.InboxScreen
 import mp.verif_ai.presentation.screens.inbox.NotificationDetailScreen
 import mp.verif_ai.presentation.screens.question.QuestionCreateScreen
 import mp.verif_ai.presentation.screens.question.QuestionDetailScreen
@@ -207,12 +207,10 @@ private fun NavGraphBuilder.inboxNavigation(navController: NavHostController) {
     ) {
         composable(Screen.MainNav.Inbox.InboxScreen.route) {
             InboxScreen(
-                navController = navController,
-                onQuestionClick = { questionId ->
-                    navController.navigate(Screen.MainNav.Inbox.QuestionDetail.createRoute(questionId))
-                },
                 onNotificationClick = { notificationId ->
-                    navController.navigate(Screen.MainNav.Inbox.NotificationDetail.createRoute(notificationId))
+                    navController.navigate(Screen.MainNav.Inbox.NotificationDetail.createRoute(
+                        notificationId.toString()
+                    ))
                 }
             )
         }
@@ -288,15 +286,8 @@ private fun NavGraphBuilder.settingsNavigation(navController: NavHostController)
     ) {
         composable(Screen.MainNav.Settings.SettingsScreen.route) {
             SettingsScreen(
-                onNavigateToProfile = {
-                    navController.navigate(Screen.MainNav.Settings.Profile.View.route)
-                },
-                onNavigateToPayment = {
-                    navController.navigate(Screen.MainNav.Settings.Payment.Subscription.route)
-                },
-                onNavigateToNotifications = {
-                    navController.navigate(Screen.MainNav.Settings.Notifications.route)
-                }
+                viewModel = hiltViewModel(),
+                navController = navController
             )
         }
 
@@ -326,6 +317,7 @@ private fun NavGraphBuilder.settingsNavigation(navController: NavHostController)
 
         composable(Screen.MainNav.Settings.Payment.Methods.route) {
             PaymentMethodsScreen(
+                navController = navController,
                 onAddMethod = {
                     navController.navigate(
                         Screen.MainNav.Settings.Payment.AddMethod.createRoute(

@@ -1,261 +1,287 @@
-package mp.verif_ai.presentation.screens.inbox
-
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Comment
-import androidx.compose.material.icons.automirrored.filled.Reply
-import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.ThumbUp
+import androidx.compose.material.icons.filled.DeleteOutline
+import androidx.compose.material.icons.filled.DoneAll
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.SwipeRefreshState
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import mp.verif_ai.domain.model.notification.Notification
-import mp.verif_ai.domain.model.notification.NotificationType
-import mp.verif_ai.presentation.navigation.AppBottomNavigation
+import mp.verif_ai.domain.model.notification.SwipeAction
 import mp.verif_ai.presentation.viewmodel.InboxUiState
 import mp.verif_ai.presentation.viewmodel.InboxViewModel
-import mp.verif_ai.util.getTimeAgo
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.math.roundToInt
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InboxScreen(
+    modifier: Modifier = Modifier,
     viewModel: InboxViewModel = hiltViewModel(),
-    onNotificationClick: (String) -> Unit,
-    onQuestionClick: (String) -> Unit,
-    navController: NavHostController
+    onNotificationClick: (Notification) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    var refreshing by remember { mutableStateOf(false) }
+    val swipeRefreshState = rememberSwipeRefreshState(refreshing)
+
+    LaunchedEffect(refreshing) {
+        if (refreshing) {
+            viewModel.refresh()
+            refreshing = false
+        }
+    }
 
     Scaffold(
-        bottomBar = {
-            AppBottomNavigation(navController = navController)
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text("알림") },
+                actions = {
+                    IconButton(onClick = { /* Show filter options */ }) {
+                        Icon(Icons.Default.FilterList, contentDescription = "필터")
+                    }
+                }
+            )
         }
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(paddingValues)  // Scaffold의 padding 적용
-                .padding(horizontal = 25.dp)  // 좌우 padding 추가
+        SwipeRefresh(
+            state = swipeRefreshState,
+            onRefresh = { refreshing = true },
+            modifier = Modifier.padding(paddingValues)
         ) {
-            InboxHeader(
-                onClearAll = { /* TODO: Implement clear all */ }
-            )
-
-            SearchBar(
-                onSearch = { /* TODO: Implement search */ }
-            )
-
-            NotificationList(
-                uiState = uiState,
-                onNotificationClick = onNotificationClick
-            )
-        }
-    }
-}
-@Composable
-private fun InboxHeader(
-    onClearAll: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 10.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "Inbox",
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold
-        )
-
-        IconButton(onClick = onClearAll) {
-            Icon(
-                imageVector = Icons.Default.Clear,
-                contentDescription = "Clear all"
-            )
-        }
-    }
-}
-
-@Composable
-private fun SearchBar(
-    onSearch: (String) -> Unit
-) {
-    var searchText by remember { mutableStateOf("") }
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp)
-            .background(
-                color = Color(0xFFF8F9FA),
-                shape = RoundedCornerShape(20.dp)
-            )
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 15.dp, vertical = 7.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            BasicTextField(
-                value = searchText,
-                onValueChange = {
-                    searchText = it
-                    onSearch(it)
-                },
-                textStyle = MaterialTheme.typography.bodyMedium.copy(
-                    color = Color(0xFF171A1F)
-                ),
-                decorationBox = { innerTextField ->
-                    if (searchText.isEmpty()) {
-                        Text(
-                            text = "Search",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Color(0xFF171A1F).copy(alpha = 0.64f)
-                        )
-                    }
-                    innerTextField()
-                }
-            )
-
-            Icon(
-                imageVector = Icons.Default.Search,
-                contentDescription = "Search",
-                tint = Color(0xFF7F7F7F)
-            )
-        }
-    }
-}
-
-@Composable
-private fun NotificationList(
-    uiState: InboxUiState,
-    onNotificationClick: (String) -> Unit
-) {
-    when (uiState) {
-        is InboxUiState.Loading -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
-        }
-        is InboxUiState.Error -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(text = uiState.message)
-            }
-        }
-        is InboxUiState.Success -> {
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(uiState.notifications) { notification ->
-                    NotificationItem(
-                        notification = notification,
-                        onClick = { onNotificationClick(notification.id) }
+            when (uiState) {
+                is InboxUiState.Loading -> LoadingState()
+                is InboxUiState.Empty -> EmptyState()
+                is InboxUiState.Success -> {
+                    val notifications = (uiState as InboxUiState.Success).notifications
+                    NotificationList(
+                        notifications = notifications,
+                        onNotificationClick = onNotificationClick,
+                        onSwipe = viewModel::onNotificationSwiped,
+                        onLoadMore = viewModel::loadMore
                     )
                 }
+                is InboxUiState.Error -> ErrorState(
+                    message = (uiState as InboxUiState.Error).message,
+                    onRetry = viewModel::refresh
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun NotificationList(
+    notifications: List<Notification>,
+    onNotificationClick: (Notification) -> Unit,
+    onSwipe: (Notification, SwipeAction) -> Unit,
+    onLoadMore: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    LazyColumn(
+        modifier = modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        contentPadding = PaddingValues(vertical = 8.dp)
+    ) {
+        items(
+            items = notifications,
+            key = { it.id }
+        ) { notification ->
+            SwipeableNotificationCard(
+                notification = notification,
+                onClick = { onNotificationClick(notification) },
+                onSwipe = { action -> onSwipe(notification, action) }
+            )
+        }
+
+        if (notifications.isNotEmpty()) {
+            item {
+                LoadMoreIndicator(onLoadMore = onLoadMore)
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SwipeableNotificationCard(
+    notification: Notification,
+    onClick: () -> Unit,
+    onSwipe: (SwipeAction) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var isRevealed by remember { mutableStateOf(false) }
+    val transitionState = remember {
+        MutableTransitionState(isRevealed).apply {
+            targetState = !isRevealed
+        }
+    }
+    val transition = updateTransition(transitionState, "cardTransition")
+    val offsetTransition by transition.animateFloat(
+        label = "offsetTransition",
+        targetValueByState = { if (isRevealed) -200f else 0f }
+    )
+
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .offset { IntOffset(offsetTransition.roundToInt(), 0) },
+        onClick = onClick
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            NotificationContent(
+                notification = notification,
+                modifier = Modifier.weight(1f)
+            )
+            if (!notification.isRead) {
+                Badge(
+                    modifier = Modifier.padding(8.dp)
+                )
             }
         }
     }
 }
 
 @Composable
-private fun NotificationItem(
+private fun NotificationContent(
     notification: Notification,
-    onClick: () -> Unit
+    modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFF8F9FA)
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 1.dp
-        )
+    Column(
+        modifier = modifier.padding(16.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .padding(15.dp)
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(5.dp)
-        ) {
-            // Notification Icon
-            Box(
-                modifier = Modifier
-                    .size(28.dp)
-                    .background(
-                        color = Color(0xFF2A5AB3),
-                        shape = CircleShape
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = when (notification.type) {
-                        NotificationType.REPLY -> Icons.AutoMirrored.Filled.Reply
-                        NotificationType.COMMENT -> Icons.AutoMirrored.Filled.Comment
-                        NotificationType.UPVOTE -> Icons.Default.ThumbUp
-                    },
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(14.dp)
-                )
-            }
+        Text(
+            text = notification.title,
+            style = MaterialTheme.typography.titleMedium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
 
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(2.dp)
-            ) {
-                Text(
-                    text = notification.questionTitle,
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Light
-                )
-                Text(
-                    text = getNotificationMessage(notification),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
+        Spacer(modifier = Modifier.height(4.dp))
 
-            Text(
-                text = getTimeAgo(notification.createdAt),
-                style = MaterialTheme.typography.bodySmall,
-                color = Color(0xFF9095A0)
+        Text(
+            text = notification.content,
+            style = MaterialTheme.typography.bodyMedium,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = notification.timestamp.formatToDateTime(),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Composable
+private fun LoadMoreIndicator(
+    onLoadMore: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator(
+            modifier = Modifier.size(32.dp),
+            color = MaterialTheme.colorScheme.secondary
+        )
+    }
+
+    LaunchedEffect(Unit) {
+        onLoadMore()
+    }
+}
+
+@Composable
+private fun LoadingState(
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator()
+    }
+}
+
+@Composable
+private fun EmptyState(
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "알림이 없습니다",
+            style = MaterialTheme.typography.titleMedium
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "새로운 알림이 오면 여기에서 확인할 수 있습니다",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Composable
+private fun ErrorState(
+    message: String,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = message,
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.error
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(
+            onClick = onRetry,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer
             )
+        ) {
+            Text("다시 시도")
         }
     }
 }
 
-private fun getNotificationMessage(notification: Notification): String {
-    return when (notification.type) {
-        NotificationType.REPLY -> "${notification.actorName} replied to your question."
-        NotificationType.COMMENT -> "${notification.actorName} commented on your question."
-        NotificationType.UPVOTE -> "${notification.actorName} upvoted your answer."
-    }
+private fun Long.formatToDateTime(): String {
+    return SimpleDateFormat("yyyy.MM.dd HH:mm", Locale.getDefault()).format(Date(this))
 }

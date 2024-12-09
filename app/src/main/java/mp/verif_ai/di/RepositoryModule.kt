@@ -1,9 +1,11 @@
 ﻿package mp.verif_ai.di
 
 import android.content.Context
+import androidx.work.WorkManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -40,6 +42,12 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {
 
+    @Binds
+    @Singleton
+    abstract fun bindInboxRepository(
+        inboxRepositoryImpl: InboxRepositoryImpl
+    ): InboxRepository
+
     companion object {
         @Provides
         @Singleton
@@ -59,9 +67,6 @@ abstract class RepositoryModule {
             return AuthRepositoryImpl(auth, firestore, passKeyRepository)
         }
 
-        @Provides
-        @Singleton
-        fun provideInboxRepository(): InboxRepository = InboxRepositoryImpl()
 
         @Provides
         @Singleton
@@ -97,6 +102,14 @@ abstract class RepositoryModule {
 
         @Provides
         @Singleton
+        fun provideWorkManager(
+            @ApplicationContext context: Context
+        ): WorkManager {
+            return WorkManager.getInstance(context)
+        }
+
+        @Provides
+        @Singleton
         fun provideFirestoreErrorHandler(): FirestoreErrorHandler = FirestoreErrorHandler()
 
         @Provides
@@ -115,12 +128,13 @@ abstract class RepositoryModule {
             firestore: FirebaseFirestore,
             localDataSource: LocalDataSource,
             errorHandler: FirestoreErrorHandler,
+            @ApplicationScope scope: CoroutineScope,
             @IoDispatcher dispatcher: CoroutineDispatcher
         ): ConversationRepository = ConversationRepositoryImpl(
-            firestore = firestore,
-            localDataSource = localDataSource,
-            errorHandler = errorHandler,
-            dispatcher = dispatcher
+            firestore,
+            localDataSource,
+            errorHandler,
+            dispatcher
         )
 
         @Provides

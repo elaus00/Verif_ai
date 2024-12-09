@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 2,
-    "identityHash": "fdf824c1a74bee80fdbd2250dfea13b9",
+    "version": 3,
+    "identityHash": "d4ee5080bfd4d83b57c872eea505b750",
     "entities": [
       {
         "tableName": "conversations",
@@ -68,7 +68,7 @@
       },
       {
         "tableName": "messages",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `conversationId` TEXT NOT NULL, `content` TEXT NOT NULL, `senderId` TEXT NOT NULL, `replyTo` TEXT, `messageSource` TEXT, `status` TEXT NOT NULL, `additionalData` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `conversationId` TEXT NOT NULL, `content` TEXT NOT NULL, `senderId` TEXT NOT NULL, `replyTo` TEXT, `messageSource` TEXT, `additionalData` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -105,12 +105,6 @@
             "columnName": "messageSource",
             "affinity": "TEXT",
             "notNull": false
-          },
-          {
-            "fieldPath": "status",
-            "columnName": "status",
-            "affinity": "TEXT",
-            "notNull": true
           },
           {
             "fieldPath": "additionalData",
@@ -303,7 +297,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fdf824c1a74bee80fdbd2250dfea13b9')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd4ee5080bfd4d83b57c872eea505b750')"
     ]
   }
 }
