@@ -92,7 +92,8 @@ class AuthRepositoryImpl @Inject constructor(
                     hashMapOf(
                         "email" to email,
                         "nickname" to nickname,
-                        "createdAt" to FieldValue.serverTimestamp()
+                        "createdAt" to FieldValue.serverTimestamp(),
+                        "points" to 2000
                     )
                 )
                 .await()

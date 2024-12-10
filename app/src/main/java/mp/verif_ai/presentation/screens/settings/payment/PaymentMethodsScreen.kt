@@ -1,39 +1,53 @@
 package mp.verif_ai.presentation.screens.settings.payment
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import mp.verif_ai.presentation.navigation.AppBottomNavigation
 import mp.verif_ai.presentation.screens.theme.VerifAiColor
+import mp.verif_ai.presentation.viewmodel.PaymentViewModel
 
 
 @Composable
 fun PaymentMethodsScreen(
     navController: NavHostController,
-    onAddMethod:()->Unit
+    viewModel: PaymentViewModel = hiltViewModel(),
+    onAddMethod: () -> Unit // 결제 수단 추가 콜백 추가
 ) {
+    val userPoints by viewModel.userPoints
+
     Scaffold(
         bottomBar = {
             AppBottomNavigation(navController = navController)
         }
-    ){paddingValues ->
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
-                .padding(paddingValues)  // Scaffold의 padding 적용
-
+                .padding(paddingValues) // Scaffold의 padding 적용
         ) {
+            // Header Row
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -42,161 +56,78 @@ fun PaymentMethodsScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                // Child views.
+                Text(
+                    text = "Payment",
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                    color = VerifAiColor.TextPrimary.copy(alpha = 0.64f),
+                    modifier = Modifier.padding(start = 16.dp)
+                )
+                Text(
+                    text = "",
+                    style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.primary),
+                    modifier = Modifier
+                        .padding(end = 16.dp)
+                        .clickable { onAddMethod() } // 결제 수단 추가 네비게이션
+                )
             }
+
+            // Points Section
             Column(
                 modifier = Modifier
-
-                    .fillMaxSize()
-                    .background(color = Color(0xFFFFFFFF))
-                    .padding(start = 25.dp, top = 10.dp, end = 25.dp, bottom = 10.dp),
-                verticalArrangement = Arrangement.spacedBy(15.dp, Alignment.Top),
-                horizontalAlignment = Alignment.CenterHorizontally,
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 10.dp)
             ) {
-                Row(//header
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(36.dp)
-                        .padding(start = 6.dp, end = 14.dp),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        text = "Payment",
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.Bold),
-                        color = VerifAiColor.TextPrimary.copy(alpha = 0.64f),
-                        modifier = Modifier
-                            .fillMaxSize()
-                    )
-                }
-                Column(//profile
-                    modifier = Modifier
-                        .width(340.dp)
-                        .height(110.dp)
-                        .padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp),
-                    verticalArrangement = Arrangement.spacedBy(13.dp, Alignment.Top),
-                    horizontalAlignment = Alignment.Start,
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        verticalArrangement = Arrangement.spacedBy(13.dp, Alignment.CenterVertically),
-                        horizontalAlignment = Alignment.Start,
-                    ) {
-                        Text(
-                            text = "Points",
-                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
-                            color = Color(0xFF2A5AB3),
-                            modifier=Modifier
-                                .fillMaxWidth()
-                        )
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(0.dp)
-                                .padding(start = 8.dp, end = 8.dp),
-                            verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.CenterVertically),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                        ) {
-                            Modifier
-                                .padding(0.dp)
-                                .fillMaxWidth()
-                                .height(0.9.dp)
-                                .background(color = Color(0x1A000000))
-                        }
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp),
-                            verticalArrangement = Arrangement.spacedBy(1.dp, Alignment.CenterVertically),
-                            horizontalAlignment = Alignment.Start,
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(34.dp)
-                                    .padding(top = 2.dp, bottom = 2.dp),
-                                horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                Text(
-                                    text = "9500 Points",
-                                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
-                                    color = Color(0xFF000000),
-                                    modifier=Modifier
-                                        .fillMaxWidth()
-                                )
-                            }
-                        }
-                    }
-                }
+                Text(
+                    text = "Points",
+                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                    color = Color(0xFF2A5AB3)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "$userPoints Points",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color.Black
+                )
+            }
 
-                Column(//application
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(497.dp)
-                        .padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 10.dp),
-                    verticalArrangement = Arrangement.spacedBy(5.dp, Alignment.Top),
-                    horizontalAlignment = Alignment.Start,
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(311.dp),
-                        verticalArrangement = Arrangement.spacedBy(13.dp, Alignment.CenterVertically),
-                        horizontalAlignment = Alignment.Start,
-                    ) {
-                        Text(
-                            text = "Charge Points",
-                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
-                            color = Color(0xFF2A5AB3),
-                            modifier=Modifier
-                                .fillMaxWidth()
-                                .height(30.dp)
-                        )
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(0.dp)
-                                .padding(start = 8.dp, end = 8.dp),
-                            verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.CenterVertically),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                        ) {
-                            Modifier
-                                .padding(0.dp)
-                                .fillMaxWidth()
-                                .height(0.9.dp)
-                                .background(color = Color(0x1A000000))
+            // Point Charging Section
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 10.dp)
+            ) {
+                Text(
+                    text = "Charge Points",
+                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                    color = Color(0xFF2A5AB3)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
 
-                        }
-                        PointsItem(
-                            pointsText = "100",
-                            priceText = "1000",
-                            onBuyClick = onAddMethod
-                        )
-                        PointsItem(
-                            pointsText = "300",
-                            priceText = "2700",
-                            onBuyClick = onAddMethod
-                        )
-                        PointsItem(
-                            pointsText = "500",
-                            priceText = "4500",
-                            onBuyClick = onAddMethod
-                        )
-                        PointsItem(
-                            pointsText = "1000",
-                            priceText = "9000",
-                            onBuyClick = onAddMethod
-                        )
-                    }
-                }
+                PointsItem(
+                    pointsText = "100",
+                    priceText = "1000",
+                    onBuyClick = { viewModel.updateUserPoints(100) }
+                )
+                PointsItem(
+                    pointsText = "300",
+                    priceText = "2700",
+                    onBuyClick = { viewModel.updateUserPoints(300) }
+                )
+                PointsItem(
+                    pointsText = "500",
+                    priceText = "4500",
+                    onBuyClick = { viewModel.updateUserPoints(500) }
+                )
+                PointsItem(
+                    pointsText = "1000",
+                    priceText = "9000",
+                    onBuyClick = { viewModel.updateUserPoints(1000) }
+                )
             }
         }
     }
-
 }
+
 
 @Composable
 fun PointsItem(
@@ -226,13 +157,20 @@ fun PointsItem(
                     .width(215.dp)
                     .height(30.dp)
             )
+            Text(
+                text = "Buy",
+                style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.primary),
+                modifier = Modifier
+                    .clickable { onBuyClick() }
+                    .padding(5.dp)
+            )
         }
     }
 }
 
 
-@Preview(showBackground = true)
-@Composable
-fun PaymentMethodScreenPreview() {
-    PaymentMethodsScreen(navController = NavHostController(LocalContext.current),onAddMethod = {} )
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun PaymentMethodScreenPreview() {
+//    PaymentMethodsScreen(navController = NavHostController(LocalContext.current),onAddMethod = {} )
+//}
