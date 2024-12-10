@@ -15,14 +15,15 @@ import mp.verif_ai.di.IoDispatcher
 import mp.verif_ai.domain.model.question.Comment
 import mp.verif_ai.domain.model.question.CommentParentType
 import mp.verif_ai.domain.model.question.Question
+import mp.verif_ai.domain.model.question.QuestionStatus
+import mp.verif_ai.domain.repository.AuthRepository
+import mp.verif_ai.domain.repository.CommentRepository
 import mp.verif_ai.domain.usecase.question.CreateQuestionUseCase
 import mp.verif_ai.domain.usecase.question.GetMyQuestionsUseCase
 import mp.verif_ai.domain.usecase.question.GetQuestionUseCase
 import mp.verif_ai.domain.usecase.question.GetTrendingQuestionsUseCase
 import mp.verif_ai.domain.usecase.question.UpdateQuestionUseCase
 import mp.verif_ai.domain.util.NotificationManager
-import mp.verif_ai.presentation.screens.question.QuestionEvent
-import mp.verif_ai.presentation.screens.question.QuestionUiState
 import mp.verif_ai.presentation.screens.question.components.ReportReason
 import javax.inject.Inject
 
@@ -33,6 +34,8 @@ class QuestionViewModel @Inject constructor(
     private val getTrendingQuestionsUseCase: GetTrendingQuestionsUseCase,
     private val getMyQuestionsUseCase: GetMyQuestionsUseCase,
     private val updateQuestionUseCase: UpdateQuestionUseCase,
+    private val commentRepository: CommentRepository,
+    private val authRepository: AuthRepository,
     private val notificationManager: NotificationManager,
     @IoDispatcher private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
@@ -51,6 +54,12 @@ class QuestionViewModel @Inject constructor(
 
     private val _selectedCategory = MutableStateFlow<String?>(null)
     val selectedCategory = _selectedCategory.asStateFlow()
+
+    private val _commentContent = MutableStateFlow("")
+    val commentContent: StateFlow<String> = _commentContent.asStateFlow()
+
+    val currentUserId = authRepository.getCurrentUser()?.id
+
 
     fun createQuestion(question: Question) {
         viewModelScope.launch(dispatcher) {
@@ -244,6 +253,150 @@ class QuestionViewModel @Inject constructor(
                 _events.emit(QuestionEvent.ShowError("질문을 불러오는 중 오류가 발생했습니다"))
                 _uiState.value = QuestionUiState.Error("알 수 없는 오류가 발생했습니다")
             }
+        }
+    }
+
+    fun adoptAnswer(questionId: String, answerId: String) {
+        viewModelScope.launch(dispatcher) {
+            try {
+                val currentQuestion = (uiState.value as? QuestionUiState.Success)?.question
+                if (currentQuestion != null) {
+                    val updatedQuestion = currentQuestion.copy(
+                        selectedAnswerId = answerId,
+                        status = QuestionStatus.CLOSED
+                    )
+                    updateQuestionUseCase(updatedQuestion)
+                        .onSuccess {
+                            _events.emit(QuestionEvent.ShowSnackbar("답변이 채택되었습니다"))
+                            notificationManager.showNotification(
+                                title = "답변 채택",
+                                content = "회원님의 답변이 채택되었습니다",
+                                questionId = questionId
+                            )
+                        }
+                        .onFailure { e ->
+                            _events.emit(QuestionEvent.ShowError(e.message ?: "답변 채택에 실패했습니다"))
+                        }
+                }
+            } catch (e: Exception) {
+                _events.emit(QuestionEvent.ShowError("답변 채택 중 오류가 발생했습니다"))
+            }
+        }
+    }
+
+    fun createComment(parentId: String, parentType: CommentParentType, content: String) {
+        if (content.isBlank()) {
+            viewModelScope.launch {
+                _events.emit(QuestionEvent.ShowError("댓글 내용을 입력해주세요"))
+            }
+            return
+        }
+
+        viewModelScope.launch(dispatcher) {
+            try {
+                val currentUser = authRepository.getCurrentUser()
+                    ?: return@launch _events.emit(QuestionEvent.ShowError("로그인이 필요합니다"))
+
+                val comment = Comment(
+                    content = content,
+                    authorId = currentUser.id,
+                    authorName = currentUser.nickname,
+                    parentId = parentId,
+                    parentType = parentType
+                )
+
+                commentRepository.createComment(comment)
+                    .onSuccess {
+                        _events.emit(QuestionEvent.ShowSnackbar("댓글이 등록되었습니다"))
+                        _commentContent.value = "" // 입력 필드 초기화
+                        getQuestionById(parentId) // 질문 데이터 새로고침
+                    }
+                    .onFailure { e ->
+                        _events.emit(QuestionEvent.ShowError(e.message ?: "댓글 등록에 실패했습니다"))
+                    }
+            } catch (e: Exception) {
+                _events.emit(QuestionEvent.ShowError("댓글 등록 중 오류가 발생했습니다"))
+            }
+        }
+    }
+
+    fun deleteComment(commentId: String, parentId: String, parentType: CommentParentType) {
+        viewModelScope.launch(dispatcher) {
+            try {
+                val currentUser = authRepository.getCurrentUser()
+                    ?: return@launch _events.emit(QuestionEvent.ShowError("로그인이 필요합니다"))
+
+                commentRepository.getComment(commentId)
+                    .onSuccess { comment ->
+                        if (comment.authorId != currentUser.id) {
+                            _events.emit(QuestionEvent.ShowError("본인의 댓글만 삭제할 수 있습니다"))
+                            return@launch
+                        }
+
+                        commentRepository.deleteComment(commentId)
+                            .onSuccess {
+                                _events.emit(QuestionEvent.ShowSnackbar("댓글이 삭제되었습니다"))
+                                getQuestionById(parentId) // 질문 데이터 새로고침
+                            }
+                            .onFailure { e ->
+                                _events.emit(QuestionEvent.ShowError(e.message ?: "댓글 삭제에 실패했습니다"))
+                            }
+                    }
+            } catch (e: Exception) {
+                _events.emit(QuestionEvent.ShowError("댓글 삭제 중 오류가 발생했습니다"))
+            }
+        }
+    }
+
+    fun reportComment(commentId: String, parentId: String, parentType: CommentParentType) {
+        viewModelScope.launch(dispatcher) {
+            try {
+                val currentUser = authRepository.getCurrentUser()
+                    ?: return@launch _events.emit(QuestionEvent.ShowError("로그인이 필요합니다"))
+
+                commentRepository.reportComment(commentId, currentUser.id)
+                    .onSuccess {
+                        _events.emit(QuestionEvent.ShowSnackbar("신고가 접수되었습니다"))
+                        getQuestionById(parentId) // 질문 데이터 새로고침
+                    }
+                    .onFailure { e ->
+                        _events.emit(QuestionEvent.ShowError(e.message ?: "신고 접수에 실패했습니다"))
+                    }
+            } catch (e: Exception) {
+                _events.emit(QuestionEvent.ShowError("신고 처리 중 오류가 발생했습니다"))
+            }
+        }
+    }
+
+    fun observeComments(parentId: String, parentType: CommentParentType) {
+        viewModelScope.launch(dispatcher) {
+            try {
+                commentRepository.observeComments(parentId, parentType)
+                    .collect { commentsList ->
+                        _uiState.update { currentState ->
+                            when (currentState) {
+                                is QuestionUiState.Success -> {
+                                    currentState.copy(
+                                        question = currentState.question?.copy(
+                                            comments = commentsList
+                                        )
+                                    )
+                                }
+                                else -> currentState
+                            }
+                        }
+                    }
+            } catch (e: Exception) {
+                _events.emit(QuestionEvent.ShowError("댓글을 불러오는 중 오류가 발생했습니다"))
+            }
+        }
+    }
+
+
+
+    fun updateCommentContent(content: String) {
+        viewModelScope.launch {
+            _commentContent.value = content
         }
     }
 }

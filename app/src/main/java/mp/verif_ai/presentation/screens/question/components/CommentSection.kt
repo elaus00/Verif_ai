@@ -9,12 +9,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ThumbUp
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -23,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import mp.verif_ai.domain.model.question.Comment
+import mp.verif_ai.domain.model.question.CommentStatus
 import mp.verif_ai.domain.util.date.DateUtils
 import mp.verif_ai.presentation.screens.theme.VerifAiColor
 
@@ -52,12 +50,12 @@ fun CommentSection(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(comments) { comment ->
-                CommentItem(
-                    comment = comment,
-                    onCommentClick = onCommentClick,
-                    onReplyClick = onReplyClick,
-                    onLikeClick = onLikeClick
-                )
+//                CommentItem(
+//                    comment = comment,
+//                    onCommentClick = onCommentClick,
+//                    onReplyClick = onReplyClick,
+//                    onLikeClick = onLikeClick
+//                )
             }
         }
     }
@@ -66,9 +64,10 @@ fun CommentSection(
 @Composable
 fun CommentItem(
     comment: Comment,
-    onCommentClick: (String) -> Unit,
-    onReplyClick: (String) -> Unit,
-    onLikeClick: (String) -> Unit,
+    currentUserId: String,
+    onDeleteClick: () -> Unit,
+    onReportClick: () -> Unit,
+    onReplyClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -85,13 +84,25 @@ fun CommentItem(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = comment.authorName,
+                        style = MaterialTheme.typography.titleSmall,
+                        color = VerifAiColor.TextPrimary
+                    )
+                    if (comment.isReported) {
+                        Text(
+                            text = "신고됨",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
                 Text(
-                    text = comment.authorName,
-                    style = MaterialTheme.typography.titleSmall,
-                    color = VerifAiColor.TextPrimary
-                )
-                Text(
-                    text = DateUtils.getTimeAgo(comment.createdAt),
+                    text = DateUtils.formatRelativeTime(comment.createdAt),
                     style = MaterialTheme.typography.bodySmall,
                     color = VerifAiColor.TextSecondary
                 )
@@ -102,7 +113,10 @@ fun CommentItem(
             Text(
                 text = comment.content,
                 style = MaterialTheme.typography.bodyMedium,
-                color = VerifAiColor.TextPrimary
+                color = if (comment.status == CommentStatus.HIDDEN)
+                    VerifAiColor.TextSecondary
+                else
+                    VerifAiColor.TextPrimary
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -111,15 +125,33 @@ fun CommentItem(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                TextButton(onClick = { onReplyClick(comment.id) }) {
+                TextButton(onClick = onReplyClick) {
                     Text("답글")
                 }
-                IconButton(onClick = { onLikeClick(comment.id) }) {
-                    Icon(
-                        imageVector = Icons.Default.ThumbUp,
-                        contentDescription = "Like"
-                    )
+
+                if (comment.authorId == currentUserId) {
+                    TextButton(
+                        onClick = onDeleteClick,
+                        colors = ButtonDefaults.textButtonColors(
+                            contentColor = MaterialTheme.colorScheme.error
+                        )
+                    ) {
+                        Text("삭제")
+                    }
+                } else {
+                    TextButton(onClick = onReportClick) {
+                        Text("신고")
+                    }
                 }
+            }
+
+            if (comment.status == CommentStatus.HIDDEN) {
+                Text(
+                    text = "신고로 인해 숨겨진 댓글입니다",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
             }
         }
     }

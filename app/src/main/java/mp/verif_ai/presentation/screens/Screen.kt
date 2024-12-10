@@ -110,6 +110,28 @@ sealed class Screen(val route: String) {
                             "main/explore/question/detail/$questionId"
                     }
                 }
+
+                data class CreateAnswer(val questionId: String) :
+                    Question("main/explore/question/answer/create/$questionId") {
+                    companion object {
+                        const val route = "main/explore/question/answer/create/{$ARG_QUESTION_ID}"
+                        fun createRoute(questionId: String) =
+                            "main/explore/question/answer/create/$questionId"
+                    }
+                }
+
+                data class AnswerDetail(val questionId: String, val answerId: String) :
+                    Question("main/explore/question/detail/$questionId/answer/$answerId") {
+                    companion object {
+                        const val route = "main/explore/question/detail/{$ARG_QUESTION_ID}/answer/{$ARG_ANSWER_ID}"
+                        fun createRoute(questionId: String, answerId: String) =
+                            "main/explore/question/detail/$questionId/answer/$answerId"
+                    }
+                }
+
+                companion object {
+                    const val ARG_ANSWER_ID = "answerId"
+                }
             }
         }
 

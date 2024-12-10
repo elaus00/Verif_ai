@@ -147,6 +147,8 @@ fun HomeScreen(
                     navController.navigate(Screen.MainNav.Explore.Question.Detail.createRoute(questionId))
                 }
             )
+
+            Spacer(modifier.padding(bottom = 8.dp))
         }
     }
 }

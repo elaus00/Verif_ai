@@ -288,13 +288,6 @@ fun CreateQuestionScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Text(
-                text = "태그 선택",
-                style = MaterialTheme.typography.titleMedium,
-                color = VerifAiColor.TextPrimary,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-
             TagSelection(
                 selectedTags = selectedTags,
                 onTagSelected = { tag ->

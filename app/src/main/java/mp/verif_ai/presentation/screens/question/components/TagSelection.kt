@@ -31,10 +31,10 @@ fun TagSelection(
             color = VerifAiColor.TextPrimary
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.Center,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             allTags.forEach { tag ->

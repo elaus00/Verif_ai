@@ -23,6 +23,7 @@ import mp.verif_ai.data.repository.conversation.MediaRepositoryImpl
 import mp.verif_ai.data.repository.conversation.ResponseRepositoryImpl
 import mp.verif_ai.data.repository.inbox.InboxRepositoryImpl
 import mp.verif_ai.data.repository.point.PointRepositoryImpl
+import mp.verif_ai.data.repository.question.CommentRepositoryImpl
 import mp.verif_ai.data.repository.question.QuestionRepositoryImpl
 import mp.verif_ai.data.service.AIServiceFactory
 import mp.verif_ai.data.util.ConversationMapper
@@ -31,6 +32,7 @@ import mp.verif_ai.data.util.LocalDataSource
 import mp.verif_ai.data.util.SyncManager
 import mp.verif_ai.domain.repository.AnswerRepository
 import mp.verif_ai.domain.repository.AuthRepository
+import mp.verif_ai.domain.repository.CommentRepository
 import mp.verif_ai.domain.repository.ConversationRepository
 import mp.verif_ai.domain.repository.InboxRepository
 import mp.verif_ai.domain.repository.MediaRepository
@@ -181,6 +183,16 @@ abstract class RepositoryModule {
             @IoDispatcher dispatcher: CoroutineDispatcher
         ): AnswerRepository {
             return AnswerRepositoryImpl(firestore, errorHandler, dispatcher)
+        }
+
+        @Provides
+        @Singleton
+        fun provideCommentRepository(
+            firestore: FirebaseFirestore,
+            errorHandler: FirestoreErrorHandler,
+            @IoDispatcher dispatcher: CoroutineDispatcher
+        ): CommentRepository {
+            return CommentRepositoryImpl(firestore, errorHandler, dispatcher)
         }
     }
 }

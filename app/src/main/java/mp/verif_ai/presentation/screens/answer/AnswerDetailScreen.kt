@@ -1,3 +1,4 @@
+package mp.verif_ai.presentation.screens.answer
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,9 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -31,33 +30,28 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import mp.verif_ai.domain.model.question.CommentParentType
+import mp.verif_ai.presentation.screens.answer.components.AnswerDetailContent
 import mp.verif_ai.presentation.screens.components.CustomSnackbar
 import mp.verif_ai.presentation.screens.question.QuestionEvent
 import mp.verif_ai.presentation.screens.question.QuestionUiState
 import mp.verif_ai.presentation.screens.question.QuestionViewModel
-import mp.verif_ai.presentation.screens.question.components.QuestionDetailContent
 import mp.verif_ai.presentation.screens.theme.VerifAiColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun QuestionDetailScreen(
+fun AnswerDetailScreen(
     questionId: String,
+    answerId: String,
     viewModel: QuestionViewModel = hiltViewModel(),
     navController: NavController,
-    onAnswerClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val comments by viewModel.comments.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
-    var commentInputText by remember { mutableStateOf("") }
 
-
-    LaunchedEffect(questionId) {
+    LaunchedEffect(questionId, answerId) {
         viewModel.getQuestionById(questionId)
-
-        // 댓글 목록 가져오기
-        viewModel.observeComments(questionId, CommentParentType.QUESTION)
+        viewModel.observeComments(answerId, CommentParentType.ANSWER)
 
         // 이벤트 구독
         viewModel.events.collect { event ->
@@ -87,52 +81,52 @@ fun QuestionDetailScreen(
         },
         topBar = {
             TopAppBar(
-                title = { Text("질문 상세") },
+                title = { Text("답변 상세") },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 }
             )
-        },
+        }
     ) { padding ->
         when (uiState) {
             is QuestionUiState.Success -> {
                 val question = (uiState as QuestionUiState.Success).question
                 if (question != null) {
-                    QuestionDetailContent(
-                        question = question,
-                        onAnswerClick = onAnswerClick,
-                        onCommentSubmit = { content ->
-                            viewModel.createComment(
-                                parentId = questionId,
-                                parentType = CommentParentType.QUESTION,
-                                content = content
-                            )
-                            commentInputText = ""  // 입력 후 초기화
-                        },
-                        onCommentDelete = { commentId ->
-                            viewModel.deleteComment(
-                                commentId = commentId,
-                                parentId = questionId,
-                                parentType = CommentParentType.QUESTION
-                            )
-                        },
-                        onCommentReport = { commentId ->
-                            viewModel.reportComment(
-                                commentId = commentId,
-                                parentId = questionId,
-                                parentType = CommentParentType.QUESTION
-                            )
-                        },
-                        onLikeClick = { viewModel.likeQuestion(questionId) },
-                        onReportClick = {
-                            viewModel.reportQuestion(questionId, it.first, it.second)
-                        },
-                        commentContent = commentInputText,
-                        onCommentContentChange = { commentInputText = it },
-                        modifier = Modifier.padding(padding)
-                    )
+                    val answer = question.answers.find { it.id == answerId }
+                    if (answer != null) {
+                        AnswerDetailContent(
+                            question = question,
+                            answer = answer,
+                            currentUserId = viewModel.currentUserId.toString(),
+                            onAdoptAnswer = {
+                                viewModel.adoptAnswer(questionId, answerId)
+                            },
+                            onCommentSubmit = { commentText ->
+                                viewModel.createComment(
+                                    parentId = answerId,
+                                    parentType = CommentParentType.ANSWER,
+                                    content = commentText
+                                )
+                            },
+                            onCommentDelete = { commentId ->
+                                viewModel.deleteComment(
+                                    commentId = commentId,
+                                    parentId = answerId,
+                                    parentType = CommentParentType.ANSWER
+                                )
+                            },
+                            onCommentReport = { commentId ->
+                                viewModel.reportComment(
+                                    commentId = commentId,
+                                    parentId = answerId,
+                                    parentType = CommentParentType.ANSWER
+                                )
+                            },
+                            modifier = Modifier.padding(padding)
+                        )
+                    }
                 }
             }
 
@@ -168,6 +162,7 @@ fun QuestionDetailScreen(
                     )
                 }
             }
+
             QuestionUiState.Initial -> {
                 Box(
                     modifier = Modifier
@@ -175,12 +170,12 @@ fun QuestionDetailScreen(
                         .padding(padding),
                     contentAlignment = Alignment.Center
                 ) {
-                    // 초기 상태에서는 로딩을 시작하도록
                     LaunchedEffect(Unit) {
                         viewModel.getQuestionById(questionId)
                     }
                 }
             }
+
             QuestionUiState.Loading -> {
                 Box(
                     modifier = Modifier
@@ -194,7 +189,7 @@ fun QuestionDetailScreen(
                     ) {
                         CircularProgressIndicator()
                         Text(
-                            text = "질문을 불러오는 중입니다...",
+                            text = "답변을 불러오는 중입니다...",
                             style = MaterialTheme.typography.bodyMedium,
                             color = VerifAiColor.TextSecondary
                         )

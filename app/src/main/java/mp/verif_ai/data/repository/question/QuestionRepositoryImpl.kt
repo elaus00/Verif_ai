@@ -38,14 +38,9 @@ class QuestionRepositoryImpl @Inject constructor(
 
     override suspend fun createQuestion(question: Question): Result<String> {
         return try {
-            val questionData = question.toMap().apply {
-                // 생성 시점의 필드들 업데이트
-                plus(
-                    mapOf(
-                        "createdAt" to com.google.firebase.Timestamp.now(),
-                        "updatedAt" to com.google.firebase.Timestamp.now()
-                    )
-                )
+            val questionData = question.toMap().toMutableMap().apply {
+                put("createdAt", com.google.firebase.Timestamp.now())
+                put("updatedAt", com.google.firebase.Timestamp.now())
             }
 
             val documentRef = questionsCollection.document()

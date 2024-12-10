@@ -39,4 +39,5 @@ interface QuestionRepository {
      * @param question 업데이트할 질문 정보
      */
     suspend fun updateQuestion(question: Question): Result<Unit>
+
 }

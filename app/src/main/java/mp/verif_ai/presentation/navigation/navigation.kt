@@ -1,6 +1,7 @@
 package mp.verif_ai.presentation.navigation
 
 import InboxScreen
+import QuestionDetailScreen
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -13,6 +14,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
 import mp.verif_ai.presentation.screens.Screen
+import mp.verif_ai.presentation.screens.answer.AnswerDetailScreen
+import mp.verif_ai.presentation.screens.answer.CreateAnswerScreen
 import mp.verif_ai.presentation.screens.auth.OnBoardingScreen
 import mp.verif_ai.presentation.screens.auth.SignInScreen
 import mp.verif_ai.presentation.screens.auth.expertsignup.ExpertOnboardingScreen
@@ -28,9 +31,7 @@ import mp.verif_ai.presentation.screens.explore.ExploreScreen
 import mp.verif_ai.presentation.screens.home.HomeScreen
 import mp.verif_ai.presentation.screens.inbox.NotificationDetailScreen
 import mp.verif_ai.presentation.screens.question.CreateQuestionScreen
-import mp.verif_ai.presentation.screens.question.QuestionDetailScreen
 import mp.verif_ai.presentation.screens.question.QuestionScreen
-import mp.verif_ai.presentation.screens.question.TrendingQuestionsScreen
 import mp.verif_ai.presentation.screens.question.components.QuestionContent
 import mp.verif_ai.presentation.screens.settings.*
 import mp.verif_ai.presentation.screens.settings.notification.NotificationSettingsScreen
@@ -278,17 +279,21 @@ private fun NavGraphBuilder.exploreNavigation(navController: NavHostController) 
                 }
             )
         }
-
-        // Trending Questions
-        composable(Screen.MainNav.Explore.Question.Trending.route) {
-            TrendingQuestionsScreen(
-                onQuestionClick = { questionId ->
-                    navController.navigate(Screen.MainNav.Explore.Question.Detail.createRoute(questionId))
-                }
+        composable(
+            route = Screen.MainNav.Explore.Question.AnswerDetail.route,
+            arguments = listOf(
+                navArgument(Screen.ARG_QUESTION_ID) { type = NavType.StringType },
+                navArgument(Screen.MainNav.Explore.Question.ARG_ANSWER_ID) { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            AnswerDetailScreen(
+                questionId = backStackEntry.arguments?.getString(Screen.ARG_QUESTION_ID) ?: "",
+                answerId = backStackEntry.arguments?.getString(Screen.MainNav.Explore.Question.ARG_ANSWER_ID) ?: "",
+                navController = navController
             )
         }
 
-        // Question Detail
+        // Question Detail 수정 - 답변 상세 화면으로 이동하는 코드 추가
         composable(
             route = Screen.MainNav.Explore.Question.Detail.route,
             arguments = listOf(
@@ -296,6 +301,34 @@ private fun NavGraphBuilder.exploreNavigation(navController: NavHostController) 
             )
         ) { backStackEntry ->
             QuestionDetailScreen(
+                questionId = backStackEntry.arguments?.getString(Screen.ARG_QUESTION_ID) ?: "",
+                onAnswerClick = { answerId ->
+                    if (answerId == "create") {
+                        navController.navigate(
+                            Screen.MainNav.Explore.Question.CreateAnswer.createRoute(
+                                backStackEntry.arguments?.getString(Screen.ARG_QUESTION_ID) ?: ""
+                            )
+                        )
+                    } else {
+                        navController.navigate(
+                            Screen.MainNav.Explore.Question.AnswerDetail.createRoute(
+                                backStackEntry.arguments?.getString(Screen.ARG_QUESTION_ID) ?: "",
+                                answerId
+                            )
+                        )
+                    }
+                },
+                navController = navController
+            )
+        }
+
+        composable(
+            route = Screen.MainNav.Explore.Question.CreateAnswer.route,
+            arguments = listOf(
+                navArgument(Screen.ARG_QUESTION_ID) { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            CreateAnswerScreen(
                 questionId = backStackEntry.arguments?.getString(Screen.ARG_QUESTION_ID) ?: "",
                 navController = navController
             )

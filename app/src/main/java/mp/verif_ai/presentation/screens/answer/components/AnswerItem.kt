@@ -109,7 +109,7 @@ fun AnswerItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = DateUtils.getTimeAgo(answer.createdAt),
+                    text = DateUtils.formatRelativeTime(answer.createdAt),
                     style = MaterialTheme.typography.bodySmall,
                     color = VerifAiColor.TextSecondary
                 )

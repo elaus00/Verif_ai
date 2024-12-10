@@ -5,22 +5,28 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Comment
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material3.AssistChip
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -45,140 +51,183 @@ import mp.verif_ai.presentation.screens.theme.VerifAiColor
 fun QuestionDetailContent(
     question: Question,
     onAnswerClick: (String) -> Unit,
-    onCommentClick: (String) -> Unit,
+    onCommentSubmit: (String) -> Unit,
+    onCommentDelete: (String) -> Unit,
+    onCommentReport: (String) -> Unit,
     onLikeClick: () -> Unit,
-    onReportClick: () -> Unit,
+    onReportClick: (Pair<ReportReason, String>) -> Unit,
+    commentContent: String,
+    onCommentContentChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showReportDialog by remember { mutableStateOf(false) }
     var showCommentInput by remember { mutableStateOf(false) }
-    var commentText by remember { mutableStateOf("") }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-    ) {
-        // Question Header
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
+    Box(modifier = modifier.fillMaxSize()) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize()
         ) {
-            Text(
-                text = question.title,
-                style = MaterialTheme.typography.headlineSmall,
-                color = VerifAiColor.TextPrimary
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = question.authorName,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = VerifAiColor.TextSecondary
-                )
-                Text(
-                    text = "•",
-                    color = VerifAiColor.TextSecondary
-                )
-                Text(
-                    text = DateUtils.formatFullDate(question.createdAt),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = VerifAiColor.TextSecondary
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = question.content,
-                style = MaterialTheme.typography.bodyLarge,
-                color = VerifAiColor.TextPrimary
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                question.tags.forEach { tag ->
-                    AssistChip(
-                        onClick = { },
-                        label = { Text(tag) }
-                    )
-                }
-            }
-        }
-
-        Divider(color = VerifAiColor.DividerColor)
-
-        // Actions
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                LikeButton(
-                    isLiked = false,  // TODO: 실제 좋아요 상태 연동
-                    likeCount = 0,    // TODO: 실제 좋아요 수 연동
-                    onLikeClick = onLikeClick
-                )
-
-                TextButton(
-                    onClick = { /* TODO: 댓글 입력 포커스 */ }
+            // Question Header
+            item {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
                 ) {
-                    Icon(Icons.Default.Comment, contentDescription = null)
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("댓글")
+                    Text(
+                        text = question.title,
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = VerifAiColor.TextPrimary
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = question.authorName,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = VerifAiColor.TextSecondary
+                        )
+                        Text(
+                            text = "•",
+                            color = VerifAiColor.TextSecondary
+                        )
+                        Text(
+                            text = DateUtils.formatFullDate(question.createdAt),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = VerifAiColor.TextSecondary
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text(
+                        text = question.content,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = VerifAiColor.TextPrimary
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        question.tags.forEach { tag ->
+                            AssistChip(
+                                onClick = { },
+                                label = { Text(tag) }
+                            )
+                        }
+                    }
                 }
             }
 
-            IconButton(onClick = { showReportDialog = true }) {
-                Icon(Icons.Default.Flag, contentDescription = "신고")
+            item {
+                Divider(color = VerifAiColor.DividerColor)
             }
-        }
 
-        Divider(color = VerifAiColor.DividerColor)
+            // Actions
+            item {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        LikeButton(
+                            isLiked = false,
+                            likeCount = 0,
+                            onLikeClick = onLikeClick
+                        )
 
-        // Comments Section
-        CommentSection(
-            comments = question.comments,
-            onCommentClick = onCommentClick,
-            onReplyClick = { commentId ->
-                showCommentInput = true
-                // TODO: 대댓글 구현
-            },
-            onLikeClick = { commentId ->
-                // TODO: 댓글 좋아요 구현
+                        TextButton(
+                            onClick = { showCommentInput = true }
+                        ) {
+                            Icon(Icons.Default.Comment, contentDescription = null)
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("댓글")
+                        }
+                    }
+
+                    IconButton(onClick = { showReportDialog = true }) {
+                        Icon(Icons.Default.Flag, contentDescription = "신고")
+                    }
+                }
             }
-        )
 
-        // Answers Section
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Text(
-                text = "답변 ${question.answers.size}개",
-                style = MaterialTheme.typography.titleMedium,
-                color = VerifAiColor.TextPrimary
-            )
+            item {
+                Divider(color = VerifAiColor.DividerColor)
+            }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            // Comments Section Header
+            item {
+                Text(
+                    text = "댓글 ${question.comments.size}개",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(16.dp),
+                    color = VerifAiColor.TextPrimary
+                )
+            }
 
-            question.answers.forEach { answer ->
+            // Comments
+            items(
+                items = question.comments,
+                key = { it.id }
+            ) { comment ->
+                CommentItem(
+                    comment = comment,
+                    currentUserId = "", // TODO: AuthRepository에서 가져오기
+                    onDeleteClick = { onCommentDelete(comment.id) },
+                    onReportClick = { onCommentReport(comment.id) },
+                    onReplyClick = { showCommentInput = true }
+                )
+            }
+
+            // Answers Section Header with Write Button
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "답변 ${question.answers.size}개",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = VerifAiColor.TextPrimary
+                    )
+                    Button(
+                        onClick = { onAnswerClick("create") },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = VerifAiColor.Navy.Deep
+                        ),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("답변하기")
+                    }
+                }
+            }
+
+            // Answers
+            items(
+                items = question.answers,
+                key = { it.id }
+            ) { answer ->
                 AnswerItem(
                     answer = answer,
                     isAdopted = answer.id == question.selectedAnswerId,
@@ -188,23 +237,23 @@ fun QuestionDetailContent(
             }
         }
 
-        // Comment Input
+        // Comment Input (Overlaid at the bottom when visible)
         AnimatedVisibility(
             visible = showCommentInput,
+            modifier = Modifier.align(Alignment.BottomCenter),
             enter = slideInVertically(initialOffsetY = { it }),
             exit = slideOutVertically(targetOffsetY = { it })
         ) {
             CommentInput(
-                value = commentText,
-                onValueChange = { commentText = it },
+                value = commentContent,
+                onValueChange = onCommentContentChange,
                 onSubmit = {
-                    // TODO: 댓글 제출 구현
+                    onCommentSubmit(commentContent)
                     showCommentInput = false
-                    commentText = ""
                 },
                 onDismiss = {
                     showCommentInput = false
-                    commentText = ""
+                    onCommentContentChange("")
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -212,6 +261,7 @@ fun QuestionDetailContent(
                     .padding(16.dp)
             )
         }
+
     }
 
     // Report Dialog
@@ -219,9 +269,8 @@ fun QuestionDetailContent(
         ReportDialog(
             onDismiss = { showReportDialog = false },
             onConfirm = { reason, comment ->
-                onReportClick()
+                onReportClick(Pair(reason, comment))
                 showReportDialog = false
-                // TODO: 신고 처리 구현
             }
         )
     }
