@@ -25,7 +25,7 @@
         tools:targetApi="tiramisu">
 
         <receiver
-            android:name=".presentation.MyAppWidgetReceiver"
+            android:name=".presentation.widget.WidgetReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

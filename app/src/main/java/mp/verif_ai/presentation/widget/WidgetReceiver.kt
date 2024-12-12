@@ -1,7 +1,7 @@
-package mp.verif_ai.presentation
+package mp.verif_ai.presentation.widget
 
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 
-class MyAppWidgetReceiver : GlanceAppWidgetReceiver() {
+class WidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget = MyAppWidget()
 }
