@@ -17,9 +17,9 @@
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:enableOnBackInvokedCallback="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/verify_logo"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/verify_logo_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Verif_ai"
         tools:targetApi="tiramisu">
