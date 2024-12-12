@@ -23,6 +23,7 @@ kotlinxSerializationJsonVersion = "1.7.3"
 lifecycleRuntimeCompose = "2.8.7"
 activityCompose = "1.9.3"
 composeBom = "2024.11.00"
+lucideCompose = "0.263.0"
 mockk = "1.13.8"
 moshi = "1.14.0"
 moshiKotlin = "1.14.0"
@@ -35,6 +36,7 @@ retrofit = "2.10.0"
 kotlinxCoroutines = "1.9.0"
 navigationCompose = "2.8.4"
 media3Extractor = "1.5.0"
+retrofit2KotlinxSerializationConverter = "1.0.0"
 roomCompiler = "2.6.1"
 roomRuntime = "2.6.1"
 workRuntimeKtx = "2.10.0"
@@ -105,6 +107,7 @@ google-services-plugin = { group = "com.google.gms", name = "google-services", v
 gms-play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "gms-play-services-auth" }
 gms-play-services-safetynet = { group = "com.google.android.gms", name = "play-services-safetynet", version.ref = "gms-play-services-safetynet" }
 play-services-fido = { group = "com.google.android.gms", name = "play-services-fido", version.ref = "playServicesFido" }
+retrofit2-kotlinx-serialization-converter = { module = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter", version.ref = "retrofit2KotlinxSerializationConverter" }
 
 
 [plugins]

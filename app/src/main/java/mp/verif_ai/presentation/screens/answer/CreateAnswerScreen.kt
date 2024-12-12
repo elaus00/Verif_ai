@@ -86,7 +86,7 @@ fun CreateAnswerScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "답변 작성",
+                        text = "Write Reply",
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontWeight = FontWeight.Bold
                         ),

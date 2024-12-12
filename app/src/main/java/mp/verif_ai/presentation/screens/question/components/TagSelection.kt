@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -34,7 +35,8 @@ fun TagSelection(
         Spacer(modifier = Modifier.height(12.dp))
 
         FlowRow(
-            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.padding(horizontal = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(2.4.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             allTags.forEach { tag ->

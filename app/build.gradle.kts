@@ -32,6 +32,7 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        signingConfig = signingConfigs.getByName("debug")
     }
 
     buildFeatures {
@@ -53,6 +54,7 @@ android {
             buildConfigField("String", "GEMINI_API_KEY", "\"${localProperties.getProperty("GEMINI_API_KEY", "")}\"")
         }
     }
+
     ksp {
         arg("room.schemaLocation", "$projectDir/schemas")
     }

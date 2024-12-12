@@ -49,6 +49,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import mp.verif_ai.domain.model.expert.ExpertFields
 import mp.verif_ai.domain.model.question.Question
+import mp.verif_ai.presentation.screens.Screen
 import mp.verif_ai.presentation.screens.components.CustomSnackbar
 import mp.verif_ai.presentation.screens.question.components.QuestionContent
 import mp.verif_ai.presentation.screens.question.components.TagSelection
@@ -141,7 +142,8 @@ fun CreateQuestionScreen(
                     )
                 }
                 is QuestionEvent.QuestionCreated -> {
-                    navController.navigate("question/${event.questionId}") {
+                    navController.navigate(Screen.MainNav.Explore.Question.Detail.createRoute(event.questionId))
+                    {
                         popUpTo("question/create") { inclusive = true }
                     }
                 }
@@ -211,7 +213,7 @@ fun CreateQuestionScreen(
                 .padding(horizontal = 20.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // 작성 가이드
             Surface(
