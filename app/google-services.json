@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "488280392024",
+    "firebase_url": "https://verifai-71428-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "verifai-71428",
+    "storage_bucket": "verifai-71428.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:488280392024:android:f33ec3c6414f596b2e652d",
+        "android_client_info": {
+          "package_name": "mp.verif_ai"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "488280392024-v9gm0ef7eq47j762rveopjpdd2879s80.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "mp.verif_ai",
+            "certificate_hash": "67674aebeec951eeb63c6a3905a2b51dc5876598"
+          }
+        },
+        {
+          "client_id": "488280392024-q5nsddv0315avokh0rldbt82v5c46qpe.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-1e73Qw-64AiGcRdnB5pPC8uXi7KJNXo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "488280392024-q5nsddv0315avokh0rldbt82v5c46qpe.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
