@@ -312,6 +312,7 @@ class QuestionViewModel @Inject constructor(
                     .onSuccess {
                         _events.emit(QuestionEvent.ShowSnackbar("댓글이 등록되었습니다"))
                         _commentContent.value = "" // 입력 필드 초기화
+                        commentRepository.updateComment(comment)
                         getQuestionById(parentId) // 질문 데이터 새로고침
                     }
                     .onFailure { e ->

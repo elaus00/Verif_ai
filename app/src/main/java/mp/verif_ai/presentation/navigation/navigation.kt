@@ -32,8 +32,7 @@ import mp.verif_ai.presentation.screens.explore.ExploreScreen
 import mp.verif_ai.presentation.screens.home.HomeScreen
 import mp.verif_ai.presentation.screens.inbox.NotificationDetailScreen
 import mp.verif_ai.presentation.screens.question.CreateQuestionScreen
-import mp.verif_ai.presentation.screens.question.QuestionScreen
-import mp.verif_ai.presentation.screens.question.components.QuestionContent
+import mp.verif_ai.presentation.screens.question.components.ExploreQuestionList
 import mp.verif_ai.presentation.screens.settings.*
 import mp.verif_ai.presentation.screens.settings.notification.NotificationSettingsScreen
 import mp.verif_ai.presentation.screens.settings.payment.PaymentMethodsScreen
@@ -275,11 +274,6 @@ private fun NavGraphBuilder.exploreNavigation(navController: NavHostController) 
             )
         }
 
-        composable(Screen.MainNav.Explore.Question.QuestionScreen.route) {
-            QuestionScreen(
-                navController = navController)
-        }
-
         // Question Creation
         composable(Screen.MainNav.Explore.Question.Create.route) {
             CreateQuestionScreen(
@@ -288,12 +282,14 @@ private fun NavGraphBuilder.exploreNavigation(navController: NavHostController) 
 
         // Question List
         composable(Screen.MainNav.Explore.Question.List.route) {
-            QuestionContent(
+            ExploreQuestionList(
                 onQuestionClick = { questionId ->
                     navController.navigate(Screen.MainNav.Explore.Question.Detail.createRoute(questionId))
                 }
             )
         }
+
+        // 정답 화면
         composable(
             route = Screen.MainNav.Explore.Question.AnswerDetail.route,
             arguments = listOf(
@@ -308,7 +304,6 @@ private fun NavGraphBuilder.exploreNavigation(navController: NavHostController) 
             )
         }
 
-        // Question Detail 수정 - 답변 상세 화면으로 이동하는 코드 추가
         composable(
             route = Screen.MainNav.Explore.Question.Detail.route,
             arguments = listOf(

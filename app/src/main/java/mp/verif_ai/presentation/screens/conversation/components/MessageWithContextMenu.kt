@@ -7,6 +7,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -27,8 +28,8 @@ fun MessageWithContextMenu(
     canRequestExpertReview: Boolean = true,
     pointBalance: Int,
     onRequestExpertReview: () -> Unit,
-    onCopy: (String) -> Unit,
-    onShare: (String) -> Unit,
+    onCopy: (Message) -> Unit,
+    onShare: (Message) -> Unit,
     content: @Composable () -> Unit
 ) {
     var showMenu by remember { mutableStateOf(false) }
@@ -49,10 +50,10 @@ fun MessageWithContextMenu(
     if (canRequestExpertReview) {
         menuItems.add(
             MenuItem(
-                text = "전문가 검증 요청",
+                text = "Request validation for Expert",
                 icon = { color ->
                     Icon(
-                        imageVector = Icons.Default.Verified,
+                        imageVector = Icons.Outlined.CheckCircle,
                         contentDescription = null,
                         tint = if (pointBalance >= Adoption.EXPERT_REVIEW_POINTS) {
                             MaterialTheme.colorScheme.primary
@@ -61,7 +62,7 @@ fun MessageWithContextMenu(
                         }
                     )
                 },
-                subText = "필요 포인트: ${Adoption.EXPERT_REVIEW_POINTS}P",
+                subText = "Point needed: ${Adoption.EXPERT_REVIEW_POINTS}",
                 onClick = {
                     if (pointBalance <= Adoption.EXPERT_REVIEW_POINTS) {
                         onRequestExpertReview()
@@ -83,18 +84,18 @@ fun MessageWithContextMenu(
     menuItems.addAll(
         listOf(
             MenuItem(
-                text = "복사하기",
+                text = "Copy",
                 icon = { Icon(Icons.Default.ContentCopy, contentDescription = null) },
                 onClick = {
-                    onCopy(message.content)
+                    onCopy(message)
                     showMenu = false
                 }
             ),
             MenuItem(
-                text = "공유하기",
+                text = "Share",
                 icon = { Icon(Icons.Default.Share, contentDescription = null) },
                 onClick = {
-                    onShare(message.content)
+                    onShare(message)
                     showMenu = false
                 }
             )
@@ -117,7 +118,7 @@ fun MessageWithContextMenu(
             expanded = showMenu,
             onDismissRequest = { showMenu = false },
             items = menuItems.map { it.text },
-            modifier = Modifier.width(200.dp),
+            modifier = Modifier.wrapContentWidth(),
             itemContent = { itemText ->
                 val menuItem = menuItems.find { it.text == itemText }
                 if (menuItem != null) {
@@ -132,7 +133,7 @@ fun MessageWithContextMenu(
                         Column {
                             Text(
                                 text = menuItem.text,
-                                style = MaterialTheme.typography.bodyLarge
+                                style = MaterialTheme.typography.bodyMedium
                             )
                             menuItem.subText?.let { subText ->
                                 Text(

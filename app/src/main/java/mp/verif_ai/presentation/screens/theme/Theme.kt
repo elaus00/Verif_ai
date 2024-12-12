@@ -94,7 +94,6 @@ fun VerifAiTheme(
         typography = Typography,
         content = {
             Surface(
-//                modifier = Modifier.fillMaxSize(),
                 color = Color.White  // 앱 전체 배경색 설정
             ) {
                 content()

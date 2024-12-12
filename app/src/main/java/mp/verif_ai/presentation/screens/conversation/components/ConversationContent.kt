@@ -54,8 +54,8 @@ fun ConversationContent(
                     canRequestExpertReview = canRequestExpertReview,
                     pointBalance = pointBalance,
                     onRequestExpertReview = onRequestExpertReview,
-                    onCopy = {},
-                    onShare = {},
+                    onCopy = { viewModel.copyMessageToClipboard(message) },
+                    onShare = { viewModel.shareMessage(message) },
                 ) {
                     Surface(
                         color = when (message.messageSource?.type) {

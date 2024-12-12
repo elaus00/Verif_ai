@@ -70,7 +70,7 @@ fun HomeScreen(
                         modifier = Modifier.size(48.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.Filled.SmartToy,
+                            imageVector = Icons.Filled.QuestionAnswer,
                             contentDescription = "AI와 대화하기"
                         )
                     }
@@ -92,7 +92,7 @@ fun HomeScreen(
                         modifier = Modifier.size(48.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.Default.QuestionAnswer,
+                            imageVector = Icons.Default.Edit,
                             contentDescription = "질문하기"
                         )
                     }

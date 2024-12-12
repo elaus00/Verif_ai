@@ -44,6 +44,8 @@ import androidx.compose.ui.unit.dp
 import mp.verif_ai.domain.model.question.Question
 import mp.verif_ai.domain.util.date.DateUtils
 import mp.verif_ai.presentation.screens.answer.components.AnswerItem
+import mp.verif_ai.presentation.screens.question.comment.CommentInput
+import mp.verif_ai.presentation.screens.question.comment.CommentItem
 import mp.verif_ai.presentation.screens.theme.VerifAiColor
 
 @OptIn(ExperimentalLayoutApi::class)

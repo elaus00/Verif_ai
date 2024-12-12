@@ -11,7 +11,7 @@ data class Question(
     val content: String = "",
     val aiConversationId: String? = null,
     val authorId: String = "",
-    val authorName: String = "",
+    val authorName: String = "Administrator",
     val answers: List<Answer> = emptyList(),
     val comments: List<Comment> = emptyList(),
     val selectedAnswerId: String? = null,
