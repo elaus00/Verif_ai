@@ -73,6 +73,9 @@ class QuestionViewModel @Inject constructor(
                             content = question.title,
                             questionId = questionId
                         )
+                        _uiState.value = QuestionUiState.Success(
+                            question = question,
+                        )
                     }
                     .onFailure { e ->
                         _events.emit(QuestionEvent.ShowError(e.message ?: "질문 등록에 실패했습니다"))
@@ -387,7 +390,7 @@ class QuestionViewModel @Inject constructor(
                         }
                     }
             } catch (e: Exception) {
-                _events.emit(QuestionEvent.ShowError("댓글을 불러오는 중 오류가 발생했습니다"))
+                _events.emit(QuestionEvent.ShowError("댓글을 불러오는 중 오류가 발생했어용"))
             }
         }
     }

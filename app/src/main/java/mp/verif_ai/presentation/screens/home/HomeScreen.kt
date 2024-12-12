@@ -7,7 +7,6 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -44,9 +43,6 @@ fun HomeScreen(
                 modifier = Modifier.padding(16.dp),
                 onNotificationClick = {
                     navController.navigate(Screen.MainNav.Inbox.InboxScreen.route)
-                },
-                onProfileClick = {
-                    navController.navigate(Screen.MainNav.Settings.Profile.View.route)
                 }
             )
         },
@@ -157,7 +153,6 @@ fun HomeScreen(
 @Composable
 fun HomeTopBar(
     onNotificationClick: () -> Unit = {},
-    onProfileClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     TopAppBar(
@@ -178,21 +173,6 @@ fun HomeTopBar(
                     contentDescription = "Notifications",
                     tint = VerifAiColor.TextPrimary
                 )
-            }
-
-            // Profile Icon
-            IconButton(onClick = onProfileClick) {
-                Surface(
-                    shape = CircleShape,
-                    modifier = Modifier.size(32.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = "Profile",
-                        tint = VerifAiColor.TextPrimary,
-                        modifier = Modifier.padding(4.dp)
-                    )
-                }
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
