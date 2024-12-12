@@ -23,6 +23,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Verif_ai"
         tools:targetApi="tiramisu">
+
+        <receiver
+            android:name=".presentation.MyAppWidgetReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/my_appwidegt_info" />
+        </receiver>
+
         <activity
             android:name=".presentation.MainActivity"
             android:exported="true"

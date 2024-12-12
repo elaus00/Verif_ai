@@ -3,6 +3,9 @@ package mp.verif_ai.presentation.viewmodel
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
@@ -11,11 +14,12 @@ import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
-import mp.verif_ai.presentation.screens.settings.notification.toggleFlash
+import mp.verif_ai.domain.model.auth.User
+import mp.verif_ai.domain.model.auth.UserType
 import mp.verif_ai.presentation.screens.settings.notification.toggleNotifications
-import mp.verif_ai.presentation.screens.settings.notification.toggleVibration
 
 data class SettingsUiState(
+    val user: User = User(),
     val profileImage: Bitmap? = null,
     val profileImageUri: Uri? = null,
     val isFlashOn: Boolean = false,
@@ -81,43 +85,47 @@ open class SettingsViewModel : ViewModel() {
             .addOnFailureListener { exception -> onFailure(exception) }
     }
 
-    fun subscribeToProfileUpdates(
-        userId: String,
-        onFailure: (Exception) -> Unit
-    ) {
-        firestore.collection("users").document(userId)
-            .addSnapshotListener { snapshot, exception ->
-                if (exception != null) {
-                    onFailure(exception)
-                    return@addSnapshotListener
-                }
-                snapshot?.getString("profileImageUrl")?.let { imageUrl ->
-                    _uiState.update { it.copy(otherUserProfileImageUri = imageUrl) }
-                }
-            }
-    }
-
-    fun fetchUserProfileImageFromFirestore(
+    // 업로드 후 유저별
+    fun uploadPdfToFirestore(
+        uri: Uri,
         userId: String,
         onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit
     ) {
-        val userDocument = firestore.collection("users").document(userId)
+        val storageReference = FirebaseStorage.getInstance().reference
+            .child("verification_files/$userId/${System.currentTimeMillis()}.pdf")
 
-        userDocument.get()
-            .addOnSuccessListener { document ->
-                val imageUrl = document.getString("profileImageUrl")
-                if (imageUrl != null) {
-                    _uiState.update { it.copy(otherUserProfileImageUri = imageUrl) }
-                    onSuccess()
-                } else {
-                    onFailure(Exception("No profile image found"))
-                }
+        storageReference.putFile(uri)
+            .addOnSuccessListener {
+                onSuccess()
+                // PDF 업로드 성공 후 일정 시간 후 UserType 업데이트
+                Handler(Looper.getMainLooper()).postDelayed({
+                    updateUserType(userId, UserType.EXPERT)
+                }, 5000) // 5초 후 업데이트
             }
             .addOnFailureListener { exception ->
                 onFailure(exception)
             }
     }
+
+
+    fun updateUserType(userId: String, newType: UserType) {
+        val db = FirebaseFirestore.getInstance()
+        db.collection("users").document(userId)
+            .update("type", newType.name)
+            .addOnSuccessListener {
+                // Firestore 업데이트 성공 시 UI 상태도 업데이트
+                _uiState.value = _uiState.value.copy(
+                    user = _uiState.value.user.copy(type = newType)
+                )
+            }
+            .addOnFailureListener { exception ->
+                // 업데이트 실패 시 로깅
+                Log.e("SettingsViewModel", "Failed to update user type: ${exception.message}")
+            }
+    }
+
+
 
     // 플래시 제어
     fun setFlashState(isEnabled: Boolean) {

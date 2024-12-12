@@ -9,28 +9,12 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -44,7 +28,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import mp.verif_ai.presentation.navigation.AppBottomNavigation
-import mp.verif_ai.presentation.screens.Screen
 import mp.verif_ai.presentation.viewmodel.SettingsViewModel
 
 @Composable
@@ -56,7 +39,7 @@ fun SettingsScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var uploadStatus by remember { mutableStateOf("Idle") }
 
-    // 이미지 업로드를 위한 갤러리 런처
+    // 이미지 업로드를 위한 갤러리 런처 ( 하단의 전문가 인증 서류 업로드 로직과 유사)
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -66,8 +49,8 @@ fun SettingsScreen(
                 uploadStatus = "Uploading..."
                 viewModel.uploadProfileImageToFirestore(
                     uri = it,
-                    userId = "currentUserId", // 사용자 ID 필요 시 변경
-                    onSuccess = { uploadStatus = "Upload successful!" },
+                    userId = "currentUserId", // 사용자 ID 필요 시 변경. 샘플임!
+                    onSuccess = { uploadStatus = "Profile Image Upload successful!" },
                     onFailure = { exception ->
                         uploadStatus = "Upload failed: ${exception.message}"
                     }
@@ -76,10 +59,29 @@ fun SettingsScreen(
         }
     }
 
+    // PDF 파일 업로드를 위한 런처
+    val pdfLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val uri: Uri? = result.data?.data
+            uri?.let {
+                // PDF 파일 처리 및 업로드 로직 실행
+                uploadStatus = "Uploading PDF..."
+                viewModel.uploadPdfToFirestore(
+                    uri = it,
+                    userId = "currentUserId", // 사용자 ID 필요 시 수정, 얘두 샘플!
+                    onSuccess = { uploadStatus = "Expert Verification file(pdf) upload successful!" },
+                    onFailure = { exception ->
+                        uploadStatus = "PDF upload failed: ${exception.message}"
+                    }
+                )
+            }
+        }
+    }
+
     Scaffold(
-        bottomBar = {
-            AppBottomNavigation(navController)
-        },
+        bottomBar = { AppBottomNavigation(navController = navController) },
         content = { paddingValues ->
             Column(
                 modifier = Modifier
@@ -150,13 +152,26 @@ fun SettingsScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // 버튼 섹션
-                SettingsButton("Change Info",)
+                SettingsButton("Change Info")
                 Spacer(modifier = Modifier.height(16.dp))
                 SettingsButton("Logout")
                 Spacer(modifier = Modifier.height(16.dp))
-                SettingsButton("Payment") {
-                    navController.navigate(Screen.MainNav.Settings.Payment.Methods.route)
+                SettingsButton("Payment")
+                Spacer(modifier = Modifier.height(16.dp))
+                SettingsButton("Expert Verification(file upload)") {
+                    val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                        type = "application/pdf"
+                        addCategory(Intent.CATEGORY_OPENABLE)
+                    }
+                    pdfLauncher.launch(intent)
                 }
+
+                Text(
+                    text = "User Type: ${uiState.user.type}",
+                    style = TextStyle(fontSize = 14.sp, color = Color.Gray),
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+
             }
         }
     )
@@ -177,12 +192,12 @@ fun SettingToggleItem(title: String, isChecked: Boolean, onCheckedChange: (Boole
 }
 
 @Composable
-fun SettingsButton(title: String,onClick: (() -> Unit)? = null) {
+fun SettingsButton(title: String, onClick: () -> Unit = {}) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
-            .clickable (enabled = onClick != null) { onClick?.invoke() },
+            .clickable { onClick() }, // 클릭 이벤트 처리
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -201,6 +216,8 @@ fun SettingsButton(title: String,onClick: (() -> Unit)? = null) {
         )
     }
 }
+
+
 
 fun saveToPreferences(context: Context, key: String, value: Boolean) {
     val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)

@@ -112,6 +112,9 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.storage)
 
+    // 위젯을 위한 glance 라이브러리 설정!!
+    implementation(libs.androidx.glance.appwidget)
+
     // Network
     implementation(libs.retrofit)
     implementation(libs.retrofit.gson.converter)
