@@ -37,7 +37,7 @@ fun ExploreScreen(
                 modifier = Modifier.padding(vertical = 12.dp),
                 title = {
                     Text(
-                        text = "탐색",
+                        text = "Explore",
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )

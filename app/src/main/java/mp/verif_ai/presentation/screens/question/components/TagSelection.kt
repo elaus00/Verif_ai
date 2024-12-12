@@ -23,11 +23,11 @@ fun TagSelection(
     onTagSelected: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val allTags = remember { getAllTags() }  // 태그 목록을 가져오는 함수
+    val allTags = remember { getAllTags() }
 
     Column(modifier = modifier) {
         Text(
-            text = "태그 선택",
+            text = "Choose a tag",
             style = MaterialTheme.typography.titleMedium,
             color = VerifAiColor.TextPrimary
         )
@@ -52,8 +52,8 @@ fun TagSelection(
 }
 
 private fun getAllTags() = listOf(
-    "기술", "과학", "수학", "교육", "문화",
-    "경제", "정치", "사회", "역사", "철학",
-    "건강", "의학", "스포츠", "예술", "음악",
-    "취미", "여행", "요리", "직장", "일상"
+    "Technology", "Science", "Mathematics", "Education", "Culture",
+    "Economy", "Politics", "Society", "History", "Philosophy",
+    "Health", "Medicine", "Sports", "Art", "Music",
+    "Hobbies", "Travel", "Cooking", "Workplace", "Daily Life"
 )

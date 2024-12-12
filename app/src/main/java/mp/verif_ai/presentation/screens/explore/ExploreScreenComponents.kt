@@ -30,13 +30,13 @@ fun CategoryChips(
     modifier: Modifier = Modifier,
     onCategorySelected: (String) -> Unit = {}
 ) {
-    var selectedCategory by remember { mutableStateOf("전체") }
+    var selectedCategory by remember { mutableStateOf("") }
 
     LazyRow(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(listOf("전체", "트렌딩", "최신", "답변 대기", "답변 완료")) { category ->
+        items(listOf("All", "Trending", "Latest", "Awaiting Answers", "Answered")) { category ->
             FilterChip(
                 selected = category == selectedCategory,
                 onClick = {

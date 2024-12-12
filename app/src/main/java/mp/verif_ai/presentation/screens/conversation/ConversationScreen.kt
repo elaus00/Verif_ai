@@ -48,14 +48,14 @@ fun ConversationScreen(
                 is ConversationEvent.ShowError -> {
                     snackbarHostState.showSnackbar(
                         message = event.message,
-                        actionLabel = "닫기",
+                        actionLabel = "Close",
                         duration = SnackbarDuration.Long
                     )
                 }
                 is ConversationEvent.InsufficientPoints -> {
                     val result = snackbarHostState.showSnackbar(
-                        message = "포인트가 부족합니다",
-                        actionLabel = "충전하기",
+                        message = "Lack of Point",
+                        actionLabel = "Charge",
                         duration = SnackbarDuration.Long
                     )
                     if (result == SnackbarResult.ActionPerformed) {
@@ -67,8 +67,8 @@ fun ConversationScreen(
                 }
                 is ConversationEvent.RequestExpertReviewSuccess -> {
                     snackbarHostState.showSnackbar(
-                        message = "전문가 검증 요청이 완료되었습니다",
-                        actionLabel = "닫기",
+                        message = "Expert review completed",
+                        actionLabel = "Close",
                         duration = SnackbarDuration.Short
                     )
                 }

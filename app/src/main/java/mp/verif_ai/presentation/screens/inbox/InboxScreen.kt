@@ -15,7 +15,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -135,11 +134,11 @@ private fun SwipeableNotificationCard(
             targetState = !isRevealed
         }
     }
-    val transition = updateTransition(transitionState, "cardTransition")
-    val offsetTransition by transition.animateFloat(
-        label = "offsetTransition",
-        targetValueByState = { if (isRevealed) -200f else 0f }
-    )
+        val transition = updateTransition(transitionState, "cardTransition")
+        val offsetTransition by transition.animateFloat(
+            label = "offsetTransition",
+            targetValueByState = { if (isRevealed) -200f else 0f } // ToDo 오류 수정 필요
+        )
 
     Card(
         modifier = modifier
@@ -243,12 +242,12 @@ private fun EmptyState(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "알림이 없습니다",
+            text = "No notifications",
             style = MaterialTheme.typography.titleMedium
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "새로운 알림이 오면 여기에서 확인할 수 있습니다",
+            text = "If there's a notification, you'll see it here.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

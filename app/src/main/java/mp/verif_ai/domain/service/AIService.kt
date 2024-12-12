@@ -57,24 +57,24 @@ enum class AIModel(
     GPT_4O(
         apiName = "gpt-4o",
         displayName = "GPT-4o",
-        description = "가장 강력한 성능을 제공하는 모델. 복잡한 작업과 전문적인 내용 처리에 적합"
+        description = "A model that provides the most powerful performance. Suitable for complex tasks and handling specialized content."
     ),
     GPT_4O_MINI(
         apiName = "gpt-4o-mini",
         displayName = "GPT-4o Mini",
-        description = "GPT-4의 경량화 버전. 빠른 응답과 효율적인 리소스 사용"
+        description = "A lightweight version of GPT-4. Fast response and efficient resource usage."
     ),
 
     // Google Gemini
     GEMINI_1_5_PRO(
         apiName = "gemini-1.5-pro",
         displayName = "Gemini 1.5 Pro",
-        description = "Google의 최신 대규모 언어 모델. 높은 정확도와 다국어 지원"
+        description = "Google's latest large language model. High accuracy and multilingual support."
     ),
     GEMINI_1_5_FLASH(
         apiName = "gemini-1.5-flash",
         displayName = "Gemini 1.5 Flash",
-        description = "빠른 응답 시간에 최적화된 Gemini 모델. 실시간 대화에 적합"
+        description = "A Gemini model optimized for fast response times. Suitable for real-time conversations."
     );
 
     override fun toString(): String = apiName

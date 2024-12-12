@@ -89,7 +89,7 @@ fun ConversationDetailTopBar(
         modifier = Modifier.padding(vertical = 12.dp),
         title = {
             Text(
-                text = currentConversation?.title ?: "대화",
+                text = currentConversation?.title ?: "Conversation",
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
