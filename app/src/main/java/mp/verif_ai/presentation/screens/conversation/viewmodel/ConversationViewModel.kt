@@ -20,6 +20,7 @@ import mp.verif_ai.domain.repository.PointRepository
 import mp.verif_ai.domain.repository.QuestionRepository
 import mp.verif_ai.domain.repository.ResponseRepository
 import mp.verif_ai.domain.service.AIModel
+import mp.verif_ai.domain.util.ClipboardManager
 import mp.verif_ai.presentation.screens.Screen
 import mp.verif_ai.presentation.screens.conversation.factory.ConversationFactory
 import mp.verif_ai.presentation.screens.conversation.factory.MessageFactory
@@ -31,7 +32,8 @@ class ConversationViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val pointRepository: PointRepository,
     private val responseRepository: ResponseRepository,
-    private val questionRepository: QuestionRepository, // 추가
+    private val questionRepository: QuestionRepository,
+    private val clipboardManager: ClipboardManager,  // 추가
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -190,48 +192,72 @@ class ConversationViewModel @Inject constructor(
     fun requestExpertReview() {
         viewModelScope.launch {
             try {
+                Log.d("ConversationVM", "Starting expert review request...")
+
                 val points = pointRepository.getUserPoints().getOrThrow()
+                Log.d("ConversationVM", "Current user points: $points")
 
                 if (points < Adoption.EXPERT_REVIEW_POINTS) {
+                    Log.d("ConversationVM", "Insufficient points. Required: ${Adoption.EXPERT_REVIEW_POINTS}, Current: $points")
                     _events.emit(ConversationEvent.InsufficientPoints)
                     return@launch
                 }
 
                 val currentUser = authRepository.getCurrentUser()
-                    ?: throw IllegalStateException("User not found")
+                Log.d("ConversationVM", "Current user: ${currentUser?.id}")
+
+                if (currentUser == null) {
+                    Log.e("ConversationVM", "Current user is null")
+                    throw IllegalStateException("User not found")
+                }
 
                 val conversation = currentConversation
-                    ?: throw IllegalStateException("Current conversation not found")
+                Log.d("ConversationVM", "Current conversation: ${conversation?.id}")
 
+                if (conversation == null) {
+                    Log.e("ConversationVM", "Current conversation is null")
+                    throw IllegalStateException("Current conversation not found")
+                }
+
+                Log.d("ConversationVM", "Creating question object...")
                 // Question 생성
                 val question = Question(
                     title = "AI 응답 검증 요청: ${conversation.title}",
-                    content = "", // ToDo
+                    content = conversation.messages.toString(),
                     aiConversationId = conversation.id,
                     authorId = currentUser.id,
                     authorName = currentUser.nickname,
                     points = Adoption.EXPERT_REVIEW_POINTS,
                     status = QuestionStatus.OPEN
                 )
+                Log.d("ConversationVM", "Question object created: $question")
 
+                Log.d("ConversationVM", "Attempting to save question...")
                 // Question 저장
                 questionRepository.createQuestion(question)
                     .onSuccess { questionId ->
+                        Log.d("ConversationVM", "Question saved successfully with ID: $questionId")
+
+                        Log.d("ConversationVM", "Requesting expert review...")
                         // 전문가 검증 요청
                         responseRepository.requestExpertReview(
                             conversationId = conversationId.toString(),
                             points = Adoption.EXPERT_REVIEW_POINTS
                         ).onSuccess {
+                            Log.d("ConversationVM", "Expert review requested successfully")
                             _events.emit(ConversationEvent.RequestExpertReviewSuccess)
                         }.onFailure { e ->
+                            Log.e("ConversationVM", "Failed to request expert review", e)
                             handleError("전문가 검증 요청에 실패했습니다", e)
                         }
                     }
                     .onFailure { e ->
+                        Log.e("ConversationVM", "Failed to save question", e)
                         handleError("질문 생성에 실패했습니다", e)
                     }
 
             } catch (e: Exception) {
+                Log.e("ConversationVM", "Error in requestExpertReview", e)
                 handleError("전문가 검증 요청에 실패했습니다", e)
             }
         }
@@ -368,6 +394,27 @@ class ConversationViewModel @Inject constructor(
 
     fun getCurrentConversation(): Conversation? = currentConversation
 
+    fun copyMessageToClipboard(message: Message) {
+        viewModelScope.launch {
+            try {
+                clipboardManager.setText(message.content)
+                _events.emit(ConversationEvent.MessageCopied)
+            } catch (e: Exception) {
+                handleError("메시지 복사에 실패했습니다", e)
+            }
+        }
+    }
+
+    fun shareMessage(message: Message) {
+        viewModelScope.launch {
+            try {
+                _events.emit(ConversationEvent.ShareMessage(message.content))
+            } catch (e: Exception) {
+                handleError("메시지 공유에 실패했습니다", e)
+            }
+        }
+    }
+
     fun retry() {
         loadConversation()
     }
@@ -402,6 +449,8 @@ sealed class ConversationEvent {
     data class AiResponseReceived(val messageId: String) : ConversationEvent()
     data object RequestExpertReviewSuccess : ConversationEvent()
     data object InsufficientPoints : ConversationEvent()
+    data object MessageCopied : ConversationEvent()
+    data class ShareMessage(val content: String) : ConversationEvent()
 }
 
 class NetworkException : Exception("네트워크 연결을 확인해주세요")

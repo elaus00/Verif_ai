@@ -187,7 +187,7 @@ fun CardHeader(
             )
         ) {
             Text(
-                text = "더보기",
+                text = "More",
                 style = MaterialTheme.typography.labelMedium.copy(
                     fontWeight = FontWeight.Medium,
                     fontSize = 13.sp,
@@ -235,7 +235,7 @@ fun CardHeaderWithRefresh(
             )
         ) {
             Text(
-                text = "새로고침",
+                text = "Refresh",
                 style = MaterialTheme.typography.labelMedium.copy(
                     fontWeight = FontWeight.Medium,
                     fontSize = 13.sp,

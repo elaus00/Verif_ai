@@ -10,18 +10,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -44,70 +40,8 @@ import androidx.navigation.NavController
 import mp.verif_ai.domain.model.question.Question
 import mp.verif_ai.presentation.screens.Screen
 import mp.verif_ai.presentation.screens.components.CustomSnackbar
-import mp.verif_ai.presentation.screens.question.components.QuestionContent
 import mp.verif_ai.presentation.screens.question.components.TagSelection
 import mp.verif_ai.presentation.screens.theme.VerifAiColor
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun QuestionScreen(
-    viewModel: QuestionViewModel = hiltViewModel(),
-    navController: NavController,
-) {
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    LaunchedEffect(Unit) {
-        viewModel.getTrendingQuestions()
-        // 이벤트 수집
-        viewModel.events.collect { event ->
-            when (event) {
-                is QuestionEvent.ShowError -> {
-                    snackbarHostState.showSnackbar(
-                        message = event.message,
-                        actionLabel = "Dismiss",
-                        duration = SnackbarDuration.Short
-                    )
-                }
-                is QuestionEvent.QuestionCreated -> {
-                    navController.navigate("question/${event.questionId}")
-                }
-                else -> {}
-            }
-        }
-    }
-
-    Scaffold(
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState) { data ->
-                CustomSnackbar(snackbarData = data)
-            }
-        },
-        topBar = {
-            TopAppBar(
-                title = { Text("질문하기") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = "Back")
-                    }
-                }
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { navController.navigate("question/create") }
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "New Question")
-            }
-        }
-    ) { padding ->
-        QuestionContent(
-            onQuestionClick = { questionId ->
-                navController.navigate("question/$questionId")
-            },
-            modifier = Modifier.padding(padding)
-        )
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

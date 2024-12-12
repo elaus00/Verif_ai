@@ -52,7 +52,6 @@ fun QuestionDetailScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     var commentInputText by remember { mutableStateOf("") }
 
-
     LaunchedEffect(questionId) {
         viewModel.getQuestionById(questionId)
 
@@ -65,13 +64,13 @@ fun QuestionDetailScreen(
                 is QuestionEvent.ShowError -> {
                     snackbarHostState.showSnackbar(
                         message = event.message,
-                        actionLabel = "확인"
+                        actionLabel = "Confirm"
                     )
                 }
                 is QuestionEvent.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(
                         message = event.message,
-                        actionLabel = "확인"
+                        actionLabel = "Confirm"
                     )
                 }
                 else -> {}
@@ -87,7 +86,7 @@ fun QuestionDetailScreen(
         },
         topBar = {
             TopAppBar(
-                title = { Text("질문 상세") },
+                title = { Text("Querstion Detail") },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -156,7 +155,7 @@ fun QuestionDetailScreen(
                         Button(
                             onClick = { viewModel.getQuestionById(questionId) }
                         ) {
-                            Text("다시 시도")
+                            Text("Retry")
                         }
                     }
                 }
@@ -164,7 +163,7 @@ fun QuestionDetailScreen(
                 LaunchedEffect(Unit) {
                     snackbarHostState.showSnackbar(
                         message = (uiState as QuestionUiState.Error).message,
-                        actionLabel = "확인"
+                        actionLabel = "Confirm"
                     )
                 }
             }
@@ -194,7 +193,7 @@ fun QuestionDetailScreen(
                     ) {
                         CircularProgressIndicator()
                         Text(
-                            text = "질문을 불러오는 중입니다...",
+                            text = "Loading Question...",
                             style = MaterialTheme.typography.bodyMedium,
                             color = VerifAiColor.TextSecondary
                         )

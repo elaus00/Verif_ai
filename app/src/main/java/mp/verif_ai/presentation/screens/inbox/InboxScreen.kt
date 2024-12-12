@@ -49,7 +49,7 @@ fun InboxScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("알림") },
+                title = { Text("Inbox") },
                 actions = {
                     IconButton(onClick = { /* Show filter options */ }) {
                         Icon(Icons.Default.FilterList, contentDescription = "필터")

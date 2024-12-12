@@ -1,4 +1,4 @@
-package mp.verif_ai.presentation.screens.question.components
+package mp.verif_ai.presentation.screens.question.comment
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -37,7 +37,7 @@ fun CommentInput(
                 onValueChange = onValueChange,
                 placeholder = {
                     Text(
-                        "댓글을 입력하세요",
+                        "Input a comment...",
                         style = MaterialTheme.typography.bodyMedium,
                         color = VerifAiColor.TextTertiary
                     )

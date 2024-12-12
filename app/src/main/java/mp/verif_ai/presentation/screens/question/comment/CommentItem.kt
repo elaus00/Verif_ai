@@ -1,4 +1,4 @@
-package mp.verif_ai.presentation.screens.question.components
+package mp.verif_ai.presentation.screens.question.comment
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -23,43 +21,6 @@ import mp.verif_ai.domain.model.question.Comment
 import mp.verif_ai.domain.model.question.CommentStatus
 import mp.verif_ai.domain.util.date.DateUtils
 import mp.verif_ai.presentation.screens.theme.VerifAiColor
-
-// CommentSection.kt
-@Composable
-fun CommentSection(
-    comments: List<Comment>,
-    onCommentClick: (String) -> Unit,
-    onReplyClick: (String) -> Unit,
-    onLikeClick: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        Text(
-            text = "댓글 ${comments.size}개",
-            style = MaterialTheme.typography.titleMedium,
-            color = VerifAiColor.TextPrimary
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(comments) { comment ->
-//                CommentItem(
-//                    comment = comment,
-//                    onCommentClick = onCommentClick,
-//                    onReplyClick = onReplyClick,
-//                    onLikeClick = onLikeClick
-//                )
-            }
-        }
-    }
-}
 
 @Composable
 fun CommentItem(

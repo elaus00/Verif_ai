@@ -32,7 +32,7 @@ fun ConversationHistoryTopBar(
 ) {
     CenterAlignedTopAppBar(
         modifier = Modifier.padding(vertical = 12.dp),
-        title = { Text("대화 목록") },
+        title = { Text("Conversation List") },
         navigationIcon = {
             IconButton(onClick = onBackClick) {
                 Icon(Icons.Default.ArrowBack, contentDescription = "뒤로가기")
@@ -62,7 +62,7 @@ fun ConversationSearchBar(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
-        placeholder = { Text("대화 검색") },
+        placeholder = { Text("Search Conversations") },
         singleLine = true,
         leadingIcon = {
             Icon(Icons.Default.Search, contentDescription = "검색")

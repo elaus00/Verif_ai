@@ -28,8 +28,8 @@ fun MessageWithContextMenu(
     canRequestExpertReview: Boolean = true,
     pointBalance: Int,
     onRequestExpertReview: () -> Unit,
-    onCopy: (String) -> Unit,
-    onShare: (String) -> Unit,
+    onCopy: (Message) -> Unit,
+    onShare: (Message) -> Unit,
     content: @Composable () -> Unit
 ) {
     var showMenu by remember { mutableStateOf(false) }
@@ -84,18 +84,18 @@ fun MessageWithContextMenu(
     menuItems.addAll(
         listOf(
             MenuItem(
-                text = "복사하기",
+                text = "Copy",
                 icon = { Icon(Icons.Default.ContentCopy, contentDescription = null) },
                 onClick = {
-                    onCopy(message.content)
+                    onCopy(message)
                     showMenu = false
                 }
             ),
             MenuItem(
-                text = "공유하기",
+                text = "Share",
                 icon = { Icon(Icons.Default.Share, contentDescription = null) },
                 onClick = {
-                    onShare(message.content)
+                    onShare(message)
                     showMenu = false
                 }
             )
@@ -118,7 +118,7 @@ fun MessageWithContextMenu(
             expanded = showMenu,
             onDismissRequest = { showMenu = false },
             items = menuItems.map { it.text },
-            modifier = Modifier.width(200.dp),
+            modifier = Modifier.wrapContentWidth(),
             itemContent = { itemText ->
                 val menuItem = menuItems.find { it.text == itemText }
                 if (menuItem != null) {
@@ -133,7 +133,7 @@ fun MessageWithContextMenu(
                         Column {
                             Text(
                                 text = menuItem.text,
-                                style = MaterialTheme.typography.bodyLarge
+                                style = MaterialTheme.typography.bodyMedium
                             )
                             menuItem.subText?.let { subText ->
                                 Text(

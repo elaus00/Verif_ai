@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -25,14 +26,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import mp.verif_ai.domain.model.question.QuestionStatus
+import mp.verif_ai.domain.model.question.TrendingQuestion
 import mp.verif_ai.domain.util.date.DateUtils
 import mp.verif_ai.presentation.screens.question.QuestionUiState
 import mp.verif_ai.presentation.screens.question.QuestionViewModel
 import mp.verif_ai.presentation.screens.theme.VerifAiColor
 
 @Composable
-fun QuestionContent(
+fun ExploreQuestionList(
     viewModel: QuestionViewModel = hiltViewModel(),
     onQuestionClick: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -43,72 +44,31 @@ fun QuestionContent(
         when (uiState) {
             is QuestionUiState.Loading -> {
                 CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
+                    modifier = Modifier.align(Alignment.Center),
+                    color = VerifAiColor.Navy.Deep
                 )
             }
 
             is QuestionUiState.Success -> {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    // 트렌딩 질문 섹션
+                Column {
+                    // 질문 섹션
                     if (uiState.trendingQuestions.isNotEmpty()) {
-                        item {
-                            Text(
-                                text = "트렌딩 질문",
-                                style = MaterialTheme.typography.titleLarge,
-                                color = VerifAiColor.TextPrimary,
-                                modifier = Modifier.padding(vertical = 8.dp)
-                            )
-                        }
-
-                        items(uiState.trendingQuestions) { question ->
-                            QuestionCard(
-                                title = question.title,
-                                status = getQuestionStatusText(question.status),
-                                date = DateUtils.formatShortDate(question.createdAt),
-                                viewCount = question.viewCount,
-                                onClick = { onQuestionClick(question.id) }
-                            )
-                        }
-
-                        item { Spacer(modifier = Modifier.height(24.dp)) }
-                    }
-
-                    // 내 질문 섹션
-                    if (uiState.myQuestions.isNotEmpty()) {
-                        item {
-                            Text(
-                                text = "내 질문",
-                                style = MaterialTheme.typography.titleLarge,
-                                color = VerifAiColor.TextPrimary,
-                                modifier = Modifier.padding(vertical = 8.dp)
-                            )
-                        }
-
-                        items(uiState.myQuestions) { question ->
-                            QuestionCard(
-                                title = question.title,
-                                status = getQuestionStatusText(question.status),
-                                date = DateUtils.formatShortDate(question.createdAt),
-                                viewCount = question.viewCount,
-                                onClick = { onQuestionClick(question.id) }
-                            )
-                        }
+                        TrendingQuestionSection(
+                            title = "Trending Questions",
+                            trendingQuestions = uiState.trendingQuestions,
+                            onQuestionClick = onQuestionClick,
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
 
                     // 데이터가 없는 경우
                     if (uiState.trendingQuestions.isEmpty() && uiState.myQuestions.isEmpty()) {
-                        item {
-                            EmptyContent(
-                                message = "아직 질문이 없습니다\n첫 질문을 작성해보세요!",
-                                modifier = Modifier
-                                    .fillParentMaxSize()
-                                    .padding(16.dp)
-                            )
-                        }
+                        EmptyContent(
+                            message = "No questions yet.\nBe the first to ask!",
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp)
+                        )
                     }
                 }
             }
@@ -122,14 +82,54 @@ fun QuestionContent(
                 )
             }
 
-            else -> {
-                // Initial state
-                Box(modifier = Modifier.fillMaxSize())
-            }
+            else -> Unit
         }
     }
 }
 
+@Composable
+fun TrendingQuestionSection(
+    title: String,
+    trendingQuestions: List<TrendingQuestion>,
+    onQuestionClick: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier) {
+//        Text(
+//            text = title,
+//            style = MaterialTheme.typography.titleLarge,
+//            color = VerifAiColor.TextPrimary,
+//            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+//        )
+
+        LazyColumn(
+            contentPadding = PaddingValues(vertical = 8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(
+                items = trendingQuestions,
+                key = { it.id }
+            ) { question ->
+                QuestionCard(
+                    title = question.title,
+                    status = question.status,
+                    category = question.category,
+                    tags = question.tags,
+                    authorName = question.authorName,
+                    points = question.points,
+                    answerCount = question.commentCount,
+                    viewCount = question.viewCount,
+                    date = DateUtils.formatShortDate(question.createdAt),
+                    onClick = { onQuestionClick(question.id) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                )
+            }
+        }
+    }
+}
 @Composable
 fun EmptyContent(
     message: String,
@@ -179,15 +179,5 @@ private fun ErrorContent(
             color = MaterialTheme.colorScheme.error,
             textAlign = TextAlign.Center
         )
-    }
-}
-
-private fun getQuestionStatusText(status: QuestionStatus): String {
-    return when (status) {
-        QuestionStatus.OPEN -> "답변 대기"
-        QuestionStatus.CLOSED -> "답변 완료"
-        QuestionStatus.IN_PROGRESS -> "답변 중"
-        QuestionStatus.EXPIRED -> "기간 만료"
-        QuestionStatus.DELETED -> "삭제됨"
     }
 }

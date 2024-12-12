@@ -31,8 +31,8 @@ import androidx.compose.ui.unit.dp
 import mp.verif_ai.domain.model.answer.Answer
 import mp.verif_ai.domain.model.question.Question
 import mp.verif_ai.domain.util.date.DateUtils
-import mp.verif_ai.presentation.screens.question.components.CommentInput
-import mp.verif_ai.presentation.screens.question.components.CommentItem
+import mp.verif_ai.presentation.screens.question.comment.CommentInput
+import mp.verif_ai.presentation.screens.question.comment.CommentItem
 import mp.verif_ai.presentation.screens.theme.VerifAiColor
 
 @Composable

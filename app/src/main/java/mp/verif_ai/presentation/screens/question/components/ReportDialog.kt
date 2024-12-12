@@ -22,7 +22,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-// ReportDialog.kt
 @Composable
 fun ReportDialog(
     onDismiss: () -> Unit,
@@ -33,11 +32,11 @@ fun ReportDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("신고하기") },
+        title = { Text("Report") },
         text = {
             Column {
                 Text(
-                    text = "신고 사유를 선택해주세요",
+                    text = "Choose a reason",
                     style = MaterialTheme.typography.bodyMedium
                 )
 
@@ -90,7 +89,7 @@ fun ReportDialog(
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("취소")
+                Text("Cancel")
             }
         }
     )

@@ -1,5 +1,6 @@
 package mp.verif_ai.presentation.screens.conversation
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -11,9 +12,11 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
+import mp.verif_ai.domain.util.shareText
 import mp.verif_ai.presentation.screens.components.CustomSnackbar
 import mp.verif_ai.presentation.screens.conversation.components.ConversationDetailPage
 import mp.verif_ai.presentation.screens.conversation.components.ConversationDetailTopBar
@@ -33,6 +36,7 @@ fun ConversationScreen(
     onNavigateToExpertProfile: (String) -> Unit,
     onNavigateToPointCharge: () -> Unit = {}
 ) {
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     var searchQuery by remember { mutableStateOf("") }
@@ -71,6 +75,14 @@ fun ConversationScreen(
                         actionLabel = "Close",
                         duration = SnackbarDuration.Short
                     )
+                }
+                is ConversationEvent.MessageCopied -> {
+                    // 복사 완료 토스트 메시지
+                    Toast.makeText(context, "메시지가 복사되었습니다", Toast.LENGTH_SHORT).show()
+                }
+                is ConversationEvent.ShareMessage -> {
+                    // 공유 기능 실행
+                    context.shareText(event.content)
                 }
                 else -> Unit
             }

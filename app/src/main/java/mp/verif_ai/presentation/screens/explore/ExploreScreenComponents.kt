@@ -1,8 +1,14 @@
 package mp.verif_ai.presentation.screens.explore
 
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -27,24 +33,61 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun CategoryChips(
-    modifier: Modifier = Modifier,
-    onCategorySelected: (String) -> Unit = {}
+    categories: Map<String, List<String>>,
+    selectedCategory: String?,
+    onCategorySelected: (String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    var selectedCategory by remember { mutableStateOf("") }
+    var expandedCategory by remember { mutableStateOf<String?>(null) }
 
-    LazyRow(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        items(listOf("All", "Trending", "Latest", "Awaiting Answers", "Answered")) { category ->
-            FilterChip(
-                selected = category == selectedCategory,
-                onClick = {
-                    selectedCategory = category
-                    onCategorySelected(category)
-                },
-                label = { Text(category) }
-            )
+    Column(modifier = modifier) {
+        // Main categories
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp)
+        ) {
+            item {
+                FilterChip(
+                    selected = selectedCategory == null,
+                    onClick = {
+                        onCategorySelected("")
+                        expandedCategory = null
+                    },
+                    label = { Text("Total") }
+                )
+            }
+
+            items(categories.keys.toList()) { category ->
+                FilterChip(
+                    selected = expandedCategory == category,
+                    onClick = {
+                        expandedCategory = if (expandedCategory == category) null else category
+                    },
+                    label = { Text(category) }
+                )
+            }
+        }
+
+        // Subcategories for expanded category
+        AnimatedVisibility(
+            visible = expandedCategory != null,
+            enter = expandVertically() + fadeIn(),
+            exit = shrinkVertically() + fadeOut()
+        ) {
+            expandedCategory?.let { category ->
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+                ) {
+                    items(categories[category] ?: emptyList()) { subCategory ->
+                        FilterChip(
+                            selected = selectedCategory == subCategory,
+                            onClick = { onCategorySelected(subCategory) },
+                            label = { Text(subCategory) }
+                        )
+                    }
+                }
+            }
         }
     }
 }
