@@ -36,7 +36,7 @@ fun TagSelection(
 
         FlowRow(
             modifier = Modifier.padding(horizontal = 4.dp),
-            horizontalArrangement = Arrangement.spacedBy(2.4.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             allTags.forEach { tag ->

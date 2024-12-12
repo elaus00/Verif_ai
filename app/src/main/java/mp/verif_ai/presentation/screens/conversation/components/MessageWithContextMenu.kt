@@ -7,6 +7,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -49,10 +50,10 @@ fun MessageWithContextMenu(
     if (canRequestExpertReview) {
         menuItems.add(
             MenuItem(
-                text = "전문가 검증 요청",
+                text = "Request validation for Expert",
                 icon = { color ->
                     Icon(
-                        imageVector = Icons.Default.Verified,
+                        imageVector = Icons.Outlined.CheckCircle,
                         contentDescription = null,
                         tint = if (pointBalance >= Adoption.EXPERT_REVIEW_POINTS) {
                             MaterialTheme.colorScheme.primary
@@ -61,7 +62,7 @@ fun MessageWithContextMenu(
                         }
                     )
                 },
-                subText = "필요 포인트: ${Adoption.EXPERT_REVIEW_POINTS}P",
+                subText = "Point needed: ${Adoption.EXPERT_REVIEW_POINTS}",
                 onClick = {
                     if (pointBalance <= Adoption.EXPERT_REVIEW_POINTS) {
                         onRequestExpertReview()
